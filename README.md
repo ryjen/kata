@@ -3,4 +3,4 @@ code kata for practice
 
 # collections
 
-See [README](src/collections/README.md)
+See [README](c/src/collections/README.md)

@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <setjmp.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,13 +18,21 @@ static int create_test_list(void **state)
     return 0;
 }
 
+static int test_int_compare(const void *a, const void *b, size_t size)
+{
+    int *i1 = (int *)a;
+    int *i2 = (int *)b;
+
+    return *i1 - *i2;
+}
+
 static a3list_item *random_list_item()
 {
     size_t size = sizeof(int);
     int *data = (int *)malloc(size);
     assert(data != NULL);
     *data = rand() % 1000;
-    return a3list_item_create(data, size);
+    return a3list_item_create(data, size, test_int_compare);
 }
 
 static int create_and_populate_test_list(void **state)
@@ -499,6 +508,40 @@ static void test_list_is_empty_invalid(void **state)
     assert_int_not_equal(a3list_is_empty(NULL), 0);
 }
 
+static void test_list_merge_sort_valid(void **state)
+{
+    a3list *list = (a3list *)*state;
+
+    int index = 0;
+
+    int values[] = {5, 7, 10, 3, 20, 4, 18, -1};
+
+    int sorted_values[] = {-1, 3, 4, 5, 7, 10, 18, 20};
+
+    size_t num_values = sizeof(values) / sizeof(values[0]);
+
+    for (index = 0; index < num_values; index++) {
+        a3list_add(list, a3list_item_create_static(&values[index], sizeof(int), test_int_compare));
+    }
+
+    assert_int_equal(a3list_size(list), num_values);
+
+    a3list_sort(list);
+
+    assert_int_equal(a3list_size(list), num_values);
+
+    for (index = 0; index < num_values; index++) {
+        int *item = (int *)a3list_get(list, index);
+        assert_int_equal(*item, sorted_values[index]);
+    }
+}
+static void test_list_sort_invalid(void **state)
+{
+    a3list *list = (a3list *)*state;
+
+    a3list_sort(NULL);
+}
+
 int main()
 {
     const struct CMUnitTest valid_tests[] = {
@@ -517,7 +560,8 @@ int main()
         cmocka_unit_test_setup_teardown(test_list_index_of_valid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_set_valid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_size_valid, create_and_populate_test_list, destroy_test_list),
-        cmocka_unit_test_setup_teardown(test_list_is_empty_valid, create_and_populate_test_list, destroy_test_list)};
+        cmocka_unit_test_setup_teardown(test_list_is_empty_valid, create_and_populate_test_list, destroy_test_list),
+        cmocka_unit_test_setup_teardown(test_list_merge_sort_valid, create_test_list, destroy_test_list)};
 
     const struct CMUnitTest invalid_tests[] = {
         cmocka_unit_test_setup_teardown(test_list_add_invalid, create_test_list, destroy_test_list),
@@ -535,7 +579,8 @@ int main()
         cmocka_unit_test_setup_teardown(test_list_index_of_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_set_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_size_invalid, create_and_populate_test_list, destroy_test_list),
-        cmocka_unit_test_setup_teardown(test_list_is_empty_invalid, create_and_populate_test_list, destroy_test_list)};
+        cmocka_unit_test_setup_teardown(test_list_is_empty_invalid, create_and_populate_test_list, destroy_test_list),
+        cmocka_unit_test_setup_teardown(test_list_sort_invalid, create_test_list, destroy_test_list)};
 
     int rval = cmocka_run_group_tests_name("valid tests", valid_tests, NULL, NULL);
 

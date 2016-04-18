@@ -25,18 +25,20 @@ struct a3list_item {
  *    compare = memcmp
  * @param  data the memory to use as a list item
  * @param  size the size of the data in bytes
+ * @param  comparator the compare function, can be null
  * @return      a list item
  */
-a3list_item *a3list_item_create(void *data, size_t size);
+a3list_item *a3list_item_create(void *data, size_t size, a3list_compare_fn comparator);
 
 /**
  * creates a list item suitable for adding to a list
  * this implementation will not destroy, copy or compare memory
  * @param  data the memory to use as a list item
  * @param  size the size of the data in bytes
+ * @param  comparator the compare function, can be NULL
  * @return      a list item
  */
-a3list_item *a3list_item_create_static(void *data, size_t size);
+a3list_item *a3list_item_create_static(void *data, size_t size, a3list_compare_fn comparator);
 
 /**
  * creates a list item suitable for adding to a list
@@ -46,11 +48,11 @@ a3list_item *a3list_item_create_static(void *data, size_t size);
  * @param  allocator  the function to allocate new memory (malloc)
  * @param  destructor the function to destroy the memory (free)
  * @param  copier     the function to copy the memory (memmove)
- * @param  comparer   the function to compare the memory (memcpy)
+ * @param  comparator the function to compare the memory (memcpy)
  * @return            a list item
  */
-a3list_item *a3list_item_create_transient(void *data, size_t size, a3list_alloc_fn allocator, a3list_destroy_fn destructor, a3list_copy_fn copier,
-                                          a3list_compare_fn comparer);
+a3list_item *a3list_item_create_transient(void *data, size_t size, a3list_compare_fn comparator, a3list_alloc_fn allocator,
+                                          a3list_destroy_fn destructor, a3list_copy_fn copier);
 
 /**
  * destroy a list item
@@ -67,7 +69,7 @@ void a3list_item_destroy(a3list_item *item);
 a3list_item *a3list_item_copy(const a3list_item *item);
 
 /**
- * compares two items.  the compare function must be set on the item
+ * compares two items.  the compare function must be set on the item, otherwise memcmp will be used
  * @param  item the item instance
  * @param  data the data to compare
  * @return      zero if equal

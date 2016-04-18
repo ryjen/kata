@@ -1,6 +1,6 @@
-#include <stdlib.h>
-
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "list-item.h"
 
@@ -91,6 +91,17 @@ static a3list_node *__a3list_get_node(const a3list *list, size_t index)
     return NULL;
 }
 
+static void __a3list_add_node(a3list *list, a3list_node *node)
+{
+    if (list == NULL || node == NULL) {
+        return;
+    }
+
+    node->next = list->first;
+    list->first = node;
+    list->size++;
+}
+
 void a3list_add(a3list *list, a3list_item *item)
 {
     a3list_node *node = NULL;
@@ -100,9 +111,8 @@ void a3list_add(a3list *list, a3list_item *item)
     }
 
     node = __a3list_node_create(item);
-    node->next = list->first;
-    list->first = node;
-    list->size++;
+
+    __a3list_add_node(list, node);
 }
 
 void a3list_add_index(a3list *list, size_t index, a3list_item *item)
@@ -413,4 +423,95 @@ size_t a3list_size(const a3list *list)
 int a3list_is_empty(const a3list *list)
 {
     return list == NULL || list->size == 0 || list->first == NULL;
+}
+
+static a3list_node *__a3list_merge_nodes(a3list_node *left, a3list_node *right)
+{
+    a3list_node *result = NULL, *last = NULL;
+    a3list_node *next = NULL;
+
+    while (left && right) {
+        if (a3list_item_compare(left->item, right->item->data) <= 0) {
+            next = left->next;
+            if (last == NULL) {
+                left->next = result;
+                result = left;
+            } else {
+                left->next = NULL;
+                last->next = left;
+            }
+            last = left;
+            left = next;
+        } else {
+            next = right->next;
+            if (last == NULL) {
+                right->next = result;
+                result = right;
+            } else {
+                right->next = NULL;
+                last->next = right;
+            }
+            last = right;
+            right = next;
+        }
+    }
+
+    if (left) {
+        if (last == NULL) {
+            result = left;
+        } else {
+            last->next = left;
+        }
+        last = left;
+    }
+
+    if (right) {
+        if (last == NULL) {
+            result = left;
+        } else {
+            last->next = right;
+        }
+        last = right;
+    }
+
+    return result;
+}
+
+static a3list_node *__a3list_merge_sort(a3list_node *first)
+{
+    a3list_node *left = NULL;
+    a3list_node *right = NULL;
+    a3list_node *node = NULL, *node_next = NULL;
+    size_t pos = 0;
+
+    /* make sure we have 2 items at least */
+    if (first == NULL || first->next == NULL) {
+        return first;
+    }
+
+    for (node = first; node; node = node_next, pos++) {
+        node_next = node->next;
+        if (pos % 2 != 0) {
+            node->next = left;
+            left = node;
+        } else {
+            node->next = right;
+            right = node;
+        }
+    }
+
+    left = __a3list_merge_sort(left);
+    right = __a3list_merge_sort(right);
+
+    return __a3list_merge_nodes(left, right);
+}
+
+void a3list_sort(a3list *list)
+{
+    // Base case. A list of zero or one elements is sorted, by definition.
+    if (a3list_size(list) <= 1) {
+        return;
+    }
+
+    list->first = __a3list_merge_sort(list->first);
 }

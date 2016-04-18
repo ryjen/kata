@@ -16,7 +16,7 @@ examples:
   size_t data_size = ...
   void *data = ...
 
-  /* create an item using stlib memory function */
+  /* create an item using stdlib memory function */
 	a3list_item *item = a3list_item_create(data, data_size);
 
   /* create an item with no memory functions, data will not be destroyed or copied */
@@ -56,11 +56,12 @@ examples:
 ### get some data
 ```c
   void *data = a3list_get(list, 1);
+
   size_t size = a3list_get_size(list, 1);
 ```
 
 ### properties
-```
+```c
   size_t list_size = a3list_size(list);
 
   int index = a3list_index_of(list, data);
@@ -68,4 +69,8 @@ examples:
   bool is_empty = a3list_is_empty(list);
 ```
 
+### sorting
+```c
+  a3list_sort(list);
+```
 

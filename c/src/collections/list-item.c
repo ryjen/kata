@@ -5,18 +5,18 @@
 
 #include "list-item.h"
 
-a3list_item *a3list_item_create(void *data, size_t size)
+a3list_item *a3list_item_create(void *data, size_t size, a3list_compare_fn comparer)
 {
-    return a3list_item_create_transient(data, size, malloc, free, memmove, memcmp);
+    return a3list_item_create_transient(data, size, comparer, malloc, free, memmove);
 }
 
-a3list_item *a3list_item_create_static(void *data, size_t size)
+a3list_item *a3list_item_create_static(void *data, size_t size, a3list_compare_fn comparer)
 {
-    return a3list_item_create_transient(data, size, NULL, NULL, NULL, NULL);
+    return a3list_item_create_transient(data, size, comparer, NULL, NULL, NULL);
 }
 
-a3list_item *a3list_item_create_transient(void *data, size_t size, a3list_alloc_fn allocator, a3list_destroy_fn destructor, a3list_copy_fn copier,
-                                          a3list_compare_fn comparer)
+a3list_item *a3list_item_create_transient(void *data, size_t size, a3list_compare_fn comparer, a3list_alloc_fn allocator,
+                                          a3list_destroy_fn destructor, a3list_copy_fn copier)
 {
     a3list_item *item = malloc(sizeof(*item));
     assert(item != NULL);
@@ -70,17 +70,19 @@ a3list_item *a3list_item_copy(const a3list_item *orig)
 
 int a3list_item_compare(const a3list_item *item, const void *data)
 {
-    if (item == NULL) {
-        return -1;
-    }
+    assert(item != NULL);
 
     if (item->data == NULL && data == NULL) {
         return 0;
     }
 
-    if (item->comparer == NULL || data == NULL) {
+    if (item->data == NULL || data == NULL) {
         return -1;
     }
 
-    return (*item->comparer)(item->data, data, item->size);
+    if (item->comparer) {
+        return (*item->comparer)(item->data, data, item->size);
+    } else {
+        return memcmp(item->data, data, item->size);
+    }
 }

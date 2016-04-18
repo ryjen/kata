@@ -152,4 +152,11 @@ size_t a3list_size(const a3list *list);
  */
 int a3list_is_empty(const a3list *list);
 
+
+/**
+ * sorts the list using a mergesort
+ * @param  list the list instance
+ */
+void a3list_sort(a3list *list);
+
 #endif

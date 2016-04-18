@@ -17,13 +17,13 @@ examples:
   void *data = ...
 
   /* create an item using stdlib memory function */
-	a3list_item *item = a3list_item_create(data, data_size);
+	a3list_item *item = a3list_item_create(data, data_size, memcmp);
 
   /* create an item with no memory functions, data will not be destroyed or copied */
-	item = a3list_item_create_static(data, data_size);
+	item = a3list_item_create_static(data, data_size, memcmp);
 
   /* create an item with custom memory functions */
-	item = a3list_item_create_transient(data, data_size, malloc, free, memmove, memcmp);
+	item = a3list_item_create_transient(data, data_size, memcmp, malloc, free, memmove);
 ```
 
 ### add some data:
@@ -46,7 +46,7 @@ examples:
   a3list_clear(list);
 ```
 
-### test some data
+### some data exist?
 ```c
   bool val = a3list_contains(list, data);
 

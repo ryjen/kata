@@ -33,6 +33,10 @@ examples:
 	a3list_add_index(list, 1, item);
 
   a3list_set(list, 1, item);
+
+  a3list_add_all(list, other_list);
+
+  a3list_add_all_index(list, 1, other_list);
 ```
 
 ### remove some data

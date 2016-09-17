@@ -32,3 +32,7 @@
 *.dSYM/
 debug
 .DS_Store
+.gradle
+.idea
+/build/
+/out/

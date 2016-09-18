@@ -5,13 +5,13 @@
 
 #define WIN32_LEAN_AND_MEAN
 
-#include <cstdarg>
-#include <cstdio>
+#include <io.h>
+#include <stdint.h>
 #include <time.h>
 #include <windows.h>
 #include <winsock2.h>
-#include <stdint.h>
-#include <io.h>
+#include <cstdarg>
+#include <cstdio>
 
 #define open _open
 #define close _close
@@ -19,38 +19,33 @@
 #define write _write
 #define lseek _lseek
 
-#ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
-
 int dprintf(int fd, const char *fmt, ...)
 {
-	char buf[1024];
-	va_list args;
-	va_start(args, fmt);
-	int rc = vsnprintf(buf, sizeof(buf), fmt, args);
-	return ::write(fd, buf, rc);
+    char buf[1024];
+    va_list args;
+    va_start(args, fmt);
+    int rc = vsnprintf(buf, sizeof(buf), fmt, args);
+    return ::write(fd, buf, rc);
 }
-int gettimeofday(struct timeval * tp, struct timezone * tzp)
+int gettimeofday(struct timeval *tp, struct timezone *tzp)
 {
-	// Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
-	static const uint64_t EPOCH = ((uint64_t)116444736000000000ULL);
+    // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
+    static const uint64_t EPOCH = ((uint64_t)116444736000000000ULL);
 
-	SYSTEMTIME  system_time;
-	FILETIME    file_time;
-	uint64_t    time;
+    SYSTEMTIME system_time;
+    FILETIME file_time;
+    uint64_t time;
 
-	GetSystemTime(&system_time);
-	SystemTimeToFileTime(&system_time, &file_time);
-	time = ((uint64_t)file_time.dwLowDateTime);
-	time += ((uint64_t)file_time.dwHighDateTime) << 32;
+    GetSystemTime(&system_time);
+    SystemTimeToFileTime(&system_time, &file_time);
+    time = ((uint64_t)file_time.dwLowDateTime);
+    time += ((uint64_t)file_time.dwHighDateTime) << 32;
 
-	tp->tv_sec = (long)((time - EPOCH) / 10000000L);
-	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
-	return 0;
+    tp->tv_sec = (long)((time - EPOCH) / 10000000L);
+    tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
+    return 0;
 }
 
 #endif
 
 #endif
-

@@ -1,5 +1,9 @@
+#ifndef WIN32
 #include <sys/time.h>
-#import <iomanip>
+#else
+#include "win_compat.hpp"
+#endif
+#include <iomanip>
 #include <sstream>
 #include "import.hpp"
 
@@ -116,7 +120,7 @@ int main(int argc, char *argv[])
     acl::Timer timer;
     acl::Timer task;
 
-    srand(time(0));
+    srand(static_cast<unsigned>(time(0)));
 
     std::cout << "Generating test file for " << NUMBER_OF_RECORDS << " records... " << std::flush;
     task.start();

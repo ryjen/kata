@@ -36,3 +36,9 @@ debug
 .idea
 /build/
 /out/
+/c++/csv_import/.vs/CSVRecord/v14
+/c++/csv_import/CSVRecordTest.vcxproj.user
+/c++/csv_import/CSVRecord.VC.VC.opendb
+/c++/csv_import/CSVRecord.VC.db
+/c++/csv_import/CSVRecordTest.vcxproj.filters
+/c++/csv_import/CSVRecord.vcxproj.filters

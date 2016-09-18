@@ -7,14 +7,11 @@
 #include <vector>
 
 #ifdef WIN32
+#include "win_compat.hpp"
 #else
-#include <fcntl.h>
 #include <unistd.h>
 #endif
-
-#ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
+#include <fcntl.h>
 
 namespace acl
 {
@@ -334,16 +331,6 @@ namespace acl
         {
         }
 
-        ~RecordWriter()
-        {
-            // make sure we sync up
-            if (fd_ != -1) {
-                if (::fsync(fd_) == -1) {
-                    perror("write sync");
-                }
-            }
-        }
-
         /**
          * write a reader to file
          * @param reader the reader to read from
@@ -362,7 +349,7 @@ namespace acl
             // for each record...
             while ((state = reader.read(record))) {
                 // and each field....
-                for (int i = 0; i < record.size(); i++) {
+                for (size_t i = 0; i < record.size(); i++) {
                     // write to file
                     if (!write(record[i], reader.fieldSize(i))) {
                         return false;
@@ -399,12 +386,12 @@ namespace acl
             switch (field.type) {
                 case Field::String:
                     // left align
-                    rv = ::dprintf(fd_, "%*s ", -size, field.value.c_str());
+                    rv = dprintf(fd_, "%*s ", -size, field.value.c_str());
                     break;
                 case Field::Integer:
                 case Field::Decimal:
                     // right align
-                    rv = ::dprintf(fd_, "%*s ", size, field.value.c_str());
+                    rv = dprintf(fd_, "%*s ", size, field.value.c_str());
                     break;
             }
 

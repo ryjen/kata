@@ -1,4 +1,4 @@
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/time.h>
 #else
 #include "win_compat.hpp"

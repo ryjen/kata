@@ -42,3 +42,5 @@ debug
 /c++/csv_import/CSVRecord.VC.db
 /c++/csv_import/CSVRecordTest.vcxproj.filters
 /c++/csv_import/CSVRecord.vcxproj.filters
+/c++/CSVRecord/CSVRecord.VC.db
+/c++/CSVRecord/CSVRecord.VC.VC.opendb

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "win_compat.hpp"
 #else
 #include <unistd.h>
@@ -191,12 +191,12 @@ namespace acl
         /**
          * get the size of a scanned field
          */
-        size_t fieldSize(size_t i) const
+        int fieldSize(size_t i) const
         {
             if (i >= columnSizes_.size()) {
                 return 0;
             }
-            return columnSizes_[i];
+            return static_cast<int>(columnSizes_[i]);
         }
 
         /**

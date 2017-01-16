@@ -1,10 +1,15 @@
 
+file(GLOB_RECURSE ALGORITHMS_SRC ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/*.c)
+file(GLOB_RECURSE COLLECTIONS_SRC ${CMAKE_CURRENT_SOURCE_DIR}/collections/*.c)
 
-add_executable (${PROJECT_NAME}-collections-test 
-	collections/list-test.c
+add_executable(${KATA_TEST}
+	kata.c
+	${ALGORITHMS_SRC}
+	${COLLECTIONS_SRC}
 )
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+target_include_directories(${KATA_TEST} PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
-target_link_libraries(${PROJECT_NAME}-collections-test ${PROJECT_NAME}-collections cmocka)
+target_link_libraries(${KATA_TEST} ${ALGORITHMS_LIB} ${COLLECTIONS_LIB} cmocka)
+
 

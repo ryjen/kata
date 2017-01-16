@@ -542,7 +542,7 @@ static void test_list_sort_invalid(void **state)
     a3list_sort(NULL);
 }
 
-int main()
+int run_list_tests()
 {
     const struct CMUnitTest valid_tests[] = {
         cmocka_unit_test_setup_teardown(test_list_add_valid, create_test_list, destroy_test_list),
@@ -582,11 +582,12 @@ int main()
         cmocka_unit_test_setup_teardown(test_list_is_empty_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_sort_invalid, create_test_list, destroy_test_list)};
 
-    int rval = cmocka_run_group_tests_name("valid tests", valid_tests, NULL, NULL);
+    int rval = cmocka_run_group_tests_name("list valid tests", valid_tests, NULL, NULL);
 
     if (rval) {
         return rval;
     }
 
-    return cmocka_run_group_tests_name("invalid tests", invalid_tests, NULL, NULL);
+    return cmocka_run_group_tests_name("list invalid tests", invalid_tests, NULL, NULL);
 }
+

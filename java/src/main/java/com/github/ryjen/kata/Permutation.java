@@ -26,7 +26,7 @@ public final class Permutation<T> extends ArrayList<List<T>> {
             Permutation<T> current = new Permutation();
 
             for (List<T> list : result) {
-                for (int i = 0; i < list.size()+1; i++) {
+                for (int i = 0; i < list.size() + 1; i++) {
                     list.add(i, element);
 
                     List<T> temp = new ArrayList<>(list);

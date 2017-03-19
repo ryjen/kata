@@ -1,60 +1,58 @@
-package com.github.ryjen.kata;
+package com.github.ryjen.kata.heap;
+
+import com.github.ryjen.kata.heap.exceptions.HeapCapacityException;
+import com.github.ryjen.kata.heap.iterators.HeapIterator;
 
 import java.lang.reflect.Array;
 import java.util.*;
 
 /**
- * A priority queue implementation using a max heap array
- * @param <T>
+ * A dynamic array heap implementation
+ *
+ * @param <E> the type of elements in the heap
  */
-public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneable {
+public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     private final List<E> values;
-    private final Comparator comparator;
+    private final Comparator<E> comparator;
     private final int capacity;
 
-    public static class Max<E extends Comparable<E>> extends Heap<E> {
-        public Max(int capacity) {
-            super(capacity, Comparator.naturalOrder());
-        }
-    }
-
-    public static class Min<E extends Comparable<E>> extends Heap<E> {
-        public Min(int capacity) {
-            super(capacity, Comparator.reverseOrder());
-        }
-    }
-
-    private Heap(int capacity, Comparator<E> comparator) {
+    /**
+     * constructs a new heap
+     *
+     * @param capacity   the capacity of the heap
+     * @param comparator how to compare heap elements
+     */
+    protected Heap(int capacity, Comparator<E> comparator) {
         this.values = new ArrayList<>(capacity);
         this.comparator = comparator;
         this.capacity = capacity;
     }
 
-    private Heap(Heap<E> other) {
+    /**
+     * copy constructor
+     *
+     * @param other the heap to copy from
+     */
+    protected Heap(Heap<E> other) {
         this.values = new ArrayList<>(other.values);
         this.comparator = other.comparator;
         this.capacity = other.capacity;
     }
 
-    private static int getParent(int index) {
-        if (index < 0) {
-            return 0;
-        }
-        return (index - 1) / 2;
-    }
+    /**
+     * copy an instance of a heap
+     *
+     * @return a heap copy of the type
+     */
+    public abstract Heap<E> copy();
 
-    private static int getLeftChild(int index) {
-        if (index < 0) {
-            return 0;
-        }
-        return (2 * index) + 1;
-    }
-
-    private static int getRightChild(int index) {
-        return getLeftChild(index) + 1;
-    }
-
+    /**
+     * swap two elements in the heap
+     *
+     * @param a the first element
+     * @param b the second element
+     */
     private void swap(int a, int b) {
         assert a >= 0 && a < values.size();
         assert b >= 0 && b < values.size();
@@ -63,13 +61,27 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
         values.set(b, temp);
     }
 
-    private boolean compare(int a, int b) {
+    /**
+     * compare two elements in the heap
+     *
+     * @param a the first element
+     * @param b the second element
+     * @return true if a is less than b
+     */
+    private boolean isMin(int a, int b) {
         assert a >= 0 && a < values.size();
         assert b >= 0 && b < values.size();
-        return compare(values.get(a), values.get(b));
+        return isMin(values.get(a), values.get(b));
     }
 
-    private boolean compare(E a, E b) {
+    /**
+     * compare two elements in the heap
+     *
+     * @param a the first element
+     * @param b the second element
+     * @return true if a is less than b
+     */
+    private boolean isMin(E a, E b) {
         assert a != null;
         assert b != null;
         if (this.comparator != null) {
@@ -79,17 +91,29 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
         }
     }
 
+    /**
+     * adds an element to the heap
+     * @throws HeapCapacityException if the heap is at capacity already
+     * @param value the element to add
+     * @return true if added
+     */
     public boolean add(E value) {
         assert value != null;
         // add if less then capacity
         if (size() >= capacity) {
-            throw new IllegalStateException();
+            throw new HeapCapacityException();
         }
 
         return heapify(value);
     }
 
-
+    /**
+     * removes an element at a position
+     * @param position the position to remove
+     * @param error the handler for an empty heap
+     * @throws NoSuchElementException if the error handler does
+     * @return the element removed or the error handler return value
+     */
     private E remove(int position, NullHandler<E> error) {
         if (values.isEmpty()) {
             return error.apply();
@@ -100,6 +124,11 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
         return removeNode;
     }
 
+    /**
+     * removes an element from the heap
+     * @param o the element
+     * @return true if removed or null
+     */
     @Override
     public boolean remove(Object o) {
 
@@ -111,11 +140,21 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
         return remove(index, () -> null) != null;
     }
 
+    /**
+     * test if all elements in a collection are contained in the heap
+     * @param c the collection of elements
+     * @return true if all of c exist in the heap
+     */
     @Override
     public boolean containsAll(Collection<?> c) {
         return values.containsAll(c);
     }
 
+    /**
+     * adds a collection of elements to the heap
+     * @param c the collection of elements
+     * @return true if all elements were added
+     */
     @Override
     public boolean addAll(Collection<? extends E> c) {
         for (E e : c) {
@@ -126,6 +165,11 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
         return true;
     }
 
+    /**
+     * remove all elements in a collection from the heap
+     * @param c the collection of elements
+     * @return true if all elements were removed
+     */
     @Override
     public boolean removeAll(Collection<?> c) {
         for (Object o : c) {
@@ -136,6 +180,11 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
         return true;
     }
 
+    /**
+     * remove all elements not contained in a collection
+     * @param c the collection of elements to keep
+     * @return true if all other elements were removed
+     */
     @Override
     public boolean retainAll(Collection<?> c) {
         Collection<E> others = new ArrayList<>();
@@ -147,18 +196,28 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
         return removeAll(others);
     }
 
+    /**
+     * clear all values in the heap
+     */
     @Override
     public void clear() {
         values.clear();
     }
 
+    /**
+     * offer a value to the heap
+     *
+     * @param value the element
+     * @return true if added to the heap
+     */
+    @Override
     public boolean offer(E value) {
         assert value != null;
         if (size() < capacity) {
             return heapify(value);
-        } else if (compare(peek(), value)) {
-            boolean success  =  heapify(value);
-            values.remove(values.size()-1);
+        } else if (isMin(peek(), value)) {
+            boolean success = heapify(value);
+            values.remove(values.size() - 1);
             return success;
         }
         return false;
@@ -167,14 +226,14 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
     /**
      * add a value and bubble it up
      *
-     * @param value
+     * @param value the element to add
      */
     private boolean heapify(E value) {
         assert value != null;
         // append value
         if (values.add(value)) {
             // bubble it up
-            int start = getParent(values.size() - 1);
+            int start = Util.parent(values.size() - 1);
             while (start >= 0) {
                 bubbleUp(start--, values.size() - 1);
             }
@@ -187,14 +246,14 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
     /**
      * bubble a value from the bottom of the heap to its correct location
      *
-     * @param start
-     * @param end
+     * @param start the start position
+     * @param end the end position
      */
     private void bubbleUp(int start, int end) {
         int child = end;
         while (child >= start) {
-            int parent = getParent(child);
-            if (compare(parent, child)) {
+            int parent = Util.parent(child);
+            if (isMin(parent, child)) {
                 swap(parent, child);
                 child = parent;
             } else {
@@ -206,21 +265,21 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
     /**
      * bubble down a value to its correct position
      *
-     * @param start
-     * @param end
+     * @param start the start position
+     * @param end the end position
      */
     private void bubbleDown(int start, int end) {
         int root = start;
 
-        int child = getLeftChild(root);
+        int child = Util.leftChild(root);
 
         while (child <= end) {
             int swap = root;
 
-            if (compare(swap, child)) {
+            if (isMin(swap, child)) {
                 swap = child;
             }
-            if (child + 1 <= end && compare(swap, child + 1)) {
+            if (child + 1 <= end && isMin(swap, child + 1)) {
                 swap = child + 1;
             }
             if (swap == root) {
@@ -228,55 +287,93 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
             }
             swap(root, swap);
             root = swap;
-            child = getLeftChild(root);
+            child = Util.leftChild(root);
         }
     }
 
+    /**
+     * remove the top element in the heap
+     * @return the element removed
+     * @throws NoSuchElementException if the heap is empty
+     */
     public E remove() {
         return remove(0, () -> {
             throw new NoSuchElementException();
         });
     }
 
+    /**
+     * remove the top element in the heap
+     * @return the top element or null
+     */
     public E poll() {
         return remove(0, () -> null);
     }
 
+    /**
+     * gets the size of the heap
+     * @return the heap size
+     */
     public int size() {
         return values.size();
     }
 
+    /**
+     * tests if the heap is empty
+     * @return true if the heap is empty
+     */
     public boolean isEmpty() {
         return values.isEmpty();
     }
 
+    /**
+     * tests if an element exists in the heap
+     * @param o the element to test
+     * @return true if the element exists
+     */
     @Override
     public boolean contains(Object o) {
         return values.contains(o);
     }
 
+    /**
+     * gets an element at a position
+     * @param position the position of the element
+     * @param error the error handler
+     * @return the element or the return value of the error handler
+     * @throws NoSuchElementException if the error handler does
+     */
     private E get(int position, NullHandler<E> error) {
         if (values.isEmpty()) {
             return error.apply();
         }
-        int parent = getParent(position);
-        int child = getLeftChild(parent);
+        int parent = Util.parent(position);
+        int child = Util.leftChild(parent);
         return values.get(child);
     }
 
+    /**
+     * gets the top element
+     * @return the element
+     * @throws NoSuchElementException if the heap is empty
+     */
     public E element() {
         return get(0, () -> {
             throw new NoSuchElementException();
         });
     }
 
+    /**
+     * looks at the top element
+     * @return the top element or null
+     */
     public E peek() {
         return get(0, () -> null);
     }
 
     @Override
-    public Iterator iterator() {
-        return new Iterator(this);
+    public Iterator<E> iterator() {
+        return new HeapIterator<>(this);
     }
 
     @Override
@@ -302,29 +399,9 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E>, Cloneab
     }
 
     /**
-     * iterate a max heap copy
+     * utility for errors
+     * @param <E> the type of element
      */
-    public class Iterator implements java.util.Iterator<E> {
-
-        Heap<E> heap;
-
-        public Iterator(Heap<E> heap) {
-            this.heap = new Heap<E>(heap) { };
-        }
-
-        public boolean hasNext() {
-            return !heap.isEmpty();
-        }
-
-        public E next() {
-            return heap.remove();
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
     private interface NullHandler<E> {
         E apply();
     }

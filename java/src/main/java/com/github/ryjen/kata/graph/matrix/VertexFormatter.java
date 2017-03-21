@@ -1,31 +1,29 @@
-package com.github.ryjen.kata.graph.formatters;
+package com.github.ryjen.kata.graph.matrix;
 
-import com.github.ryjen.kata.graph.Graph;
-import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.Formatter;
 
-import java.util.Iterator;
 import java.util.OptionalInt;
 import java.util.stream.StreamSupport;
 
 /**
  * a formatter that displays vertices
  */
-public class GraphVertexFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
+public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
     final int width;
-    final Graph<Vertex> graph;
+    final MatrixGraph<Vertex> graph;
 
     /**
      * construct a new graph vertex formatter
      *
      * @param graph the graph to format
      */
-    public GraphVertexFormatter(Graph<Vertex> graph) {
+    public VertexFormatter(MatrixGraph<Vertex> graph) {
         assert graph != null;
         this.graph = graph;
         OptionalInt vertexWidth = StreamSupport.stream(graph.vertices().spliterator(), false)
                 .mapToInt(value -> String.valueOf(value).length()).max();
-        OptionalInt edgeWidth = StreamSupport.stream(graph.edges().spliterator(), false).flatMapToInt(row ->
-                StreamSupport.stream(row.spliterator(), false).mapToInt(edge -> String.valueOf(edge).length())).max();
+        OptionalInt edgeWidth = StreamSupport.stream(graph.edges().spliterator(), false)
+                .mapToInt(edge -> String.valueOf(edge).length()).max();
         width = Math.max(vertexWidth.getAsInt(), edgeWidth.getAsInt());
     }
 
@@ -44,17 +42,19 @@ public class GraphVertexFormatter<Vertex extends Comparable<Vertex>> implements 
     public void format(StringBuilder buf) {
         header(buf);
 
-        Iterator<Vertex> vertices = graph.vertices().iterator();
+        for (int row = 0; row < graph.size(); row++) {
 
-        for (Iterable<Edge> row : graph.edges()) {
-            if (vertices.hasNext()) {
-                buf.append(format(vertices.next()));
-            } else {
-                buf.append(format(""));
-            }
+            buf.append(format(graph.getVertex(row)));
+
             buf.append(" │ ");
-            for (Edge edge : row) {
-                buf.append(format(edge)).append(' ');
+
+            for (int col = 0; col < graph.size(); col++) {
+                if (graph.isEdge(row, col)) {
+                    buf.append(format(graph.getEdge(row, col)));
+                } else {
+                    buf.append(format(graph.emptyEdge()));
+                }
+                buf.append(' ');
             }
             buf.append('\n');
         }
@@ -70,8 +70,8 @@ public class GraphVertexFormatter<Vertex extends Comparable<Vertex>> implements 
             buf.append(' ');
         }
         buf.append(" │ ");
-        for (Vertex vertex : graph.vertices()) {
-            buf.append(format(vertex)).append(' ');
+        for (int i = 0; i < graph.size(); i++) {
+            buf.append(format(graph.getVertex(i))).append(' ');
         }
         buf.append('\n');
         for (int i = 0; i < width; i++) {

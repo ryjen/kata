@@ -4,7 +4,9 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by ryan on 2017-02-04.
@@ -14,7 +16,7 @@ public class PermutationTest extends TestCase {
     private static <T> void assertListEquality(List<T> expected, List<T> actual) {
         Assert.assertEquals(expected.size(), actual.size());
 
-        for(int i = 0; i < expected.size(); i++) {
+        for (int i = 0; i < expected.size(); i++) {
             Assert.assertEquals(expected.get(i), actual.get(i));
         }
     }

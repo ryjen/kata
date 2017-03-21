@@ -26,7 +26,7 @@ public class HeapTest {
         Assert.assertTrue(heap.offer(4));
         Assert.assertTrue(heap.offer(10));
         Assert.assertFalse(heap.offer(7));
-        Assert.assertTrue(heap.offer( 13));
+        Assert.assertTrue(heap.offer(13));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.github.ryjen.kata.graph;
+package com.github.ryjen.kata.graph.matrix;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  */
 class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Iterator<Vertex>, Iterable<Vertex> {
 
-    final AdjacencyGraph<Vertex> graph;
+    final MatrixGraph<Vertex> graph;
     final int v;
     int u;
 
@@ -18,7 +18,7 @@ class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Itera
      * @param graph  the graph to search
      * @param vertex the vertex index to search from
      */
-    AdjacentVertexIterator(AdjacencyGraph<Vertex> graph, int vertex) {
+    AdjacentVertexIterator(MatrixGraph<Vertex> graph, int vertex) {
         assert graph != null;
         assert vertex >= 0 && vertex < graph.size();
         this.graph = graph;

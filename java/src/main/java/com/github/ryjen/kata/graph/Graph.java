@@ -23,7 +23,9 @@ public interface Graph<Vertex extends Comparable<Vertex>> {
 
     Iterable<Vertex> vertices();
 
-    Iterable<Iterable<Edge>> edges();
+    Iterable<Edge> edges();
 
     int degree(Vertex vertex);
+
+    boolean isDirected();
 }

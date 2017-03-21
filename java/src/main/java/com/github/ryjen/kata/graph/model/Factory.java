@@ -1,6 +1,7 @@
 package com.github.ryjen.kata.graph.model;
 
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Describes how to create vertices and edges in a graph
@@ -22,14 +23,13 @@ public interface Factory<V extends Comparable<V>> {
      */
     Edge emptyEdge();
 
+
     /**
-     * creates an array of vertices
+     * initializes the vertices
      *
-     * @param size the size of the array
-     * @return an array of vertices
-     * NOTE: whether the implementation fills the array or not is up to the implementation
+     * @return the list of vertices or null
      */
-    V[] createVertices(int size);
+    List<V> initialVertices();
 
     /**
      * creates a comparator for vertices

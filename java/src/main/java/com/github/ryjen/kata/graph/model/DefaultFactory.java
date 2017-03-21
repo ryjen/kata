@@ -1,9 +1,13 @@
 package com.github.ryjen.kata.graph.model;
 
-import java.lang.reflect.Array;
 import java.util.Comparator;
+import java.util.List;
 
-public class TypeFactory<V extends Comparable<V>> implements Factory<V> {
+/**
+ * Created by ryanjennings on 2017-03-20.
+ */
+public class DefaultFactory<Vertex extends Comparable<Vertex>> implements Factory<Vertex> {
+
     /**
      * single reference to an empty edge
      */
@@ -43,11 +47,6 @@ public class TypeFactory<V extends Comparable<V>> implements Factory<V> {
             return false;
         }
     };
-    Class<V> type;
-
-    public TypeFactory(Class<V> type) {
-        this.type = type;
-    }
 
     @Override
     public Edge createEdge() {
@@ -60,13 +59,12 @@ public class TypeFactory<V extends Comparable<V>> implements Factory<V> {
     }
 
     @Override
-    public V[] createVertices(int size) {
-        return (V[]) Array.newInstance(type, size);
-    }
-
-    @Override
-    public Comparator<V> createComparator() {
+    public List<Vertex> initialVertices() {
         return null;
     }
 
+    @Override
+    public Comparator<Vertex> createComparator() {
+        return null;
+    }
 }

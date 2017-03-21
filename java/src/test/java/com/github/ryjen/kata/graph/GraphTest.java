@@ -1,8 +1,6 @@
 package com.github.ryjen.kata.graph;
 
-import com.github.ryjen.kata.graph.exceptions.VertexLimitException;
-import com.github.ryjen.kata.graph.model.Factory;
-import com.github.ryjen.kata.graph.model.TypeFactory;
+import com.github.ryjen.kata.graph.matrix.MatrixGraph;
 import com.github.ryjen.kata.graph.search.Search;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -17,24 +15,10 @@ import java.util.List;
  * Created by ryan on 2017-03-18.
  */
 public class GraphTest {
-    private static final Factory<Integer> INDEX_FACTORY = new TypeFactory<Integer>(Integer.class) {
-        @Override
-        public Integer[] createVertices(int size) {
-            Integer[] value = super.createVertices(size);
-
-            for (int i = 0; i < size; i++) {
-                value[i] = i;
-            }
-            return value;
-        }
-    };
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     public static void main(String[] args) {
 
-        AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 5);
+        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(5));
 
         System.out.println("Test 1:\n");
 
@@ -48,7 +32,7 @@ public class GraphTest {
 
         System.out.println(graph);
 
-        graph = new AdjacencyGraph<>(INDEX_FACTORY, 4);
+        graph = new MatrixGraph<>(new IndexFactory(4));
 
         System.out.println("Test 2:\n");
 
@@ -61,7 +45,7 @@ public class GraphTest {
 
     @Test
     public void testAddEdgeUndirected() {
-        AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 4);
+        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4));
         Assert.assertFalse(graph.isDirected());
         graph.addEdge(1, 2);
         Assert.assertTrue(graph.isEdge(1, 2));
@@ -70,7 +54,7 @@ public class GraphTest {
 
     @Test
     public void testAddEdgeDirected() {
-        AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 4, true);
+        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), true);
         Assert.assertTrue(graph.isDirected());
         graph.addEdge(1, 2);
         Assert.assertTrue(graph.isEdge(1, 2));
@@ -79,7 +63,7 @@ public class GraphTest {
 
     @Test
     public void testToStringUndirected() {
-        AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 4, false);
+        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), false);
 
         Assert.assertFalse(graph.isDirected());
 
@@ -100,9 +84,7 @@ public class GraphTest {
 
     @Test
     public void testToStringVertices() {
-        Factory<Character> factory = new TypeFactory<>(Character.class);
-
-        AdjacencyGraph<Character> graph = new AdjacencyGraph<>(factory, 5);
+        MatrixGraph<Character> graph = new MatrixGraph<>();
 
         graph.addVertices('A', 'B', 'C', 'D', 'Z');
 
@@ -125,7 +107,7 @@ public class GraphTest {
 
     @Test
     public void testToStringDirected() {
-        AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 4, true);
+        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), true);
 
         Assert.assertTrue(graph.isDirected());
 
@@ -146,7 +128,7 @@ public class GraphTest {
 
     @Test
     public void testDegreeUndirected() {
-        AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 4, false);
+        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), false);
 
         graph.addEdge(1, 2);
 
@@ -173,7 +155,7 @@ public class GraphTest {
 
     @Test
     public void testDegreeDirected() {
-        AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 4, true);
+        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), true);
 
         graph.addEdge(1, 2);
 
@@ -214,23 +196,8 @@ public class GraphTest {
     }
 
     @Test
-    public void testAddVertex() {
-        Factory<Character> factory = new TypeFactory<>(Character.class);
-
-        AdjacencyGraph<Character> graph = new AdjacencyGraph<>(factory, 5);
-
-        graph.addVertices('A', 'B', 'C', 'D', 'Z');
-
-        exception.expect(VertexLimitException.class);
-
-        graph.addVertex('Y');
-    }
-
-    @Test
     public void testVertexFormatting() {
-        Factory<String> factory = new TypeFactory<>(String.class);
-
-        AdjacencyGraph<String> graph = new AdjacencyGraph<>(factory, 5);
+        MatrixGraph<String> graph = new MatrixGraph<>();
 
         graph.addVertices("Hello", "World", "Robot", "Unnecessary", "Point");
 
@@ -257,7 +224,7 @@ public class GraphTest {
     @Test
     public void testSearch() {
 
-        final AdjacencyGraph<Integer> graph = new AdjacencyGraph<>(INDEX_FACTORY, 8, false);
+        final MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(8), false);
 
         final List<Integer> results = new ArrayList<>();
 

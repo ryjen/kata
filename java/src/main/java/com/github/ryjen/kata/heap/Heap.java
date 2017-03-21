@@ -93,9 +93,10 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * adds an element to the heap
-     * @throws HeapCapacityException if the heap is at capacity already
+     *
      * @param value the element to add
      * @return true if added
+     * @throws HeapCapacityException if the heap is at capacity already
      */
     public boolean add(E value) {
         assert value != null;
@@ -109,10 +110,11 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * removes an element at a position
+     *
      * @param position the position to remove
-     * @param error the handler for an empty heap
-     * @throws NoSuchElementException if the error handler does
+     * @param error    the handler for an empty heap
      * @return the element removed or the error handler return value
+     * @throws NoSuchElementException if the error handler does
      */
     private E remove(int position, NullHandler<E> error) {
         if (values.isEmpty()) {
@@ -126,6 +128,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * removes an element from the heap
+     *
      * @param o the element
      * @return true if removed or null
      */
@@ -142,6 +145,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * test if all elements in a collection are contained in the heap
+     *
      * @param c the collection of elements
      * @return true if all of c exist in the heap
      */
@@ -152,6 +156,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * adds a collection of elements to the heap
+     *
      * @param c the collection of elements
      * @return true if all elements were added
      */
@@ -167,6 +172,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * remove all elements in a collection from the heap
+     *
      * @param c the collection of elements
      * @return true if all elements were removed
      */
@@ -182,6 +188,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * remove all elements not contained in a collection
+     *
      * @param c the collection of elements to keep
      * @return true if all other elements were removed
      */
@@ -247,7 +254,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
      * bubble a value from the bottom of the heap to its correct location
      *
      * @param start the start position
-     * @param end the end position
+     * @param end   the end position
      */
     private void bubbleUp(int start, int end) {
         int child = end;
@@ -266,7 +273,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
      * bubble down a value to its correct position
      *
      * @param start the start position
-     * @param end the end position
+     * @param end   the end position
      */
     private void bubbleDown(int start, int end) {
         int root = start;
@@ -293,6 +300,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * remove the top element in the heap
+     *
      * @return the element removed
      * @throws NoSuchElementException if the heap is empty
      */
@@ -304,6 +312,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * remove the top element in the heap
+     *
      * @return the top element or null
      */
     public E poll() {
@@ -312,6 +321,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * gets the size of the heap
+     *
      * @return the heap size
      */
     public int size() {
@@ -320,6 +330,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * tests if the heap is empty
+     *
      * @return true if the heap is empty
      */
     public boolean isEmpty() {
@@ -328,6 +339,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * tests if an element exists in the heap
+     *
      * @param o the element to test
      * @return true if the element exists
      */
@@ -338,8 +350,9 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * gets an element at a position
+     *
      * @param position the position of the element
-     * @param error the error handler
+     * @param error    the error handler
      * @return the element or the return value of the error handler
      * @throws NoSuchElementException if the error handler does
      */
@@ -354,6 +367,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * gets the top element
+     *
      * @return the element
      * @throws NoSuchElementException if the heap is empty
      */
@@ -365,6 +379,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * looks at the top element
+     *
      * @return the top element or null
      */
     public E peek() {
@@ -400,6 +415,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * utility for errors
+     *
      * @param <E> the type of element
      */
     private interface NullHandler<E> {

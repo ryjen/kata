@@ -1,7 +1,9 @@
 package com.github.ryjen.kata.graph.list;
 
 import com.github.ryjen.kata.graph.AdjacencyGraph;
-import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
+import com.github.ryjen.kata.graph.formatters.Formatter;
+import com.github.ryjen.kata.graph.formatters.ListFormatter;
+import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
@@ -18,10 +20,36 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
     private final Factory<Vertex> factory;
     private final boolean directed;
 
+    public ListGraph() {
+        this(new DefaultFactory<>(), false);
+    }
+
+    public ListGraph(boolean directed) {
+        this(new DefaultFactory<>(), false);
+    }
+
+    public ListGraph(Factory<Vertex> factory) {
+        this(factory, false);
+    }
+
     public ListGraph(Factory<Vertex> factory, boolean directed) {
-        this.vertexList = new HashMap<>();
+        assert factory != null;
+
+        this.vertexList = new LinkedHashMap<>();
         this.factory = factory;
         this.directed = directed;
+
+        List<Vertex> initial = factory.initialVertices();
+
+        if (initial != null) {
+            for (Vertex v : initial) {
+                addVertex(v);
+            }
+        }
+    }
+
+    private static <T extends Comparable<T>> Set<T> createAdjacencySet() {
+        return new LinkedHashSet<>();
     }
 
     @Override
@@ -30,7 +58,14 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
             return;
         }
 
-        vertexList.put(vertex, new HashSet<>());
+        vertexList.put(vertex, new LinkedHashSet<>());
+    }
+
+    @Override
+    public void addVertices(Vertex... list) {
+        for (Vertex v : list) {
+            addVertex(v);
+        }
     }
 
     @Override
@@ -56,18 +91,56 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         assert v != null;
         assert u != null;
 
-        if (!vertexList.containsKey(v) || !vertexList.containsKey(u)) {
-            throw new NoSuchVertexException();
+        Set<Vertex> list;
+
+        if (!vertexList.containsKey(v)) {
+            list = createAdjacencySet();
+            vertexList.put(v, list);
+        } else {
+            list = vertexList.get(v);
         }
 
-        Set<Vertex> list1 = vertexList.get(v);
-        Set<Vertex> list2 = vertexList.get(u);
+        list.add(u);
 
-        list2.add(v);
-
-        if (isDirected()) {
-            list1.add(u);
+        if (!isDirected()) {
+            if (!vertexList.containsKey(u)) {
+                list = createAdjacencySet();
+                vertexList.put(u, list);
+            } else {
+                list = vertexList.get(u);
+            }
+            list.add(v);
         }
+    }
+
+    @Override
+    public boolean isEdge(Vertex a, Vertex b) {
+        assert a != null;
+        assert b != null;
+
+        boolean value = false;
+
+        if (vertexList.containsKey(a)) {
+            Set<Vertex> list = vertexList.get(a);
+            value = list.contains(b);
+        }
+
+        if (!isDirected() && !value && vertexList.containsKey(b)) {
+            Set<Vertex> list = vertexList.get(b);
+            value = list.contains(a);
+        }
+
+        return value;
+    }
+
+    @Override
+    public Edge getEdge(Vertex a, Vertex b) {
+        return isEdge(a, b) ? factory.createEdge() : null;
+    }
+
+    @Override
+    public Edge getEdgeOrDefault(Vertex a, Vertex b) {
+        return isEdge(a, b) ? factory.createEdge() : factory.emptyEdge();
     }
 
     @Override
@@ -102,14 +175,52 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
 
     @Override
     public int degree(Vertex vertex) {
-        if (vertexList.containsKey(vertex)) {
+        return inDegree(vertex) + outDegree(vertex);
+    }
+
+    @Override
+    public int outDegree(Vertex vertex) {
+
+        if (!vertexList.containsKey(vertex)) {
             return 0;
         }
         return vertexList.get(vertex).size();
     }
 
     @Override
+    public int inDegree(Vertex vertex) {
+        int count = 0;
+
+        for (Set<Vertex> list : vertexList.values()) {
+            if (list.contains(vertex)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
     public boolean isDirected() {
         return this.directed;
     }
+
+    /**
+     * custom toString() with option to show vertices
+     *
+     * @param formatter how to format the graph
+     * @return the string representation
+     */
+    public String toString(Formatter formatter) {
+        StringBuilder buf = new StringBuilder();
+
+        formatter.format(buf);
+
+        return buf.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString(new ListFormatter<>(this));
+    }
+
 }

@@ -51,6 +51,7 @@ public class EdgeIterator<Vertex extends Comparable<Vertex>> implements Iterator
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
+        y.next();
         return factory.createEdge();
     }
 }

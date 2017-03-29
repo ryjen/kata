@@ -1,4 +1,4 @@
-package com.github.ryjen.kata.graph;
+package com.github.ryjen.kata.graph.formatters;
 
 /**
  * interface for formatting a graph

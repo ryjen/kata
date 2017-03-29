@@ -28,7 +28,7 @@ class VertexIterator<Vertex extends Comparable<Vertex>> implements Iterator<Vert
     @Override
     public boolean hasNext() {
         while (v < graph.size()) {
-            if (graph.getVertex(v) != null) {
+            if (graph.getVertexByRow(v) != null) {
                 return true;
             }
             v++;
@@ -41,6 +41,6 @@ class VertexIterator<Vertex extends Comparable<Vertex>> implements Iterator<Vert
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        return graph.getVertex(v++);
+        return graph.getVertexByRow(v++);
     }
 }

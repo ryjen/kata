@@ -30,7 +30,7 @@ class EdgeIterator implements Iterator<Edge>, Iterable<Edge> {
     public boolean hasNext() {
         while (row < graph.size()) {
             while (col < graph.size()) {
-                if (graph.isEdge(row, col)) {
+                if (graph.isEdgeByRowColumn(row, col)) {
                     return true;
                 }
                 col++;

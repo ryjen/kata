@@ -1,11 +1,15 @@
 package com.github.ryjen.kata.graph;
 
+import com.github.ryjen.kata.graph.formatters.ListFormatter;
+import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
+import com.github.ryjen.kata.graph.formatters.VertexFormatter;
+import com.github.ryjen.kata.graph.list.ListGraph;
 import com.github.ryjen.kata.graph.matrix.MatrixGraph;
+import com.github.ryjen.kata.graph.model.DefaultFactory;
+import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.Search;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +19,20 @@ import java.util.List;
  * Created by ryan on 2017-03-18.
  */
 public class GraphTest {
+
+    private final static boolean GraphType = true;
+
+    private static <T extends Comparable<T>> Graph<T> newGraph(Factory<T> factory, boolean directed) {
+        if (GraphType) {
+            return new ListGraph(factory, directed);
+        } else {
+            return new MatrixGraph(factory, directed);
+        }
+    }
+
+    private static <T extends Comparable<T>> Graph<T> newGraph() {
+        return newGraph(new DefaultFactory<T>(), false);
+    }
 
     public static void main(String[] args) {
 
@@ -45,7 +63,7 @@ public class GraphTest {
 
     @Test
     public void testAddEdgeUndirected() {
-        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4));
+        Graph<Integer> graph = newGraph(new IndexFactory(4), false);
         Assert.assertFalse(graph.isDirected());
         graph.addEdge(1, 2);
         Assert.assertTrue(graph.isEdge(1, 2));
@@ -54,7 +72,7 @@ public class GraphTest {
 
     @Test
     public void testAddEdgeDirected() {
-        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), true);
+        Graph<Integer> graph = newGraph(new IndexFactory(4), true);
         Assert.assertTrue(graph.isDirected());
         graph.addEdge(1, 2);
         Assert.assertTrue(graph.isEdge(1, 2));
@@ -62,8 +80,8 @@ public class GraphTest {
     }
 
     @Test
-    public void testToStringUndirected() {
-        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), false);
+    public void testMatrixToStringUndirected() {
+        MatrixGraph<Integer> graph = new MatrixGraph(new IndexFactory(4), false);
 
         Assert.assertFalse(graph.isDirected());
 
@@ -84,7 +102,7 @@ public class GraphTest {
 
     @Test
     public void testToStringVertices() {
-        MatrixGraph<Character> graph = new MatrixGraph<>();
+        Graph<Character> graph = newGraph();
 
         graph.addVertices('A', 'B', 'C', 'D', 'Z');
 
@@ -100,14 +118,14 @@ public class GraphTest {
         buf.append("Z │ ○ ○ ○ ○ ○ \n");
 
         String expected = buf.toString();
-        String actual = graph.toString();
+        String actual = graph.toString(new VertexFormatter<>(graph));
 
         Assert.assertEquals(expected, actual);
     }
 
     @Test
-    public void testToStringDirected() {
-        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), true);
+    public void testMatrixToStringDirected() {
+        Graph<Integer> graph = newGraph(new IndexFactory(4), true);
 
         Assert.assertTrue(graph.isDirected());
 
@@ -120,7 +138,27 @@ public class GraphTest {
         buf.append("○ ○ ○ ○ \n");
         buf.append("○ ○ ○ ○ \n");
 
-        String actual = graph.toSimpleString();
+        String actual = graph.toString(new SimpleFormatter<>(graph));
+        String expected = buf.toString();
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testListToStringDirected() {
+        Graph<Integer> graph = newGraph(new IndexFactory(4), true);
+
+        graph.addEdge(1, 2);
+        graph.addEdge(1, 4);
+        graph.addEdge(0, 3);
+
+        StringBuilder buf = new StringBuilder();
+        buf.append("0 → 3\n");
+        buf.append("1 → 2, 4\n");
+        buf.append("2 → \n");
+        buf.append("3 → \n");
+
+        String actual = graph.toString(new ListFormatter<>(graph));
         String expected = buf.toString();
 
         Assert.assertEquals(expected, actual);
@@ -128,7 +166,7 @@ public class GraphTest {
 
     @Test
     public void testDegreeUndirected() {
-        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), false);
+        Graph<Integer> graph = newGraph(new IndexFactory(4), false);
 
         graph.addEdge(1, 2);
 
@@ -155,7 +193,7 @@ public class GraphTest {
 
     @Test
     public void testDegreeDirected() {
-        MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(4), true);
+        Graph<Integer> graph = newGraph(new IndexFactory(4), true);
 
         graph.addEdge(1, 2);
 
@@ -197,7 +235,7 @@ public class GraphTest {
 
     @Test
     public void testVertexFormatting() {
-        MatrixGraph<String> graph = new MatrixGraph<>();
+        Graph<String> graph = newGraph();
 
         graph.addVertices("Hello", "World", "Robot", "Unnecessary", "Point");
 
@@ -216,7 +254,7 @@ public class GraphTest {
 
         String expected = buf.toString();
 
-        String actual = graph.toString();
+        String actual = graph.toString(new VertexFormatter<>(graph));
 
         Assert.assertEquals(expected, actual);
     }
@@ -224,7 +262,7 @@ public class GraphTest {
     @Test
     public void testSearch() {
 
-        final MatrixGraph<Integer> graph = new MatrixGraph<>(new IndexFactory(8), false);
+        final Graph<Integer> graph = newGraph(new IndexFactory(8), false);
 
         final List<Integer> results = new ArrayList<>();
 

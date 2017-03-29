@@ -1,6 +1,6 @@
-package com.github.ryjen.kata.graph.matrix;
+package com.github.ryjen.kata.graph.formatters;
 
-import com.github.ryjen.kata.graph.Formatter;
+import com.github.ryjen.kata.graph.Graph;
 
 import java.util.OptionalInt;
 import java.util.stream.StreamSupport;
@@ -10,14 +10,14 @@ import java.util.stream.StreamSupport;
  */
 public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
     final int width;
-    final MatrixGraph<Vertex> graph;
+    final Graph<Vertex> graph;
 
     /**
      * construct a new graph vertex formatter
      *
      * @param graph the graph to format
      */
-    public VertexFormatter(MatrixGraph<Vertex> graph) {
+    public VertexFormatter(Graph<Vertex> graph) {
         assert graph != null;
         this.graph = graph;
         OptionalInt vertexWidth = StreamSupport.stream(graph.vertices().spliterator(), false)
@@ -42,18 +42,14 @@ public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Forma
     public void format(StringBuilder buf) {
         header(buf);
 
-        for (int row = 0; row < graph.size(); row++) {
+        for (Vertex a : graph.vertices()) {
 
-            buf.append(format(graph.getVertex(row)));
+            buf.append(format(a));
 
             buf.append(" │ ");
 
-            for (int col = 0; col < graph.size(); col++) {
-                if (graph.isEdge(row, col)) {
-                    buf.append(format(graph.getEdge(row, col)));
-                } else {
-                    buf.append(format(graph.emptyEdge()));
-                }
+            for (Vertex b : graph.vertices()) {
+                buf.append(format(graph.getEdgeOrDefault(a, b)));
                 buf.append(' ');
             }
             buf.append('\n');
@@ -70,8 +66,8 @@ public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Forma
             buf.append(' ');
         }
         buf.append(" │ ");
-        for (int i = 0; i < graph.size(); i++) {
-            buf.append(format(graph.getVertex(i))).append(' ');
+        for (Vertex v : graph.vertices()) {
+            buf.append(format(v)).append(' ');
         }
         buf.append('\n');
         for (int i = 0; i < width; i++) {

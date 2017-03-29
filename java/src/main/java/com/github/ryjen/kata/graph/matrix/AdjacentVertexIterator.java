@@ -34,7 +34,7 @@ class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Itera
     @Override
     public boolean hasNext() {
         while (u < graph.size()) {
-            if (graph.isEdge(v, u)) {
+            if (graph.isEdgeByRowColumn(v, u)) {
                 return true;
             }
             u++;
@@ -47,6 +47,6 @@ class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Itera
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        return graph.getVertex(u++);
+        return graph.getVertexByRow(u++);
     }
 }

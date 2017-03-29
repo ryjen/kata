@@ -1,8 +1,10 @@
 package com.github.ryjen.kata.graph.matrix;
 
-import com.github.ryjen.kata.graph.Formatter;
 import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
+import com.github.ryjen.kata.graph.formatters.Formatter;
+import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
+import com.github.ryjen.kata.graph.formatters.VertexFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
@@ -28,7 +30,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
     private final Comparator<Vertex> comparator;
 
     public MatrixGraph() {
-        this(new DefaultFactory<>());
+        this(new DefaultFactory<>(), false);
     }
 
     public MatrixGraph(boolean directed) {
@@ -139,7 +141,6 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * adds a vertex to the graph
      *
      * @param vertex the vertex
-     * @throws VertexLimitException if there is no more room in the graph
      */
     @Override
     public void addVertex(Vertex vertex) {
@@ -161,7 +162,6 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * adds a list of vertices to the graph
      *
      * @param list the vertices to add
-     * @throws VertexLimitException if there is no more room in the graph
      */
     public void addVertices(Vertex... list) {
         for (Vertex v : list) {
@@ -212,6 +212,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @param u the upper vertex
      * @return true if there is an edge between vertices
      */
+    @Override
     public Edge getEdge(Vertex v, Vertex u) {
         assert v != null;
         assert u != null;
@@ -219,13 +220,11 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
         return getEdge(indexOf(v), indexOf(u));
     }
 
-    /**
-     * tests if two vertices have an edge
-     *
-     * @param v the vertical index
-     * @param u the upper index
-     * @return the edge between two vertices
-     */
+    @Override
+    public Edge getEdgeOrDefault(Vertex v, Vertex b) {
+        return isEdge(v, b) ? getEdge(v, b) : factory.emptyEdge();
+    }
+
     Edge getEdge(int v, int u) {
         return edges.get(v, u);
     }
@@ -234,7 +233,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
         return factory.emptyEdge();
     }
 
-    Vertex getVertex(int v) {
+    Vertex getVertexByRow(int v) {
         assert v >= 0 && v < size();
 
         return vertices.get(v);
@@ -247,11 +246,12 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @param u the upper vertex
      * @return true if there is a non-empty edge
      */
+    @Override
     public boolean isEdge(Vertex v, Vertex u) {
         assert v != null;
         assert u != null;
 
-        return isEdge(indexOf(v), indexOf(u));
+        return isEdgeByRowColumn(indexOf(v), indexOf(u));
     }
 
     /**
@@ -261,7 +261,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @param u the upper vertex
      * @return true if there is a non-empty edge
      */
-    boolean isEdge(int v, int u) {
+    boolean isEdgeByRowColumn(int v, int u) {
         return edges.get(v, u) != null;
     }
 
@@ -351,7 +351,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @return the degree
      */
     public int outDegree(Vertex vertex) {
-        return degree(vertex, (v, u) -> isEdge(v, u));
+        return degree(vertex, (v, u) -> isEdgeByRowColumn(v, u));
     }
 
     /**
@@ -361,7 +361,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @return the degree
      */
     public int inDegree(Vertex vertex) {
-        return degree(vertex, (v, u) -> isEdge(u, v));
+        return degree(vertex, (v, u) -> isEdgeByRowColumn(u, v));
     }
 
     /**

@@ -11,12 +11,13 @@ import com.github.ryjen.kata.graph.search.DepthFirstSearch;
 import com.github.ryjen.kata.graph.search.Search;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by ryanjennings on 2017-03-20.
  */
 public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGraph<Vertex> {
-    private final Map<Vertex, Set<Vertex>> vertexList;
+    private final Map<Vertex, Set<Entry<Vertex>>> vertexList;
     private final Factory<Vertex> factory;
     private final boolean directed;
 
@@ -48,7 +49,7 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         }
     }
 
-    private static <T extends Comparable<T>> Set<T> createAdjacencySet() {
+    private static <T extends Comparable<T>> Set<Entry<T>> createAdjacencySet() {
         return new LinkedHashSet<>();
     }
 
@@ -58,7 +59,7 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
             return;
         }
 
-        vertexList.put(vertex, new LinkedHashSet<>());
+        vertexList.put(vertex, createAdjacencySet());
     }
 
     @Override
@@ -73,7 +74,7 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         if (vertexList.containsKey(vertex)) {
             vertexList.remove(vertex);
 
-            for (Set<Vertex> list : vertexList.values()) {
+            for (Set<Entry<Vertex>> list : vertexList.values()) {
                 list.remove(vertex);
             }
             return true;
@@ -87,29 +88,34 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
     }
 
     @Override
-    public void addEdge(Vertex v, Vertex u) {
-        assert v != null;
-        assert u != null;
+    public void addEdge(Vertex a, Vertex b) {
+        addEdge(a, b, factory.createEdge());
+    }
 
-        Set<Vertex> list;
+    @Override
+    public void addEdge(Vertex a, Vertex b, Edge edge) {
+        assert a != null;
+        assert b != null;
 
-        if (!vertexList.containsKey(v)) {
+        Set<Entry<Vertex>> list;
+
+        if (!vertexList.containsKey(a)) {
             list = createAdjacencySet();
-            vertexList.put(v, list);
+            vertexList.put(a, list);
         } else {
-            list = vertexList.get(v);
+            list = vertexList.get(a);
         }
 
-        list.add(u);
+        list.add(new Entry(b, edge));
 
         if (!isDirected()) {
-            if (!vertexList.containsKey(u)) {
+            if (!vertexList.containsKey(b)) {
                 list = createAdjacencySet();
-                vertexList.put(u, list);
+                vertexList.put(b, list);
             } else {
-                list = vertexList.get(u);
+                list = vertexList.get(b);
             }
-            list.add(v);
+            list.add(new Entry(a, edge));
         }
     }
 
@@ -121,13 +127,13 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         boolean value = false;
 
         if (vertexList.containsKey(a)) {
-            Set<Vertex> list = vertexList.get(a);
-            value = list.contains(b);
+            Set<Entry<Vertex>> list = vertexList.get(a);
+            value = list.stream().anyMatch(e -> e.getVertex() == b);
         }
 
         if (!isDirected() && !value && vertexList.containsKey(b)) {
-            Set<Vertex> list = vertexList.get(b);
-            value = list.contains(a);
+            Set<Entry<Vertex>> list = vertexList.get(b);
+            value = list.stream().anyMatch(e -> e.getVertex() == a);
         }
 
         return value;
@@ -160,7 +166,7 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v);
+        return vertexList.get(v).stream().map(e -> e.getVertex()).collect(Collectors.toSet());
     }
 
     @Override
@@ -170,7 +176,11 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
 
     @Override
     public Iterable<Edge> edges() {
-        return new EdgeIterator(this, factory);
+        return entries().stream().map(e -> e.getEdge()).collect(Collectors.toList());
+    }
+
+    Set<Entry<Vertex>> entries() {
+        return vertexList.values().stream().flatMap(e -> e.stream()).collect(Collectors.toSet());
     }
 
     @Override
@@ -191,8 +201,8 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
     public int inDegree(Vertex vertex) {
         int count = 0;
 
-        for (Set<Vertex> list : vertexList.values()) {
-            if (list.contains(vertex)) {
+        for (Set<Entry<Vertex>> list : vertexList.values()) {
+            if (list.stream().anyMatch(e -> e.getVertex() == vertex)) {
                 count++;
             }
         }

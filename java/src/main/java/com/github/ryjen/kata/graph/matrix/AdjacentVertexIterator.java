@@ -8,9 +8,9 @@ import java.util.NoSuchElementException;
  */
 class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Iterator<Vertex>, Iterable<Vertex> {
 
-    final MatrixGraph<Vertex> graph;
-    final int v;
-    int u;
+    private final MatrixGraph<Vertex> graph;
+    private final int v;
+    private int u;
 
     /**
      * construct an adjacent iterator

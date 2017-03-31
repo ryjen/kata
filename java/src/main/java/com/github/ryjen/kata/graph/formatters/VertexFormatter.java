@@ -9,8 +9,8 @@ import java.util.stream.StreamSupport;
  * a formatter that displays vertices
  */
 public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
-    final int width;
-    final Graph<Vertex> graph;
+    private final int width;
+    private final Graph<Vertex> graph;
 
     /**
      * construct a new graph vertex formatter

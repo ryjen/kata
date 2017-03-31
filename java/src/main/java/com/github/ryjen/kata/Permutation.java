@@ -36,7 +36,7 @@ public final class Permutation<T> extends ArrayList<List<T>> {
                 }
             }
 
-            result = new Permutation(current);
+            result = new Permutation<>(current);
         }
 
         return result;

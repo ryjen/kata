@@ -14,9 +14,17 @@ public interface Graph<Vertex extends Comparable<Vertex>> {
 
     void addVertices(Vertex... list);
 
-    int size();
+    void addEdge(Vertex a, Vertex b);
 
-    void addEdge(Vertex v, Vertex u);
+    void addEdge(Vertex a, Vertex b, Edge edge);
+
+    boolean isEdge(Vertex a, Vertex b);
+
+    Edge getEdge(Vertex a, Vertex b);
+
+    Edge getEdgeOrDefault(Vertex a, Vertex b);
+
+    int size();
 
     void dfs(Search.OnVisit<Vertex> callback);
 
@@ -33,12 +41,6 @@ public interface Graph<Vertex extends Comparable<Vertex>> {
     int inDegree(Vertex vertex);
 
     int outDegree(Vertex vertex);
-
-    boolean isEdge(Vertex a, Vertex b);
-
-    Edge getEdge(Vertex a, Vertex b);
-
-    Edge getEdgeOrDefault(Vertex a, Vertex b);
 
     boolean isDirected();
 

@@ -6,7 +6,7 @@ import com.github.ryjen.kata.graph.Graph;
  * a simple format that doesn't display vertices
  */
 public class SimpleFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
-    final Graph<Vertex> graph;
+    private final Graph<Vertex> graph;
 
     /**
      * constructs a new simple formatter

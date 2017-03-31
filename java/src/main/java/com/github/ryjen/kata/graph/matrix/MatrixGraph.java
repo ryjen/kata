@@ -22,7 +22,7 @@ import java.util.function.BiFunction;
  * A graph implementation using an adjacency matrix
  */
 public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Vertex> {
-    public static final int NOT_FOUND = -1;
+    private static final int NOT_FOUND = -1;
     private final Matrix<Edge> edges;
     private final boolean directed;
     private final List<Vertex> vertices;
@@ -128,7 +128,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @param vertex the vertex
      * @return the index of the vertex or NOT_FOUND
      */
-    int indexOf(Vertex vertex) {
+    private int indexOf(Vertex vertex) {
         for (int i = 0; i < vertices.size(); i++) {
             if (equals(vertices.get(i), vertex)) {
                 return i;
@@ -147,7 +147,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
         addVertex(vertex, true);
     }
 
-    public void addVertex(Vertex vertex, boolean resize) {
+    private void addVertex(Vertex vertex, boolean resize) {
 
         if (!vertices.contains(vertex)) {
             vertices.add(vertex);
@@ -194,7 +194,6 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
         return false;
     }
 
-
     /**
      * gets the size of the graph
      *
@@ -217,7 +216,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
         assert v != null;
         assert u != null;
 
-        return getEdge(indexOf(v), indexOf(u));
+        return getEdgeByIndices(indexOf(v), indexOf(u));
     }
 
     @Override
@@ -225,12 +224,8 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
         return isEdge(v, b) ? getEdge(v, b) : factory.emptyEdge();
     }
 
-    Edge getEdge(int v, int u) {
+    Edge getEdgeByIndices(int v, int u) {
         return edges.get(v, u);
-    }
-
-    Edge emptyEdge() {
-        return factory.emptyEdge();
     }
 
     Vertex getVertexByRow(int v) {
@@ -396,7 +391,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @return the formatted string
      */
     public String toSimpleString() {
-        return toString(new SimpleFormatter(this));
+        return toString(new SimpleFormatter<>(this));
     }
 
     /**

@@ -24,9 +24,9 @@ public class GraphTest {
 
     private static <T extends Comparable<T>> Graph<T> newGraph(Factory<T> factory, boolean directed) {
         if (GraphType) {
-            return new ListGraph(factory, directed);
+            return new ListGraph<>(factory, directed);
         } else {
-            return new MatrixGraph(factory, directed);
+            return new MatrixGraph<>(factory, directed);
         }
     }
 
@@ -81,7 +81,7 @@ public class GraphTest {
 
     @Test
     public void testMatrixToStringUndirected() {
-        MatrixGraph<Integer> graph = new MatrixGraph(new IndexFactory(4), false);
+        Graph<Integer> graph = newGraph(new IndexFactory(4), false);
 
         Assert.assertFalse(graph.isDirected());
 
@@ -94,7 +94,7 @@ public class GraphTest {
         buf.append("○ ● ○ ○ \n");
         buf.append("● ○ ○ ○ \n");
 
-        String actual = graph.toSimpleString();
+        String actual = graph.toString(new SimpleFormatter<>(graph));
         String expected = buf.toString();
 
         Assert.assertEquals(expected, actual);

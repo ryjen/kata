@@ -23,7 +23,6 @@ public interface Factory<V extends Comparable<V>> {
      */
     Edge emptyEdge();
 
-
     /**
      * initializes the vertices
      *

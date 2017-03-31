@@ -7,8 +7,8 @@ import java.util.NoSuchElementException;
  * iterate through all vertices
  */
 class VertexIterator<Vertex extends Comparable<Vertex>> implements Iterator<Vertex>, Iterable<Vertex> {
-    final MatrixGraph<Vertex> graph;
-    int v;
+    private final MatrixGraph<Vertex> graph;
+    private int v;
 
     /**
      * constructs a vertex iterator

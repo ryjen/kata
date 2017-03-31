@@ -10,9 +10,9 @@ import java.util.NoSuchElementException;
  */
 class EdgeIterator implements Iterator<Edge>, Iterable<Edge> {
 
-    final MatrixGraph<?> graph;
-    int row;
-    int col;
+    private final MatrixGraph<?> graph;
+    private int row;
+    private int col;
 
     public EdgeIterator(MatrixGraph<?> graph) {
         assert graph != null;
@@ -47,7 +47,7 @@ class EdgeIterator implements Iterator<Edge>, Iterable<Edge> {
             throw new NoSuchElementException();
         }
 
-        return graph.getEdge(row, col++);
+        return graph.getEdgeByIndices(row, col++);
 
     }
 }

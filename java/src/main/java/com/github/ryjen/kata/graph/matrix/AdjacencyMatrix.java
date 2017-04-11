@@ -3,7 +3,6 @@ package com.github.ryjen.kata.graph.matrix;
 import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
-import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
 import com.github.ryjen.kata.graph.formatters.VertexFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
@@ -379,15 +378,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
     @Override
     public String toString() {
         return toString(new VertexFormatter<>(this));
-    }
-
-    /**
-     * gets a simple representation of the graph as a string
-     *
-     * @return the formatted string
-     */
-    public String toSimpleString() {
-        return toString(new SimpleFormatter<>(this));
     }
 
     /**

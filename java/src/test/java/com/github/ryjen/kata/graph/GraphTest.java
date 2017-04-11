@@ -5,7 +5,6 @@ import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.formatters.ListFormatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
 import com.github.ryjen.kata.graph.formatters.VertexFormatter;
-import com.github.ryjen.kata.graph.matrix.AdjacencyMatrix;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.Ordering;
@@ -24,33 +23,6 @@ import java.util.stream.StreamSupport;
  * Created by ryan on 2017-03-18.
  */
 public abstract class GraphTest {
-
-    public static void main(String[] args) {
-
-        AdjacencyMatrix<Integer> graph = new AdjacencyMatrix<>(new IndexFactory(5));
-
-        System.out.println("Test 1:\n");
-
-        graph.addEdge(1, 0);
-        graph.addEdge(3, 0);
-        graph.addEdge(3, 2);
-        graph.addEdge(2, 1);
-        graph.addEdge(4, 0);
-        graph.addEdge(4, 1);
-        graph.addEdge(4, 3);
-
-        System.out.println(graph);
-
-        graph = new AdjacencyMatrix<>(new IndexFactory(4));
-
-        System.out.println("Test 2:\n");
-
-        graph.addEdge(1, 0);
-        graph.addEdge(2, 1);
-        graph.addEdge(3, 2);
-
-        System.out.println(graph);
-    }
 
     public abstract <T extends Comparable<T>> Graph<T> newGraph(Factory<T> factory, boolean directed);
 

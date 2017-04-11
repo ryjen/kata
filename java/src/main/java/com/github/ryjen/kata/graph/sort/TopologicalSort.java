@@ -39,14 +39,18 @@ public class TopologicalSort<T extends Comparable<T>> {
         return result;
     }
 
-    private void sort(T vertex, LinkedList<T> result) throws GraphIsCyclicException {
+    private boolean isMarked(T vertex) throws GraphIsCyclicException {
         int mark = marked.getOrDefault(vertex, 0);
 
         if (mark == MARK_TEMP) {
             throw new GraphIsCyclicException();
         }
 
-        if (mark == 0) {
+        return mark == MARK_PERM;
+    }
+
+    private void sort(T vertex, LinkedList<T> result) throws GraphIsCyclicException {
+        if (!isMarked(vertex)) {
             marked.put(vertex, MARK_TEMP);
 
             for (T w : graph.adjacent(vertex)) {

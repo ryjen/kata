@@ -1,19 +1,12 @@
 package com.github.ryjen.kata.graph.list;
 
 import com.github.ryjen.kata.graph.Graph;
-import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
-import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.ListFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
-import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
-import com.github.ryjen.kata.graph.search.DepthFirstSearch;
-import com.github.ryjen.kata.graph.search.Ordering;
-import com.github.ryjen.kata.graph.search.Search;
-import com.github.ryjen.kata.graph.sort.TopologicalSort;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,7 +17,6 @@ import java.util.stream.Collectors;
 public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vertex> {
     private final Map<Vertex, Set<Entry<Vertex>>> vertexList;
     private final Factory<Vertex> factory;
-    private final boolean directed;
 
     public AdjacencyList() {
         this(new DefaultFactory<>(), false);
@@ -44,7 +36,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
 
         this.vertexList = new LinkedHashMap<>();
         this.factory = factory;
-        this.directed = directed;
 
         List<Vertex> initial = factory.initialVertices();
 
@@ -59,7 +50,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         super(other);
         this.vertexList = new LinkedHashMap<>(other.vertexList);
         this.factory = other.factory;
-        this.directed = other.directed;
     }
 
     private static <T extends Comparable<T>> Set<Entry<T>> createEntrySet() {
@@ -180,45 +170,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     }
 
     @Override
-    public void dfs(Vertex start, Search.OnVisit<Vertex> callback, Ordering ordering) {
-        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback, ordering);
-        dfs.search(start);
-    }
-
-    @Override
-    public void bfs(Vertex start, Search.OnVisit<Vertex> callback) {
-        Search<Vertex> bfs = new BreadthFirstSearch<Vertex>(this, callback);
-        bfs.search(start);
-    }
-
-    @Override
-    public boolean isConnected() {
-        Set<Vertex> visited = new HashSet<>();
-        for (Vertex v : vertices()) {
-            bfs(v, value -> visited.add(value));
-        }
-        return visited.size() == size();
-    }
-
-    @Override
-    public boolean isCyclic() {
-
-        if (!isDirected()) {
-            return false;
-        }
-
-        try {
-            TopologicalSort<Vertex> sorter = new TopologicalSort<>(this);
-
-            sorter.sort();
-
-            return false;
-        } catch (GraphNotDirectedException | GraphIsCyclicException e) {
-            return true;
-        }
-    }
-
-    @Override
     public Iterable<Vertex> adjacent(Vertex v) {
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
@@ -241,11 +192,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     }
 
     @Override
-    public int degree(Vertex vertex) {
-        return inDegree(vertex) + outDegree(vertex);
-    }
-
-    @Override
     public int outDegree(Vertex vertex) {
 
         if (!vertexList.containsKey(vertex)) {
@@ -264,11 +210,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
             }
         }
         return count;
-    }
-
-    @Override
-    public boolean isDirected() {
-        return this.directed;
     }
 
     /**

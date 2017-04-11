@@ -2,15 +2,15 @@ package com.github.ryjen.kata.graph.matrix;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Stack;
 
 /**
  * an iterable to find adjacent vertices for a vertex
  */
 class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Iterator<Vertex>, Iterable<Vertex> {
 
-    private final MatrixGraph<Vertex> graph;
-    private final int v;
-    private int u;
+    private final AdjacencyMatrix<Vertex> graph;
+    private final Stack<Entry> stack;
 
     /**
      * construct an adjacent iterator
@@ -18,12 +18,12 @@ class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Itera
      * @param graph  the graph to search
      * @param vertex the vertex index to search from
      */
-    AdjacentVertexIterator(MatrixGraph<Vertex> graph, int vertex) {
+    AdjacentVertexIterator(AdjacencyMatrix<Vertex> graph, int vertex) {
         assert graph != null;
         assert vertex >= 0 && vertex < graph.size();
         this.graph = graph;
-        this.v = vertex;
-        this.u = 0;
+        this.stack = new Stack<>();
+        this.stack.add(new Entry(vertex, 0));
     }
 
     @Override
@@ -33,12 +33,13 @@ class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Itera
 
     @Override
     public boolean hasNext() {
-        while (u < graph.size()) {
-            if (graph.isEdgeByRowColumn(v, u)) {
+
+        for (Entry entry : stack) {
+            if (entry.findNextEdge()) {
                 return true;
             }
-            u++;
         }
+
         return false;
     }
 
@@ -47,6 +48,37 @@ class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> implements Itera
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        return graph.getVertexByRow(u++);
+
+        while (!stack.isEmpty()) {
+            Entry entry = stack.pop();
+
+            if (entry.findNextEdge()) {
+                Vertex vertex = graph.getVertexByRow(entry.y++);
+                stack.push(new Entry(entry.x, entry.y));
+                return vertex;
+            }
+        }
+
+        throw new NoSuchElementException();
+    }
+
+    private final class Entry {
+        public int x;
+        public int y;
+
+        public Entry(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public boolean findNextEdge() {
+            while (this.y < graph.size()) {
+                if (graph.isEdgeByRowColumn(this.x, this.y)) {
+                    return true;
+                }
+                this.y++;
+            }
+            return false;
+        }
     }
 }

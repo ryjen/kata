@@ -2,16 +2,17 @@ package com.github.ryjen.kata.graph.search;
 
 import com.github.ryjen.kata.graph.Graph;
 
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
  * an abstract class to implement a search on an graph
  */
 public abstract class Search<Vertex extends Comparable<Vertex>> {
-    private Set<Vertex> visited;
-    private Graph<Vertex> graph;
-    private OnVisit<Vertex> callback;
+    private final Set<Vertex> visited;
+    private final Graph<Vertex> graph;
+    private final OnVisit<Vertex> callback;
 
     /**
      * construct a new search
@@ -25,7 +26,7 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
         this.graph = graph;
         this.callback = callback;
 
-        visited = new HashSet<>(graph.size());
+        visited = new LinkedHashSet<>(graph.size());
     }
 
     /**
@@ -38,23 +39,7 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
         return graph.adjacent(v);
     }
 
-    /**
-     * Method to perform a recursive search on a vertex
-     *
-     * @param v the vertex
-     */
-    protected abstract void search(Vertex v);
-
-    /**
-     * starts the search
-     */
-    public void search() {
-        for (Vertex v : graph.vertices()) {
-            if (!isVisited(v)) {
-                search(v);
-            }
-        }
-    }
+    public abstract void search(Vertex v);
 
     /**
      * tests if a vertex has been visited
@@ -75,7 +60,18 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
     protected void visit(Vertex v) {
         assert v != null;
         visited.add(v);
+    }
+
+    protected void callback(Vertex v) {
         callback.onSearchVisit(v);
+    }
+
+    public Set<Vertex> getVisited() {
+        return Collections.unmodifiableSet(visited);
+    }
+
+    public Graph<Vertex> getGraph() {
+        return graph;
     }
 
     /**
@@ -86,5 +82,4 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
     public interface OnVisit<V> {
         void onSearchVisit(V value);
     }
-
 }

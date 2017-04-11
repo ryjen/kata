@@ -1,6 +1,9 @@
 package com.github.ryjen.kata.graph.list;
 
-import com.github.ryjen.kata.graph.AdjacencyGraph;
+import com.github.ryjen.kata.graph.Graph;
+import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
+import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
+import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.ListFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
@@ -8,7 +11,9 @@ import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
+import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.search.Search;
+import com.github.ryjen.kata.graph.sort.TopologicalSort;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,24 +21,24 @@ import java.util.stream.Collectors;
 /**
  * Created by ryanjennings on 2017-03-20.
  */
-public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGraph<Vertex> {
+public class AdjacencyList<Vertex extends Comparable<Vertex>> implements com.github.ryjen.kata.graph.Graph<Vertex> {
     private final Map<Vertex, Set<Entry<Vertex>>> vertexList;
     private final Factory<Vertex> factory;
     private final boolean directed;
 
-    public ListGraph() {
+    public AdjacencyList() {
         this(new DefaultFactory<>(), false);
     }
 
-    public ListGraph(boolean directed) {
+    public AdjacencyList(boolean directed) {
         this(new DefaultFactory<>(), false);
     }
 
-    public ListGraph(Factory<Vertex> factory) {
+    public AdjacencyList(Factory<Vertex> factory) {
         this(factory, false);
     }
 
-    public ListGraph(Factory<Vertex> factory, boolean directed) {
+    public AdjacencyList(Factory<Vertex> factory, boolean directed) {
         assert factory != null;
 
         this.vertexList = new LinkedHashMap<>();
@@ -49,8 +54,18 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         }
     }
 
-    private static <T extends Comparable<T>> Set<Entry<T>> createAdjacencySet() {
+    public AdjacencyList(AdjacencyList<Vertex> other) {
+        this.vertexList = new LinkedHashMap<>(other.vertexList);
+        this.factory = other.factory;
+        this.directed = other.directed;
+    }
+
+    private static <T extends Comparable<T>> Set<Entry<T>> createEntrySet() {
         return new LinkedHashSet<>();
+    }
+
+    public Graph<Vertex> clone() {
+        return new AdjacencyList<>(this);
     }
 
     @Override
@@ -59,7 +74,7 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
             return;
         }
 
-        vertexList.put(vertex, createAdjacencySet());
+        vertexList.put(vertex, createEntrySet());
     }
 
     @Override
@@ -97,26 +112,46 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         assert a != null;
         assert b != null;
 
-        Set<Entry<Vertex>> list;
-
         if (!vertexList.containsKey(a)) {
-            list = createAdjacencySet();
-            vertexList.put(a, list);
-        } else {
-            list = vertexList.get(a);
+            throw new NoSuchVertexException();
         }
-
-        list.add(new Entry(b, edge));
 
         if (!isDirected()) {
             if (!vertexList.containsKey(b)) {
-                list = createAdjacencySet();
-                vertexList.put(b, list);
-            } else {
-                list = vertexList.get(b);
+                throw new NoSuchVertexException();
             }
+            Set<Entry<Vertex>> list = vertexList.get(b);
             list.add(new Entry(a, edge));
         }
+
+        if (!vertexList.containsKey(a)) {
+            throw new NoSuchVertexException();
+        }
+
+        Set<Entry<Vertex>> list = vertexList.get(a);
+        list.add(new Entry(b, edge));
+    }
+
+    @Override
+    public boolean removeEdge(Vertex a, Vertex b) {
+        assert a != null;
+        assert b != null;
+
+        if (!vertexList.containsKey(a)) {
+            throw new NoSuchVertexException();
+        }
+
+        if (!isDirected()) {
+            if (!vertexList.containsKey(b)) {
+                throw new NoSuchVertexException();
+            }
+        }
+
+        for (Set<Entry<Vertex>> list : vertexList.values()) {
+            list.removeIf(e -> (e.getVertex() == a || e.getVertex() == b));
+        }
+
+        return true;
     }
 
     @Override
@@ -150,15 +185,42 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
     }
 
     @Override
-    public void dfs(Search.OnVisit<Vertex> callback) {
-        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback);
-        dfs.search();
+    public void dfs(Vertex start, Search.OnVisit<Vertex> callback, Ordering ordering) {
+        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback, ordering);
+        dfs.search(start);
     }
 
     @Override
-    public void bfs(Search.OnVisit<Vertex> callback) {
+    public void bfs(Vertex start, Search.OnVisit<Vertex> callback) {
         Search<Vertex> bfs = new BreadthFirstSearch<Vertex>(this, callback);
-        bfs.search();
+        bfs.search(start);
+    }
+
+    @Override
+    public boolean isConnected() {
+        Set<Vertex> visited = new HashSet<>();
+        for (Vertex v : vertices()) {
+            bfs(v, value -> visited.add(value));
+        }
+        return visited.size() == size();
+    }
+
+    @Override
+    public boolean isCyclic() {
+
+        if (!isDirected()) {
+            return false;
+        }
+
+        try {
+            TopologicalSort<Vertex> sorter = new TopologicalSort<>(this);
+
+            sorter.sort();
+
+            return false;
+        } catch (GraphNotDirectedException | GraphIsCyclicException e) {
+            return true;
+        }
     }
 
     @Override
@@ -166,7 +228,7 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(e -> e.getVertex()).collect(Collectors.toSet());
+        return vertexList.get(v).stream().map(e -> e.getVertex()).collect(Collectors.toList());
     }
 
     @Override
@@ -179,8 +241,8 @@ public class ListGraph<Vertex extends Comparable<Vertex>> implements AdjacencyGr
         return entries().stream().map(e -> e.getEdge()).collect(Collectors.toList());
     }
 
-    Set<Entry<Vertex>> entries() {
-        return vertexList.values().stream().flatMap(e -> e.stream()).collect(Collectors.toSet());
+    Collection<Entry<Vertex>> entries() {
+        return vertexList.values().stream().flatMap(e -> e.stream()).collect(Collectors.toList());
     }
 
     @Override

@@ -14,6 +14,14 @@ public class Matrix<T> {
         this.type = type;
     }
 
+    public Matrix(Matrix<T> other) {
+        this.type = other.type;
+        resize(other.value.length);
+        for (int i = 0; i < other.value.length; i++) {
+            System.arraycopy(other.value[i], 0, this.value[i], 0, this.value[i].length);
+        }
+    }
+
     public void set(int row, int col, T value) {
 
         resize(Math.max(row, col));

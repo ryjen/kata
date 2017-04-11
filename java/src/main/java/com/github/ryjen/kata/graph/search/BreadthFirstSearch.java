@@ -15,21 +15,19 @@ public class BreadthFirstSearch<Vertex extends Comparable<Vertex>> extends Searc
     }
 
     @Override
-    protected void search(Vertex v) {
-        visit(v);
-
+    public void search(Vertex v) {
         Queue<Vertex> queue = new LinkedList<>();
         queue.add(v);
 
         while (!queue.isEmpty()) {
-            for (Vertex w : adjacent(queue.peek())) {
-                if (!isVisited(w)) {
-                    visit(w);
-
+            v = queue.remove();
+            if (!isVisited(v)) {
+                visit(v);
+                callback(v);
+                for (Vertex w : adjacent(v)) {
                     queue.add(w);
                 }
             }
-            queue.remove();
         }
     }
 }

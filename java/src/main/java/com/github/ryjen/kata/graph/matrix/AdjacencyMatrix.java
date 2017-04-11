@@ -1,6 +1,8 @@
 package com.github.ryjen.kata.graph.matrix;
 
 import com.github.ryjen.kata.graph.Graph;
+import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
+import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
@@ -10,18 +12,18 @@ import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
+import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.search.Search;
+import com.github.ryjen.kata.graph.sort.TopologicalSort;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 
 /**
  * Created by ryan on 2017-03-18.
  * A graph implementation using an adjacency matrix
  */
-public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Vertex> {
+public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph<Vertex> {
     private static final int NOT_FOUND = -1;
     private final Matrix<Edge> edges;
     private final boolean directed;
@@ -29,11 +31,11 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
     private final Factory factory;
     private final Comparator<Vertex> comparator;
 
-    public MatrixGraph() {
+    public AdjacencyMatrix() {
         this(new DefaultFactory<>(), false);
     }
 
-    public MatrixGraph(boolean directed) {
+    public AdjacencyMatrix(boolean directed) {
         this(new DefaultFactory<>(), directed);
     }
 
@@ -42,7 +44,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      *
      * @param factory the factor to create objects
      */
-    public MatrixGraph(Factory<Vertex> factory) {
+    public AdjacencyMatrix(Factory<Vertex> factory) {
         this(factory, false);
     }
 
@@ -52,7 +54,7 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @param factory  the factory to create objects
      * @param directed true if this is a directed graph
      */
-    public MatrixGraph(Factory<Vertex> factory, boolean directed) {
+    public AdjacencyMatrix(Factory<Vertex> factory, boolean directed) {
         assert factory != null;
         this.factory = factory;
         this.comparator = factory.createComparator();
@@ -64,6 +66,18 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
         }
         this.edges = new Matrix<>(Edge.class);
         this.directed = directed;
+    }
+
+    public AdjacencyMatrix(AdjacencyMatrix<Vertex> other) {
+        this.factory = other.factory;
+        this.comparator = other.comparator;
+        this.vertices = new ArrayList<>(other.vertices);
+        this.edges = new Matrix<>(other.edges);
+        this.directed = other.directed;
+    }
+
+    public Graph<Vertex> clone() {
+        return new AdjacencyMatrix<>(this);
     }
 
     private boolean equals(Vertex a, Vertex b) {
@@ -104,11 +118,45 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
             throw new NoSuchVertexException();
         }
 
-        edges.set(index1, index2, edge);
-
         if (!directed) {
+
             edges.set(index2, index1, edge);
         }
+
+        edges.set(index1, index2, edge);
+    }
+
+    /**
+     * removes an edge from a graph
+     *
+     * @param a - the first vertex
+     * @param b - the second vertex
+     * @return true if removed
+     */
+    @Override
+    public boolean removeEdge(Vertex a, Vertex b) {
+        assert a != null;
+        assert b != null;
+
+        boolean rval = true;
+
+        int index1 = indexOf(a);
+
+        if (index1 == NOT_FOUND) {
+            throw new NoSuchVertexException();
+        }
+
+        int index2 = indexOf(b);
+
+        if (index2 == NOT_FOUND) {
+            throw new NoSuchVertexException();
+        }
+
+        if (!directed) {
+            rval = edges.remove(index2, index1);
+        }
+
+        return edges.remove(index1, index2) && rval;
     }
 
     /**
@@ -266,10 +314,10 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @see Search
      */
     @Override
-    public void dfs(Search.OnVisit<Vertex> callback) {
-        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback);
+    public void dfs(Vertex start, Search.OnVisit<Vertex> callback, Ordering ordering) {
+        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback, ordering);
 
-        dfs.search();
+        dfs.search(start);
     }
 
     /**
@@ -278,10 +326,39 @@ public class MatrixGraph<Vertex extends Comparable<Vertex>> implements Graph<Ver
      * @see Search
      */
     @Override
-    public void bfs(Search.OnVisit<Vertex> callback) {
+    public void bfs(Vertex start, Search.OnVisit<Vertex> callback) {
         Search<Vertex> bfs = new BreadthFirstSearch<>(this, callback);
 
-        bfs.search();
+        bfs.search(start);
+    }
+
+    @Override
+    public boolean isConnected() {
+        Set<Vertex> visited = new HashSet<>();
+
+        for (Vertex v : vertices()) {
+            dfs(v, value -> visited.add(value), Ordering.Pre);
+        }
+
+        return visited.size() == size();
+    }
+
+    @Override
+    public boolean isCyclic() {
+
+        if (!isDirected()) {
+            return false;
+        }
+
+        try {
+            TopologicalSort<Vertex> sorter = new TopologicalSort<>(this);
+
+            sorter.sort();
+
+            return false;
+        } catch (GraphNotDirectedException | GraphIsCyclicException e) {
+            return true;
+        }
     }
 
     /**

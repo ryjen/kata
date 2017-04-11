@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Created by ryanjennings on 2017-03-20.
  */
-public class AdjacencyList<Vertex extends Comparable<Vertex>> implements com.github.ryjen.kata.graph.Graph<Vertex> {
+public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vertex> {
     private final Map<Vertex, Set<Entry<Vertex>>> vertexList;
     private final Factory<Vertex> factory;
     private final boolean directed;
@@ -39,6 +39,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> implements com.git
     }
 
     public AdjacencyList(Factory<Vertex> factory, boolean directed) {
+        super(directed);
         assert factory != null;
 
         this.vertexList = new LinkedHashMap<>();
@@ -55,6 +56,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> implements com.git
     }
 
     public AdjacencyList(AdjacencyList<Vertex> other) {
+        super(other);
         this.vertexList = new LinkedHashMap<>(other.vertexList);
         this.factory = other.factory;
         this.directed = other.directed;
@@ -75,13 +77,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> implements com.git
         }
 
         vertexList.put(vertex, createEntrySet());
-    }
-
-    @Override
-    public void addVertices(Vertex... list) {
-        for (Vertex v : list) {
-            addVertex(v);
-        }
     }
 
     @Override

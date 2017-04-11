@@ -1,58 +1,111 @@
 package com.github.ryjen.kata.graph;
 
+import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
+import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
-import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
+import com.github.ryjen.kata.graph.search.DepthFirstSearch;
 import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.search.Search;
+import com.github.ryjen.kata.graph.sort.TopologicalSort;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by ryan on 2017-03-19.
  */
-public interface Graph<Vertex extends Comparable<Vertex>> extends Cloneable {
+public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgable<Vertex>, Vertexable<Vertex>, Cloneable {
 
-    Graph<Vertex> clone();
+    private boolean directed;
 
-    void addVertex(Vertex vertex);
+    protected Graph(boolean directed) {
+        this.directed = directed;
+    }
 
-    boolean removeVertex(Vertex vertex);
+    protected Graph(Graph<Vertex> other) {
+        this.directed = other.directed;
+    }
 
-    void addVertices(Vertex... list);
+    public abstract Graph<Vertex> clone();
 
-    void addEdge(Vertex a, Vertex b);
+    public void addVertices(Vertex... list) {
+        for (Vertex v : list) {
+            addVertex(v);
+        }
+    }
 
-    void addEdge(Vertex a, Vertex b, Edge edge);
+    public abstract int size();
 
-    boolean isEdge(Vertex a, Vertex b);
 
-    Edge getEdge(Vertex a, Vertex b);
+    /**
+     * performs a depth first search
+     *
+     * @see Search
+     */
+    public void dfs(Vertex start, Search.OnVisit<Vertex> callback, Ordering ordering) {
+        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback, ordering);
 
-    Edge getEdgeOrDefault(Vertex a, Vertex b);
+        dfs.search(start);
+    }
 
-    boolean removeEdge(Vertex a, Vertex b);
+    /**
+     * performs a breadth first search
+     *
+     * @see Search
+     */
+    public void bfs(Vertex start, Search.OnVisit<Vertex> callback) {
+        Search<Vertex> bfs = new BreadthFirstSearch<>(this, callback);
 
-    int size();
+        bfs.search(start);
+    }
 
-    void dfs(Vertex start, Search.OnVisit<Vertex> callback, Ordering ordering);
+    public boolean isConnected() {
+        Set<Vertex> visited = new HashSet<>();
 
-    void bfs(Vertex start, Search.OnVisit<Vertex> callback);
+        for (Vertex v : vertices()) {
+            dfs(v, value -> visited.add(value), Ordering.Pre);
+        }
 
-    Iterable<Vertex> adjacent(Vertex v);
+        return visited.size() == size();
+    }
 
-    Iterable<Vertex> vertices();
+    public boolean isCyclic() {
 
-    Iterable<Edge> edges();
+        if (!isDirected()) {
+            return false;
+        }
 
-    int degree(Vertex vertex);
+        try {
+            TopologicalSort<Vertex> sorter = new TopologicalSort<>(this);
 
-    int inDegree(Vertex vertex);
+            sorter.sort();
 
-    int outDegree(Vertex vertex);
+            return false;
+        } catch (GraphNotDirectedException | GraphIsCyclicException e) {
+            return true;
+        }
+    }
 
-    boolean isDirected();
+    /**
+     * gets the degree of a vertex
+     *
+     * @param vertex the vertex
+     * @return the degree
+     */
+    public int degree(Vertex vertex) {
+        return inDegree(vertex) + outDegree(vertex);
+    }
 
-    boolean isCyclic();
 
-    String toString(Formatter formatter);
+    public abstract int inDegree(Vertex vertex);
 
-    boolean isConnected();
+    public abstract int outDegree(Vertex vertex);
+
+    public boolean isDirected() {
+        return directed;
+    }
+
+
+    public abstract String toString(Formatter formatter);
 }

@@ -1,8 +1,6 @@
 package com.github.ryjen.kata.graph.matrix;
 
 import com.github.ryjen.kata.graph.Graph;
-import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
-import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
@@ -10,23 +8,19 @@ import com.github.ryjen.kata.graph.formatters.VertexFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
-import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
-import com.github.ryjen.kata.graph.search.DepthFirstSearch;
-import com.github.ryjen.kata.graph.search.Ordering;
-import com.github.ryjen.kata.graph.search.Search;
-import com.github.ryjen.kata.graph.sort.TopologicalSort;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.BiFunction;
 
 /**
  * Created by ryan on 2017-03-18.
  * A graph implementation using an adjacency matrix
  */
-public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph<Vertex> {
+public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Vertex> {
     private static final int NOT_FOUND = -1;
     private final Matrix<Edge> edges;
-    private final boolean directed;
     private final List<Vertex> vertices;
     private final Factory factory;
     private final Comparator<Vertex> comparator;
@@ -55,6 +49,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph
      * @param directed true if this is a directed graph
      */
     public AdjacencyMatrix(Factory<Vertex> factory, boolean directed) {
+        super(directed);
         assert factory != null;
         this.factory = factory;
         this.comparator = factory.createComparator();
@@ -65,15 +60,14 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph
             this.vertices = initial;
         }
         this.edges = new Matrix<>(Edge.class);
-        this.directed = directed;
     }
 
     public AdjacencyMatrix(AdjacencyMatrix<Vertex> other) {
+        super(other);
         this.factory = other.factory;
         this.comparator = other.comparator;
         this.vertices = new ArrayList<>(other.vertices);
         this.edges = new Matrix<>(other.edges);
-        this.directed = other.directed;
     }
 
     public Graph<Vertex> clone() {
@@ -118,7 +112,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph
             throw new NoSuchVertexException();
         }
 
-        if (!directed) {
+        if (!isDirected()) {
 
             edges.set(index2, index1, edge);
         }
@@ -152,7 +146,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph
             throw new NoSuchVertexException();
         }
 
-        if (!directed) {
+        if (!isDirected()) {
             rval = edges.remove(index2, index1);
         }
 
@@ -211,10 +205,9 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph
      *
      * @param list the vertices to add
      */
+    @Override
     public void addVertices(Vertex... list) {
-        for (Vertex v : list) {
-            addVertex(v, false);
-        }
+        super.addVertices(list);
         edges.resize(vertices.size());
     }
 
@@ -309,59 +302,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph
     }
 
     /**
-     * performs a depth first search
-     *
-     * @see Search
-     */
-    @Override
-    public void dfs(Vertex start, Search.OnVisit<Vertex> callback, Ordering ordering) {
-        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback, ordering);
-
-        dfs.search(start);
-    }
-
-    /**
-     * performs a breadth first search
-     *
-     * @see Search
-     */
-    @Override
-    public void bfs(Vertex start, Search.OnVisit<Vertex> callback) {
-        Search<Vertex> bfs = new BreadthFirstSearch<>(this, callback);
-
-        bfs.search(start);
-    }
-
-    @Override
-    public boolean isConnected() {
-        Set<Vertex> visited = new HashSet<>();
-
-        for (Vertex v : vertices()) {
-            dfs(v, value -> visited.add(value), Ordering.Pre);
-        }
-
-        return visited.size() == size();
-    }
-
-    @Override
-    public boolean isCyclic() {
-
-        if (!isDirected()) {
-            return false;
-        }
-
-        try {
-            TopologicalSort<Vertex> sorter = new TopologicalSort<>(this);
-
-            sorter.sort();
-
-            return false;
-        } catch (GraphNotDirectedException | GraphIsCyclicException e) {
-            return true;
-        }
-    }
-
-    /**
      * gets an iterator to the list of vertices
      *
      * @return an iterator of vertices
@@ -434,27 +374,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> implements Graph
      */
     public int inDegree(Vertex vertex) {
         return degree(vertex, (v, u) -> isEdgeByRowColumn(u, v));
-    }
-
-    /**
-     * gets the degree of a vertex
-     *
-     * @param vertex the vertex
-     * @return the degree
-     */
-    @Override
-    public int degree(Vertex vertex) {
-        return inDegree(vertex) + outDegree(vertex);
-    }
-
-    /**
-     * tests if this graph is directed or undirected
-     *
-     * @return true if the graph is directed
-     */
-    @Override
-    public boolean isDirected() {
-        return directed;
     }
 
     @Override

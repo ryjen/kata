@@ -212,20 +212,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         return count;
     }
 
-    /**
-     * custom toString() with option to show vertices
-     *
-     * @param formatter how to format the graph
-     * @return the string representation
-     */
-    public String toString(Formatter formatter) {
-        StringBuilder buf = new StringBuilder();
-
-        formatter.format(buf);
-
-        return buf.toString();
-    }
-
     @Override
     public String toString() {
         return toString(new ListFormatter<>(this));

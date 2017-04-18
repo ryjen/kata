@@ -1,39 +1,39 @@
-#ifndef ARG3_KATA_LIST_SINGLE_H_
-#define ARG3_KATA_LIST_SINGLE_H_
+#ifndef RYJEN_KATA_LIST_SINGLE_H
+#define RYJEN_KATA_LIST_SINGLE_H
 
 /**
  * a singly linked list
  */
-typedef struct a3list a3list;
+typedef struct rj_list rj_list;
 
 /**
  * creates a new list
  * @return an allocated list object
  */
-a3list *a3list_create();
+rj_list *rj_list_create();
 
 /**
  * destroys a created list
  * @param list the list instance
  */
-void a3list_destroy(a3list *list);
+void rj_list_destroy(rj_list *list);
 
 /**
  * prepends a list item to the list
  * @param list the list instance
  * @param item the item to add to the list
- * @see a3list_item_create
+ * @see rj_list_item_create
  */
-void a3list_add(a3list *list, a3list_item *item);
+void rj_list_add(rj_list *list, rj_list_item *item);
 
 /**
  * adds an item to the list after the specific index
  * @param list  the list instance
  * @param index the index to add after
  * @param item  the item to add
- * @see a3list_item_create
+ * @see rj_list_item_create
  */
-void a3list_add_index(a3list *list, size_t index, a3list_item *item);
+void rj_list_add_index(rj_list *list, size_t index, rj_list_item *item);
 
 /**
  * adds one list to another
@@ -42,7 +42,7 @@ void a3list_add_index(a3list *list, size_t index, a3list_item *item);
  * @param list  the list instance
  * @param other the list to add from
  */
-void a3list_add_all(a3list *list, const a3list *other);
+void rj_list_add_all(rj_list *list, const rj_list *other);
 
 /**
  * adds one list to another after the specified index
@@ -52,14 +52,14 @@ void a3list_add_all(a3list *list, const a3list *other);
  * @param index the index to add after
  * @param other the list to add from
  */
-void a3list_add_all_index(a3list *list, size_t index, const a3list *other);
+void rj_list_add_all_index(rj_list *list, size_t index, const rj_list *other);
 
 /**
  * removes all items in the list
  * if the items have a destructor set, it will be called
  * @param list the list instance
  */
-void a3list_clear(a3list *list);
+void rj_list_clear(rj_list *list);
 
 /**
  * tests if a list contains an item
@@ -68,7 +68,7 @@ void a3list_clear(a3list *list);
  * @param  item the item (memory) to check for
  * @return      zero if not found, positive if found
  */
-int a3list_contains(const a3list *list, const void *item);
+int rj_list_contains(const rj_list *list, const void *item);
 
 /**
  * tests if a list contains all items in another list
@@ -77,16 +77,16 @@ int a3list_contains(const a3list *list, const void *item);
  * @param  other the list to check
  * @return       zero if nothing found, otherwise the number of items found
  */
-int a3list_contains_all(const a3list *list, const a3list *other);
+int rj_list_contains_all(const rj_list *list, const rj_list *other);
 
 /**
  * gets the data (memory) from a list
  * @param  list  the list instance
  * @param  index the index of the data
  * @return       bytes of the item
- * @see a3list_get_size to get the size of the data
+ * @see rj_list_get_size to get the size of the data
  */
-void *a3list_get(const a3list *list, size_t index);
+void *rj_list_get(const rj_list *list, size_t index);
 
 /**
  * gets the size of the data from a list
@@ -94,7 +94,7 @@ void *a3list_get(const a3list *list, size_t index);
  * @param  index the index of the data
  * @return       the size of the data at the given index
  */
-size_t a3list_get_size(const a3list *list, size_t index);
+size_t rj_list_get_size(const rj_list *list, size_t index);
 
 /**
  * removes an item from a list
@@ -103,7 +103,7 @@ size_t a3list_get_size(const a3list *list, size_t index);
  * @param  item the item to remove
  * @return      zero if nothing was removed, otherwise a positive value
  */
-int a3list_remove(a3list *list, const void *item);
+int rj_list_remove(rj_list *list, const void *item);
 
 /**
  * removes an index from a list
@@ -111,7 +111,7 @@ int a3list_remove(a3list *list, const void *item);
  * @param  index the index to remove
  * @return       positive value if the index was removed
  */
-int a3list_remove_index(a3list *list, size_t index);
+int rj_list_remove_index(rj_list *list, size_t index);
 
 /**
  * removes a list from a list
@@ -120,7 +120,7 @@ int a3list_remove_index(a3list *list, size_t index);
  * @param  other the list to remove
  * @return       zero if nothing removed, otherwise the number of items removed
  */
-int a3list_remove_all(a3list *list, const a3list *other);
+int rj_list_remove_all(rj_list *list, const rj_list *other);
 
 /**
  * gets the index of an item in a list
@@ -128,7 +128,7 @@ int a3list_remove_all(a3list *list, const a3list *other);
  * @param  item the item to find
  * @return      the index of the item in the list
  */
-int a3list_index_of(const a3list *list, const void *item);
+int rj_list_index_of(const rj_list *list, const void *item);
 
 /**
  * sets (replaces) an item in a list.  the existing item will be destroyed.
@@ -136,27 +136,28 @@ int a3list_index_of(const a3list *list, const void *item);
  * @param index the index to set
  * @param item  the item to set
  */
-void a3list_set(a3list *list, size_t index, a3list_item *item);
+void rj_list_set(rj_list *list, size_t index, rj_list_item *item);
 
 /**
  * gets the size of a list
  * @param  list the list instance
  * @return      the size (number of items)
  */
-size_t a3list_size(const a3list *list);
+size_t rj_list_size(const rj_list *list);
 
 /**
  * tests if a list is empty
  * @param  list the list instance
  * @return      a positive value if the list is empty, otherwise zero
  */
-int a3list_is_empty(const a3list *list);
+int rj_list_is_empty(const rj_list *list);
 
 
 /**
- * sorts the list using a mergesort
+ * sorts the list based on the comparator
+ * NOTE: the implementation is subject to change
  * @param  list the list instance
  */
-void a3list_sort(a3list *list);
+void rj_list_sort(rj_list *list);
 
 #endif

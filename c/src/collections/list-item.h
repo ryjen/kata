@@ -1,20 +1,20 @@
-#ifndef ARG3_KATA_LIST_ITEM_H_
-#define ARG3_KATA_LIST_ITEM_H_
+#ifndef RYJEN_KATA_LIST_ITEM_H
+#define RYJEN_KATA_LIST_ITEM_H
 
-typedef void (*a3list_destroy_fn)(void *);
-typedef void *(*a3list_alloc_fn)(size_t);
-typedef int (*a3list_compare_fn)(const void *, const void *, size_t);
-typedef void *(*a3list_copy_fn)(void *, const void *, size_t);
+typedef void (*rj_list_destroy_fn)(void *);
+typedef void *(*rj_list_alloc_fn)(size_t);
+typedef int (*rj_list_compare_fn)(const void *, const void *, size_t);
+typedef void *(*rj_list_copy_fn)(void *, const void *, size_t);
 
-typedef struct a3list_item a3list_item;
+typedef struct rj_list_item rj_list_item;
 
-struct a3list_item {
+struct rj_list_item {
     void *data;
     size_t size;
-    a3list_alloc_fn allocator;
-    a3list_destroy_fn destructor;
-    a3list_copy_fn copier;
-    a3list_compare_fn comparer;
+    rj_list_alloc_fn allocator;
+    rj_list_destroy_fn destructor;
+    rj_list_copy_fn copier;
+    rj_list_compare_fn comparer;
 };
 
 /**
@@ -28,7 +28,7 @@ struct a3list_item {
  * @param  comparator the compare function, can be null
  * @return      a list item
  */
-a3list_item *a3list_item_create(void *data, size_t size, a3list_compare_fn comparator);
+rj_list_item *rj_list_item_create(void *data, size_t size, rj_list_compare_fn comparator);
 
 /**
  * creates a list item suitable for adding to a list
@@ -38,7 +38,7 @@ a3list_item *a3list_item_create(void *data, size_t size, a3list_compare_fn compa
  * @param  comparator the compare function, can be NULL
  * @return      a list item
  */
-a3list_item *a3list_item_create_static(void *data, size_t size, a3list_compare_fn comparator);
+rj_list_item *rj_list_item_create_static(void *data, size_t size, rj_list_compare_fn comparator);
 
 /**
  * creates a list item suitable for adding to a list
@@ -51,22 +51,22 @@ a3list_item *a3list_item_create_static(void *data, size_t size, a3list_compare_f
  * @param  comparator the function to compare the memory (memcpy)
  * @return            a list item
  */
-a3list_item *a3list_item_create_transient(void *data, size_t size, a3list_compare_fn comparator, a3list_alloc_fn allocator,
-                                          a3list_destroy_fn destructor, a3list_copy_fn copier);
+rj_list_item *rj_list_item_create_transient(void *data, size_t size, rj_list_compare_fn comparator, rj_list_alloc_fn allocator,
+                                          rj_list_destroy_fn destructor, rj_list_copy_fn copier);
 
 /**
  * destroy a list item
  * will call the destructor function on the data if set
  * @param item the item instance
  */
-void a3list_item_destroy(a3list_item *item);
+void rj_list_item_destroy(rj_list_item *item);
 
 /**
  * copies and item.  the allocator and copy functions will be called if set, otherwise the pointer will be assigned
  * @param  item the item instance
  * @return      a copy of the item
  */
-a3list_item *a3list_item_copy(const a3list_item *item);
+rj_list_item *rj_list_item_copy(const rj_list_item *item);
 
 /**
  * compares two items.  the compare function must be set on the item, otherwise memcmp will be used
@@ -74,6 +74,6 @@ a3list_item *a3list_item_copy(const a3list_item *item);
  * @param  data the data to compare
  * @return      zero if equal
  */
-int a3list_item_compare(const a3list_item *item, const void *data);
+int rj_list_item_compare(const rj_list_item *item, const void *data);
 
 #endif

@@ -206,7 +206,10 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      */
     @Override
     public void addVertices(Vertex... list) {
-        super.addVertices(list);
+        for (Vertex v : list) {
+            // don't resize on each vertex
+            addVertex(v, false);
+        }
         edges.resize(vertices.size());
     }
 

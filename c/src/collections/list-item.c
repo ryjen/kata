@@ -5,20 +5,20 @@
 
 #include "list-item.h"
 
-a3list_item *a3list_item_create(void *data, size_t size, a3list_compare_fn comparer)
+rj_list_item *rj_list_item_create(void *data, size_t size, rj_list_compare_fn comparer)
 {
-    return a3list_item_create_transient(data, size, comparer, malloc, free, memmove);
+    return rj_list_item_create_transient(data, size, comparer, malloc, free, memmove);
 }
 
-a3list_item *a3list_item_create_static(void *data, size_t size, a3list_compare_fn comparer)
+rj_list_item *rj_list_item_create_static(void *data, size_t size, rj_list_compare_fn comparer)
 {
-    return a3list_item_create_transient(data, size, comparer, NULL, NULL, NULL);
+    return rj_list_item_create_transient(data, size, comparer, NULL, NULL, NULL);
 }
 
-a3list_item *a3list_item_create_transient(void *data, size_t size, a3list_compare_fn comparer, a3list_alloc_fn allocator,
-                                          a3list_destroy_fn destructor, a3list_copy_fn copier)
+rj_list_item *rj_list_item_create_transient(void *data, size_t size, rj_list_compare_fn comparer, rj_list_alloc_fn allocator,
+                                          rj_list_destroy_fn destructor, rj_list_copy_fn copier)
 {
-    a3list_item *item = malloc(sizeof(*item));
+    rj_list_item *item = malloc(sizeof(*item));
     assert(item != NULL);
     item->data = data;
     item->size = size;
@@ -29,7 +29,7 @@ a3list_item *a3list_item_create_transient(void *data, size_t size, a3list_compar
     return item;
 }
 
-void a3list_item_destroy(a3list_item *item)
+void rj_list_item_destroy(rj_list_item *item)
 {
     if (item == NULL) {
         return;
@@ -42,9 +42,9 @@ void a3list_item_destroy(a3list_item *item)
     free(item);
 }
 
-a3list_item *a3list_item_copy(const a3list_item *orig)
+rj_list_item *rj_list_item_copy(const rj_list_item *orig)
 {
-    a3list_item *item = NULL;
+    rj_list_item *item = NULL;
 
     if (orig == NULL) {
         return NULL;
@@ -68,7 +68,7 @@ a3list_item *a3list_item_copy(const a3list_item *orig)
     return item;
 }
 
-int a3list_item_compare(const a3list_item *item, const void *data)
+int rj_list_item_compare(const rj_list_item *item, const void *data)
 {
     assert(item != NULL);
 

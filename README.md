@@ -1,6 +1,15 @@
 # kata
 code kata for practice
 
-# collections
+# c lang
 
-See [README](c/src/collections/README.md)
+See [README](c)
+
+# java lang
+
+See [README](java)
+
+# rust lang
+
+See [README](rust)
+

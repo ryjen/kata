@@ -1,5 +1,5 @@
-#ifndef ARG3_KATA_LIST_H_
-#define ARG3_KATA_LIST_H_
+#ifndef RYJEN_KATA_LIST_H
+#define RYJEN_KATA_LIST_H
 
 #include "list-item.h"
 #include "list-single.h"

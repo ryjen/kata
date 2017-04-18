@@ -79,7 +79,7 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      *
      * @param <V> the type of vertex
      */
-    public interface OnVisit<V> {
+    public interface OnVisit<V extends Comparable<V>> {
         void onSearchVisit(V value);
     }
 }

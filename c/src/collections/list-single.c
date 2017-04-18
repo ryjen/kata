@@ -6,77 +6,77 @@
 
 #include "list-single.h"
 
-typedef struct a3list_node a3list_node;
+typedef struct rj_list_node rj_list_node;
 
-struct a3list_node {
-    a3list_node *next;
-    a3list_item *item;
+struct rj_list_node {
+    rj_list_node *next;
+    rj_list_item *item;
 };
 
-struct a3list {
-    a3list_node *first;
+struct rj_list {
+    rj_list_node *first;
     size_t size;
 };
 
-static a3list_node *__a3list_node_create(a3list_item *item)
+static rj_list_node *__rj_list_node_create(rj_list_item *item)
 {
-    a3list_node *node = malloc(sizeof(*node));
+    rj_list_node *node = malloc(sizeof(*node));
     assert(node != NULL);
     node->next = NULL;
     node->item = item;
     return node;
 }
 
-static void __a3list_node_destroy(a3list_node *node)
+static void __rj_list_node_destroy(rj_list_node *node)
 {
     if (node == NULL) {
         return;
     }
 
     if (node->item != NULL) {
-        a3list_item_destroy(node->item);
+        rj_list_item_destroy(node->item);
     }
 
     free(node);
 }
 
-a3list *a3list_create()
+rj_list *rj_list_create()
 {
-    a3list *list = malloc(sizeof(*list));
+    rj_list *list = malloc(sizeof(*list));
     assert(list != NULL);
     list->first = NULL;
     list->size = 0;
     return list;
 }
 
-void a3list_destroy(a3list *list)
+void rj_list_destroy(rj_list *list)
 {
     if (list == NULL) {
         return;
     }
 
-    a3list_clear(list);
+    rj_list_clear(list);
 
     free(list);
 }
 
-static void __a3list_node_insert_after(a3list_node *node, a3list_item *item)
+static void __rj_list_node_insert_after(rj_list_node *node, rj_list_item *item)
 {
-    a3list_node *other = NULL;
+    rj_list_node *other = NULL;
 
     if (node == NULL || item == NULL) {
         return;
     }
 
-    other = __a3list_node_create(item);
+    other = __rj_list_node_create(item);
 
     other->next = node->next;
     node->next = other;
 }
 
-static a3list_node *__a3list_get_node(const a3list *list, size_t index)
+static rj_list_node *__rj_list_get_node(const rj_list *list, size_t index)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
     size_t pos = 0;
 
     if (list == NULL) {
@@ -91,7 +91,7 @@ static a3list_node *__a3list_get_node(const a3list *list, size_t index)
     return NULL;
 }
 
-static void __a3list_add_node(a3list *list, a3list_node *node)
+static void __rj_list_add_node(rj_list *list, rj_list_node *node)
 {
     if (list == NULL || node == NULL) {
         return;
@@ -102,70 +102,70 @@ static void __a3list_add_node(a3list *list, a3list_node *node)
     list->size++;
 }
 
-void a3list_add(a3list *list, a3list_item *item)
+void rj_list_add(rj_list *list, rj_list_item *item)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
 
     if (list == NULL) {
         return;
     }
 
-    node = __a3list_node_create(item);
+    node = __rj_list_node_create(item);
 
-    __a3list_add_node(list, node);
+    __rj_list_add_node(list, node);
 }
 
-void a3list_add_index(a3list *list, size_t index, a3list_item *item)
+void rj_list_add_index(rj_list *list, size_t index, rj_list_item *item)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
     if (list == NULL) {
         return;
     }
 
-    node = __a3list_get_node(list, index);
+    node = __rj_list_get_node(list, index);
 
     if (node != NULL) {
-        __a3list_node_insert_after(node, item);
+        __rj_list_node_insert_after(node, item);
         list->size++;
     }
 }
 
-void a3list_add_all(a3list *list, const a3list *other)
+void rj_list_add_all(rj_list *list, const rj_list *other)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
 
     if (list == NULL || other == NULL) {
         return;
     }
 
     for (node = other->first; node; node = node->next) {
-        a3list_add(list, a3list_item_copy(node->item));
+        rj_list_add(list, rj_list_item_copy(node->item));
     }
 }
 
 
-void a3list_add_all_index(a3list *list, size_t index, const a3list *other)
+void rj_list_add_all_index(rj_list *list, size_t index, const rj_list *other)
 {
-    a3list_node *node = NULL, *other_node = NULL;
+    rj_list_node *node = NULL, *other_node = NULL;
 
     if (list == NULL || other == NULL) {
         return;
     }
 
-    node = __a3list_get_node(list, index);
+    node = __rj_list_get_node(list, index);
 
     if (node == NULL) {
         return;
     }
 
     for (other_node = other->first; other_node; other_node = other_node->next) {
-        a3list_add_index(list, index, a3list_item_copy(other_node->item));
+        rj_list_add_index(list, index, rj_list_item_copy(other_node->item));
     }
 }
 
-void a3list_clear(a3list *list)
+void rj_list_clear(rj_list *list)
 {
-    a3list_node *node = NULL, *next_node = NULL;
+    rj_list_node *node = NULL, *next_node = NULL;
 
     if (list == NULL) {
         return;
@@ -173,22 +173,22 @@ void a3list_clear(a3list *list)
 
     for (node = list->first; node; node = next_node) {
         next_node = node->next;
-        __a3list_node_destroy(node);
+        __rj_list_node_destroy(node);
     }
     list->first = NULL;
     list->size = 0;
 }
 
-static a3list_node *__a3list_find_node_data(const a3list *list, const void *data)
+static rj_list_node *__rj_list_find_node_data(const rj_list *list, const void *data)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
 
     if (list == NULL) {
         return NULL;
     }
 
     for (node = list->first; node; node = node->next) {
-        a3list_item *item = node->item;
+        rj_list_item *item = node->item;
 
         if (item == NULL) {
             continue;
@@ -198,23 +198,23 @@ static a3list_node *__a3list_find_node_data(const a3list *list, const void *data
             return node;
         }
 
-        if (a3list_item_compare(item, data) == 0) {
+        if (rj_list_item_compare(item, data) == 0) {
             return node;
         }
     }
     return NULL;
 }
 
-int a3list_contains(const a3list *list, const void *data)
+int rj_list_contains(const rj_list *list, const void *data)
 {
-    a3list_node *node = NULL;
-    a3list_item *item = NULL;
+    rj_list_node *node = NULL;
+    rj_list_item *item = NULL;
 
     if (list == NULL) {
         return 0;
     }
 
-    node = __a3list_find_node_data(list, data);
+    node = __rj_list_find_node_data(list, data);
 
     if (node == NULL) {
         return 0;
@@ -223,9 +223,9 @@ int a3list_contains(const a3list *list, const void *data)
     return 1;
 }
 
-int a3list_contains_all(const a3list *list, const a3list *other)
+int rj_list_contains_all(const rj_list *list, const rj_list *other)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
 
     if (list == NULL || other == NULL) {
         return 0;
@@ -236,7 +236,7 @@ int a3list_contains_all(const a3list *list, const a3list *other)
     }
 
     for (node = other->first; node; node = node->next) {
-        if (a3list_contains(list, node->item->data)) {
+        if (rj_list_contains(list, node->item->data)) {
             return 1;
         }
     }
@@ -244,13 +244,13 @@ int a3list_contains_all(const a3list *list, const a3list *other)
     return 0;
 }
 
-void *a3list_get(const a3list *list, size_t index)
+void *rj_list_get(const rj_list *list, size_t index)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
     if (list == NULL) {
         return NULL;
     }
-    node = __a3list_get_node(list, index);
+    node = __rj_list_get_node(list, index);
 
     if (node == NULL || node->item == NULL) {
         return NULL;
@@ -259,13 +259,13 @@ void *a3list_get(const a3list *list, size_t index)
     return node->item->data;
 }
 
-size_t a3list_get_size(const a3list *list, size_t index)
+size_t rj_list_get_size(const rj_list *list, size_t index)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
     if (list == NULL) {
         return 0;
     }
-    node = __a3list_get_node(list, index);
+    node = __rj_list_get_node(list, index);
 
     if (node == NULL || node->item == NULL) {
         return 0;
@@ -274,9 +274,9 @@ size_t a3list_get_size(const a3list *list, size_t index)
     return node->item->size;
 }
 
-static void __a3list_node_unlink(a3list *list, a3list_node *node)
+static void __rj_list_node_unlink(rj_list *list, rj_list_node *node)
 {
-    a3list_node *prev = NULL;
+    rj_list_node *prev = NULL;
 
     if (list == NULL || node == NULL) {
         return;
@@ -299,51 +299,51 @@ static void __a3list_node_unlink(a3list *list, a3list_node *node)
     }
 }
 
-int a3list_remove(a3list *list, const void *item)
+int rj_list_remove(rj_list *list, const void *item)
 {
-    a3list_node *node = NULL, *prev = NULL;
+    rj_list_node *node = NULL, *prev = NULL;
 
     if (list == NULL) {
         return 0;
     }
 
-    node = __a3list_find_node_data(list, item);
+    node = __rj_list_find_node_data(list, item);
 
     if (node == NULL) {
         return 0;
     }
 
-    __a3list_node_unlink(list, node);
+    __rj_list_node_unlink(list, node);
 
-    __a3list_node_destroy(node);
+    __rj_list_node_destroy(node);
 
     return 1;
 }
 
-int a3list_remove_index(a3list *list, size_t index)
+int rj_list_remove_index(rj_list *list, size_t index)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
 
     if (list == NULL) {
         return 0;
     }
 
-    node = __a3list_get_node(list, index);
+    node = __rj_list_get_node(list, index);
 
     if (node == NULL) {
         return 0;
     }
 
-    __a3list_node_unlink(list, node);
+    __rj_list_node_unlink(list, node);
 
-    __a3list_node_destroy(node);
+    __rj_list_node_destroy(node);
 
     return 1;
 }
 
-int a3list_remove_all(a3list *list, const a3list *other)
+int rj_list_remove_all(rj_list *list, const rj_list *other)
 {
-    a3list_node *node = NULL, *found = NULL;
+    rj_list_node *node = NULL, *found = NULL;
     int result = 0;
 
     if (list == NULL || other == NULL) {
@@ -355,12 +355,12 @@ int a3list_remove_all(a3list *list, const a3list *other)
             continue;
         }
 
-        found = __a3list_find_node_data(list, node->item->data);
+        found = __rj_list_find_node_data(list, node->item->data);
 
         if (found) {
-            __a3list_node_unlink(list, found);
+            __rj_list_node_unlink(list, found);
 
-            __a3list_node_destroy(found);
+            __rj_list_node_destroy(found);
 
             result++;
         }
@@ -369,9 +369,9 @@ int a3list_remove_all(a3list *list, const a3list *other)
     return result;
 }
 
-int a3list_index_of(const a3list *list, const void *data)
+int rj_list_index_of(const rj_list *list, const void *data)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
     int pos = 0;
 
     if (list == NULL) {
@@ -379,13 +379,13 @@ int a3list_index_of(const a3list *list, const void *data)
     }
 
     for (node = list->first; node; node = node->next, pos++) {
-        a3list_item *item = node->item;
+        rj_list_item *item = node->item;
 
         if (item == NULL) {
             continue;
         }
 
-        if (a3list_item_compare(item, data) == 0) {
+        if (rj_list_item_compare(item, data) == 0) {
             return pos;
         }
     }
@@ -393,26 +393,26 @@ int a3list_index_of(const a3list *list, const void *data)
     return -1;
 }
 
-void a3list_set(a3list *list, size_t index, a3list_item *item)
+void rj_list_set(rj_list *list, size_t index, rj_list_item *item)
 {
-    a3list_node *node = NULL;
+    rj_list_node *node = NULL;
 
     if (list == NULL) {
         return;
     }
 
-    node = __a3list_get_node(list, index);
+    node = __rj_list_get_node(list, index);
 
     if (node == NULL) {
         return;
     }
 
-    a3list_item_destroy(node->item);
+    rj_list_item_destroy(node->item);
 
     node->item = item;
 }
 
-size_t a3list_size(const a3list *list)
+size_t rj_list_size(const rj_list *list)
 {
     if (list == NULL) {
         return 0;
@@ -420,18 +420,22 @@ size_t a3list_size(const a3list *list)
     return list->size;
 }
 
-int a3list_is_empty(const a3list *list)
+int rj_list_is_empty(const rj_list *list)
 {
     return list == NULL || list->size == 0 || list->first == NULL;
 }
 
-static a3list_node *__a3list_merge_nodes(a3list_node *left, a3list_node *right)
+static rj_list_node *__rj_list_merge_nodes(rj_list_node *left, rj_list_node *right)
 {
-    a3list_node *result = NULL, *last = NULL;
-    a3list_node *next = NULL;
+    rj_list_node *result = NULL, *last = NULL;
+    rj_list_node *next = NULL;
 
     while (left && right) {
-        if (a3list_item_compare(left->item, right->item->data) <= 0) {
+
+        // compare the two nodes
+        if (rj_list_item_compare(left->item, right->item->data) <= 0) {
+
+            // move the left up
             next = left->next;
             if (last == NULL) {
                 left->next = result;
@@ -443,6 +447,7 @@ static a3list_node *__a3list_merge_nodes(a3list_node *left, a3list_node *right)
             last = left;
             left = next;
         } else {
+            // move the right up
             next = right->next;
             if (last == NULL) {
                 right->next = result;
@@ -457,15 +462,18 @@ static a3list_node *__a3list_merge_nodes(a3list_node *left, a3list_node *right)
     }
 
     if (left) {
+        // ensure left ends meet
         if (last == NULL) {
             result = left;
         } else {
             last->next = left;
         }
+        // last might be needed in the next comparison
         last = left;
     }
 
     if (right) {
+        // ensure right ends meet
         if (last == NULL) {
             result = left;
         } else {
@@ -477,11 +485,15 @@ static a3list_node *__a3list_merge_nodes(a3list_node *left, a3list_node *right)
     return result;
 }
 
-static a3list_node *__a3list_merge_sort(a3list_node *first)
+/**
+ * standard merge sort, O(n log n)
+ * TODO: more efficient algorithm
+ */
+static rj_list_node *__rj_list_merge_sort(rj_list_node *first)
 {
-    a3list_node *left = NULL;
-    a3list_node *right = NULL;
-    a3list_node *node = NULL, *node_next = NULL;
+    rj_list_node *left = NULL;
+    rj_list_node *right = NULL;
+    rj_list_node *node = NULL, *node_next = NULL;
     size_t pos = 0;
 
     /* make sure we have 2 items at least */
@@ -489,6 +501,10 @@ static a3list_node *__a3list_merge_sort(a3list_node *first)
         return first;
     }
 
+    /* this divides the list into two seperate lists.
+     * doesn't split down the middle as calculating the size is
+     * extra overhead, instead just alternating each consecutive item
+     */
     for (node = first; node; node = node_next, pos++) {
         node_next = node->next;
         if (pos % 2 != 0) {
@@ -500,18 +516,18 @@ static a3list_node *__a3list_merge_sort(a3list_node *first)
         }
     }
 
-    left = __a3list_merge_sort(left);
-    right = __a3list_merge_sort(right);
+    left = __rj_list_merge_sort(left);
+    right = __rj_list_merge_sort(right);
 
-    return __a3list_merge_nodes(left, right);
+    return __rj_list_merge_nodes(left, right);
 }
 
-void a3list_sort(a3list *list)
+void rj_list_sort(rj_list *list)
 {
     // Base case. A list of zero or one elements is sorted, by definition.
-    if (a3list_size(list) <= 1) {
+    if (rj_list_size(list) <= 1) {
         return;
     }
 
-    list->first = __a3list_merge_sort(list->first);
+    list->first = __rj_list_merge_sort(list->first);
 }

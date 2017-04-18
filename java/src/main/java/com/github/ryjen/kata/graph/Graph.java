@@ -3,6 +3,8 @@ package com.github.ryjen.kata.graph;
 import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
+import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
+import com.github.ryjen.kata.graph.formatters.VertexFormatter;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
 import com.github.ryjen.kata.graph.search.Ordering;
@@ -19,22 +21,42 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     private boolean directed;
 
+    /**
+     * default constructor
+     * @param directed true if the graph is directed
+     */
     protected Graph(boolean directed) {
         this.directed = directed;
     }
 
+    /**
+     * copy constructor
+     * @param other
+     */
     protected Graph(Graph<Vertex> other) {
         this.directed = other.directed;
     }
 
+    /**
+     * clones this instance
+     * @return a copy of this graph
+     */
     public abstract Graph<Vertex> clone();
 
+    /**
+     * add a list of vertices
+     * @param list
+     */
     public void addVertices(Vertex... list) {
         for (Vertex v : list) {
             addVertex(v);
         }
     }
 
+    /**
+     * gets the size of the graph in terms of number of vertices
+     * @return the size
+     */
     public abstract int size();
 
 
@@ -60,6 +82,10 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         bfs.search(start);
     }
 
+    /**
+     * tests if this graph is connected (no stray vertices)
+     * @return true if all vertices are connected
+     */
     public boolean isConnected() {
         Set<Vertex> visited = new HashSet<>();
 
@@ -70,6 +96,10 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         return visited.size() == size();
     }
 
+    /**
+     * tests if this graph is cyclic
+     * @return true if one or more vertices are connected in a loop
+     */
     public boolean isCyclic() {
 
         if (!isDirected()) {
@@ -82,8 +112,10 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
             sorter.sort();
 
             return false;
-        } catch (GraphNotDirectedException | GraphIsCyclicException e) {
+        } catch (GraphIsCyclicException e) {
             return true;
+        } catch (GraphNotDirectedException e) {
+            return false;
         }
     }
 
@@ -98,14 +130,45 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
     }
 
 
+    /**
+     * test for the number of connections into a vertex
+     * @param vertex the vertex to check
+     * @return the number of in connections
+     */
     public abstract int inDegree(Vertex vertex);
 
+    /**
+     * test for the number of connections coming from a vertex
+     * @param vertex the vertex to test
+     * @return the number of out connections
+     */
     public abstract int outDegree(Vertex vertex);
 
+    /**
+     * tests if this graph is directed
+     * @return true if is directed
+     */
     public boolean isDirected() {
         return directed;
     }
 
 
-    public abstract String toString(Formatter formatter);
+    @Override
+    public String toString() {
+        return toString(new SimpleFormatter<>(this));
+    }
+
+    /**
+     * custom toString() with option to show vertices
+     *
+     * @param formatter how to format the graph
+     * @return the string representation
+     */
+    public String toString(Formatter formatter) {
+        StringBuilder buf = new StringBuilder();
+
+        formatter.format(buf);
+
+        return buf.toString();
+    }
 }

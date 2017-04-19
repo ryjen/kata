@@ -6,28 +6,28 @@
 
 #include "list-single.h"
 
-typedef struct rj_list_node rj_list_node;
+typedef struct __rj_list_node RJListNode;
 
-struct rj_list_node {
-    rj_list_node *next;
-    rj_list_item *item;
+struct __rj_list_node {
+    RJListNode *next;
+    RJListItem *item;
 };
 
-struct rj_list {
-    rj_list_node *first;
+struct __rj_list {
+    RJListNode *first;
     size_t size;
 };
 
-static rj_list_node *__rj_list_node_create(rj_list_item *item)
+static RJListNode *__rj_list_node_create(RJListItem *item)
 {
-    rj_list_node *node = malloc(sizeof(*node));
+    RJListNode *node = malloc(sizeof(*node));
     assert(node != NULL);
     node->next = NULL;
     node->item = item;
     return node;
 }
 
-static void __rj_list_node_destroy(rj_list_node *node)
+static void __rj_list_node_destroy(RJListNode *node)
 {
     if (node == NULL) {
         return;
@@ -40,16 +40,16 @@ static void __rj_list_node_destroy(rj_list_node *node)
     free(node);
 }
 
-rj_list *rj_list_create()
+RJList *rj_list_create()
 {
-    rj_list *list = malloc(sizeof(*list));
+    RJList *list = malloc(sizeof(RJList));
     assert(list != NULL);
     list->first = NULL;
     list->size = 0;
     return list;
 }
 
-void rj_list_destroy(rj_list *list)
+void rj_list_destroy(RJList *list)
 {
     if (list == NULL) {
         return;
@@ -60,9 +60,9 @@ void rj_list_destroy(rj_list *list)
     free(list);
 }
 
-static void __rj_list_node_insert_after(rj_list_node *node, rj_list_item *item)
+static void __rj_list_node_insert_after(RJListNode *node, RJListItem *item)
 {
-    rj_list_node *other = NULL;
+    RJListNode *other = NULL;
 
     if (node == NULL || item == NULL) {
         return;
@@ -74,9 +74,9 @@ static void __rj_list_node_insert_after(rj_list_node *node, rj_list_item *item)
     node->next = other;
 }
 
-static rj_list_node *__rj_list_get_node(const rj_list *list, size_t index)
+static RJListNode *__rj_list_get_node(const RJList *list, size_t index)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
     size_t pos = 0;
 
     if (list == NULL) {
@@ -91,7 +91,7 @@ static rj_list_node *__rj_list_get_node(const rj_list *list, size_t index)
     return NULL;
 }
 
-static void __rj_list_add_node(rj_list *list, rj_list_node *node)
+static void __rj_list_add_node(RJList *list, RJListNode *node)
 {
     if (list == NULL || node == NULL) {
         return;
@@ -102,9 +102,9 @@ static void __rj_list_add_node(rj_list *list, rj_list_node *node)
     list->size++;
 }
 
-void rj_list_add(rj_list *list, rj_list_item *item)
+void rj_list_add(RJList *list, RJListItem *item)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
 
     if (list == NULL) {
         return;
@@ -115,9 +115,9 @@ void rj_list_add(rj_list *list, rj_list_item *item)
     __rj_list_add_node(list, node);
 }
 
-void rj_list_add_index(rj_list *list, size_t index, rj_list_item *item)
+void rj_list_add_index(RJList *list, size_t index, RJListItem *item)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
     if (list == NULL) {
         return;
     }
@@ -130,9 +130,9 @@ void rj_list_add_index(rj_list *list, size_t index, rj_list_item *item)
     }
 }
 
-void rj_list_add_all(rj_list *list, const rj_list *other)
+void rj_list_add_all(RJList *list, const RJList *other)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
 
     if (list == NULL || other == NULL) {
         return;
@@ -144,9 +144,9 @@ void rj_list_add_all(rj_list *list, const rj_list *other)
 }
 
 
-void rj_list_add_all_index(rj_list *list, size_t index, const rj_list *other)
+void rj_list_add_all_index(RJList *list, size_t index, const RJList *other)
 {
-    rj_list_node *node = NULL, *other_node = NULL;
+    RJListNode *node = NULL, *other_node = NULL;
 
     if (list == NULL || other == NULL) {
         return;
@@ -163,9 +163,9 @@ void rj_list_add_all_index(rj_list *list, size_t index, const rj_list *other)
     }
 }
 
-void rj_list_clear(rj_list *list)
+void rj_list_clear(RJList *list)
 {
-    rj_list_node *node = NULL, *next_node = NULL;
+    RJListNode *node = NULL, *next_node = NULL;
 
     if (list == NULL) {
         return;
@@ -179,16 +179,16 @@ void rj_list_clear(rj_list *list)
     list->size = 0;
 }
 
-static rj_list_node *__rj_list_find_node_data(const rj_list *list, const void *data)
+static RJListNode *__rj_list_find_node_data(const RJList *list, const void *data)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
 
     if (list == NULL) {
         return NULL;
     }
 
     for (node = list->first; node; node = node->next) {
-        rj_list_item *item = node->item;
+        RJListItem *item = node->item;
 
         if (item == NULL) {
             continue;
@@ -205,10 +205,10 @@ static rj_list_node *__rj_list_find_node_data(const rj_list *list, const void *d
     return NULL;
 }
 
-int rj_list_contains(const rj_list *list, const void *data)
+int rj_list_contains(const RJList *list, const void *data)
 {
-    rj_list_node *node = NULL;
-    rj_list_item *item = NULL;
+    RJListNode *node = NULL;
+    RJListItem *item = NULL;
 
     if (list == NULL) {
         return 0;
@@ -223,9 +223,9 @@ int rj_list_contains(const rj_list *list, const void *data)
     return 1;
 }
 
-int rj_list_contains_all(const rj_list *list, const rj_list *other)
+int rj_list_contains_all(const RJList *list, const RJList *other)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
 
     if (list == NULL || other == NULL) {
         return 0;
@@ -244,9 +244,9 @@ int rj_list_contains_all(const rj_list *list, const rj_list *other)
     return 0;
 }
 
-void *rj_list_get(const rj_list *list, size_t index)
+void *rj_list_get(const RJList *list, size_t index)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
     if (list == NULL) {
         return NULL;
     }
@@ -259,9 +259,9 @@ void *rj_list_get(const rj_list *list, size_t index)
     return node->item->data;
 }
 
-size_t rj_list_get_size(const rj_list *list, size_t index)
+size_t rj_list_get_size(const RJList *list, size_t index)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
     if (list == NULL) {
         return 0;
     }
@@ -274,9 +274,9 @@ size_t rj_list_get_size(const rj_list *list, size_t index)
     return node->item->size;
 }
 
-static void __rj_list_node_unlink(rj_list *list, rj_list_node *node)
+static void __rj_list_node_unlink(RJList *list, RJListNode *node)
 {
-    rj_list_node *prev = NULL;
+    RJListNode *prev = NULL;
 
     if (list == NULL || node == NULL) {
         return;
@@ -299,9 +299,9 @@ static void __rj_list_node_unlink(rj_list *list, rj_list_node *node)
     }
 }
 
-int rj_list_remove(rj_list *list, const void *item)
+int rj_list_remove(RJList *list, const void *item)
 {
-    rj_list_node *node = NULL, *prev = NULL;
+    RJListNode *node = NULL, *prev = NULL;
 
     if (list == NULL) {
         return 0;
@@ -320,9 +320,9 @@ int rj_list_remove(rj_list *list, const void *item)
     return 1;
 }
 
-int rj_list_remove_index(rj_list *list, size_t index)
+int rj_list_remove_index(RJList *list, size_t index)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
 
     if (list == NULL) {
         return 0;
@@ -341,9 +341,9 @@ int rj_list_remove_index(rj_list *list, size_t index)
     return 1;
 }
 
-int rj_list_remove_all(rj_list *list, const rj_list *other)
+int rj_list_remove_all(RJList *list, const RJList *other)
 {
-    rj_list_node *node = NULL, *found = NULL;
+    RJListNode *node = NULL, *found = NULL;
     int result = 0;
 
     if (list == NULL || other == NULL) {
@@ -369,9 +369,9 @@ int rj_list_remove_all(rj_list *list, const rj_list *other)
     return result;
 }
 
-int rj_list_index_of(const rj_list *list, const void *data)
+int rj_list_index_of(const RJList *list, const void *data)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
     int pos = 0;
 
     if (list == NULL) {
@@ -379,7 +379,7 @@ int rj_list_index_of(const rj_list *list, const void *data)
     }
 
     for (node = list->first; node; node = node->next, pos++) {
-        rj_list_item *item = node->item;
+        RJListItem *item = node->item;
 
         if (item == NULL) {
             continue;
@@ -393,9 +393,9 @@ int rj_list_index_of(const rj_list *list, const void *data)
     return -1;
 }
 
-void rj_list_set(rj_list *list, size_t index, rj_list_item *item)
+void rj_list_set(RJList *list, size_t index, RJListItem *item)
 {
-    rj_list_node *node = NULL;
+    RJListNode *node = NULL;
 
     if (list == NULL) {
         return;
@@ -412,7 +412,7 @@ void rj_list_set(rj_list *list, size_t index, rj_list_item *item)
     node->item = item;
 }
 
-size_t rj_list_size(const rj_list *list)
+size_t rj_list_size(const RJList *list)
 {
     if (list == NULL) {
         return 0;
@@ -420,21 +420,19 @@ size_t rj_list_size(const rj_list *list)
     return list->size;
 }
 
-int rj_list_is_empty(const rj_list *list)
+int rj_list_is_empty(const RJList *list)
 {
     return list == NULL || list->size == 0 || list->first == NULL;
 }
 
-static rj_list_node *__rj_list_merge_nodes(rj_list_node *left, rj_list_node *right)
+static RJListNode *__rj_list_merge_nodes(RJListNode *left, RJListNode *right)
 {
-    rj_list_node *result = NULL, *last = NULL;
-    rj_list_node *next = NULL;
+    RJListNode *result = NULL, *last = NULL;
+    RJListNode *next = NULL;
 
     while (left && right) {
-
         // compare the two nodes
         if (rj_list_item_compare(left->item, right->item->data) <= 0) {
-
             // move the left up
             next = left->next;
             if (last == NULL) {
@@ -489,11 +487,11 @@ static rj_list_node *__rj_list_merge_nodes(rj_list_node *left, rj_list_node *rig
  * standard merge sort, O(n log n)
  * TODO: more efficient algorithm
  */
-static rj_list_node *__rj_list_merge_sort(rj_list_node *first)
+static RJListNode *__rj_list_merge_sort(RJListNode *first)
 {
-    rj_list_node *left = NULL;
-    rj_list_node *right = NULL;
-    rj_list_node *node = NULL, *node_next = NULL;
+    RJListNode *left = NULL;
+    RJListNode *right = NULL;
+    RJListNode *node = NULL, *node_next = NULL;
     size_t pos = 0;
 
     /* make sure we have 2 items at least */
@@ -522,7 +520,7 @@ static rj_list_node *__rj_list_merge_sort(rj_list_node *first)
     return __rj_list_merge_nodes(left, right);
 }
 
-void rj_list_sort(rj_list *list)
+void rj_list_sort(RJList *list)
 {
     // Base case. A list of zero or one elements is sorted, by definition.
     if (rj_list_size(list) <= 1) {

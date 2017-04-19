@@ -1,20 +1,20 @@
 #ifndef RYJEN_KATA_LIST_ITEM_H
 #define RYJEN_KATA_LIST_ITEM_H
 
-typedef void (*rj_list_destroy_fn)(void *);
-typedef void *(*rj_list_alloc_fn)(size_t);
-typedef int (*rj_list_compare_fn)(const void *, const void *, size_t);
-typedef void *(*rj_list_copy_fn)(void *, const void *, size_t);
+typedef void (*RJListDestroyCallback)(void *);
+typedef void *(*RJListAllocCallback)(size_t);
+typedef int (*RJListCompareCallback)(const void *, const void *, size_t);
+typedef void *(*RJListCopyCallback)(void *, const void *, size_t);
 
-typedef struct rj_list_item rj_list_item;
+typedef struct __rj_list_item RJListItem;
 
-struct rj_list_item {
+struct __rj_list_item {
     void *data;
     size_t size;
-    rj_list_alloc_fn allocator;
-    rj_list_destroy_fn destructor;
-    rj_list_copy_fn copier;
-    rj_list_compare_fn comparer;
+    RJListAllocCallback allocator;
+    RJListDestroyCallback destructor;
+    RJListCopyCallback copier;
+    RJListCompareCallback comparer;
 };
 
 /**
@@ -28,7 +28,7 @@ struct rj_list_item {
  * @param  comparator the compare function, can be null
  * @return      a list item
  */
-rj_list_item *rj_list_item_create(void *data, size_t size, rj_list_compare_fn comparator);
+RJListItem *rj_list_item_create(void *data, size_t size, RJListCompareCallback comparator);
 
 /**
  * creates a list item suitable for adding to a list
@@ -38,7 +38,7 @@ rj_list_item *rj_list_item_create(void *data, size_t size, rj_list_compare_fn co
  * @param  comparator the compare function, can be NULL
  * @return      a list item
  */
-rj_list_item *rj_list_item_create_static(void *data, size_t size, rj_list_compare_fn comparator);
+RJListItem *rj_list_item_create_static(void *data, size_t size, RJListCompareCallback comparator);
 
 /**
  * creates a list item suitable for adding to a list
@@ -51,22 +51,23 @@ rj_list_item *rj_list_item_create_static(void *data, size_t size, rj_list_compar
  * @param  comparator the function to compare the memory (memcpy)
  * @return            a list item
  */
-rj_list_item *rj_list_item_create_transient(void *data, size_t size, rj_list_compare_fn comparator, rj_list_alloc_fn allocator,
-                                          rj_list_destroy_fn destructor, rj_list_copy_fn copier);
+RJListItem *rj_list_item_create_transient(void *data, size_t size, RJListCompareCallback comparator,
+                                          RJListAllocCallback allocator, RJListDestroyCallback destructor,
+                                          RJListCopyCallback copier);
 
 /**
  * destroy a list item
  * will call the destructor function on the data if set
  * @param item the item instance
  */
-void rj_list_item_destroy(rj_list_item *item);
+void rj_list_item_destroy(RJListItem *item);
 
 /**
  * copies and item.  the allocator and copy functions will be called if set, otherwise the pointer will be assigned
  * @param  item the item instance
  * @return      a copy of the item
  */
-rj_list_item *rj_list_item_copy(const rj_list_item *item);
+RJListItem *rj_list_item_copy(const RJListItem *item);
 
 /**
  * compares two items.  the compare function must be set on the item, otherwise memcmp will be used
@@ -74,6 +75,6 @@ rj_list_item *rj_list_item_copy(const rj_list_item *item);
  * @param  data the data to compare
  * @return      zero if equal
  */
-int rj_list_item_compare(const rj_list_item *item, const void *data);
+int rj_list_item_compare(const RJListItem *item, const void *data);
 
 #endif

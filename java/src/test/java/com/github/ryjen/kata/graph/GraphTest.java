@@ -6,7 +6,9 @@ import com.github.ryjen.kata.graph.formatters.ListFormatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
 import com.github.ryjen.kata.graph.formatters.VertexFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
+import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
+import com.github.ryjen.kata.graph.model.WeightedEdge;
 import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.sort.TopologicalSort;
 import org.junit.Assert;
@@ -405,4 +407,19 @@ public abstract class GraphTest {
 
     }
 
+    @Test
+    public void testAdjacentEdges() {
+        Graph<Integer> graph = newGraph(new IndexFactory(5), false);
+
+        graph.addEdge(0, 1, 3);
+        graph.addEdge(1, 3, 4);
+        graph.addEdge(2, 1, 1);
+        graph.addEdge(3, 4, 3);
+
+        List<Edge> expected = Arrays.asList(new WeightedEdge(3), new WeightedEdge(1), new WeightedEdge(4));
+
+        List<Edge> actual = StreamSupport.stream(graph.edges(1).spliterator(), false).collect(Collectors.toList());
+
+        Assert.assertEquals(expected, actual);
+    }
 }

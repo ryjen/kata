@@ -5,7 +5,7 @@ package com.github.ryjen.kata.graph.model;
  *
  * @see Factory
  */
-public abstract class Edge {
+public abstract class Edge implements Comparable<Edge> {
 
     /**
      * how to display the edge
@@ -32,4 +32,27 @@ public abstract class Edge {
      * @return true if there is no edge between vertices
      */
     public abstract boolean isEmpty();
+
+    @Override
+    public int compareTo(Edge o) {
+        return Integer.compare(getWeight(), o.getWeight());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj instanceof Edge) {
+            Edge o = (Edge) obj;
+            return getWeight() == o.getWeight();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(getWeight());
+    }
 }

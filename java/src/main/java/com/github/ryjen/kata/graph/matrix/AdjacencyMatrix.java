@@ -21,7 +21,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
     private static final int NOT_FOUND = -1;
     private final Matrix<Edge> edges;
     private final List<Vertex> vertices;
-    private final Factory factory;
     private final Comparator<Vertex> comparator;
 
     public AdjacencyMatrix() {
@@ -48,9 +47,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param directed true if this is a directed graph
      */
     public AdjacencyMatrix(Factory<Vertex> factory, boolean directed) {
-        super(directed);
-        assert factory != null;
-        this.factory = factory;
+        super(factory, directed);
         this.comparator = factory.createComparator();
         List<Vertex> initial = factory.initialVertices();
         if (initial == null) {
@@ -63,7 +60,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
 
     public AdjacencyMatrix(AdjacencyMatrix<Vertex> other) {
         super(other);
-        this.factory = other.factory;
         this.comparator = other.comparator;
         this.vertices = new ArrayList<>(other.vertices);
         this.edges = new Matrix<>(other.edges);
@@ -86,6 +82,11 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
     @Override
     public Iterable<Edge> edges() {
         return new EdgeIterator(this);
+    }
+
+    @Override
+    public Iterable<Edge> edges(Vertex v) {
+        return new AdjacentEdgeIterator<>(this, indexOf(v));
     }
 
     /**
@@ -150,17 +151,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
         }
 
         return edges.remove(index1, index2) && rval;
-    }
-
-    /**
-     * adds a default edge between two vertices
-     *
-     * @param v the vertical vertex
-     * @param u the upper vertex
-     */
-    @Override
-    public void addEdge(Vertex v, Vertex u) {
-        addEdge(v, u, factory.createEdge());
     }
 
     /**
@@ -260,11 +250,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
         assert u != null;
 
         return getEdgeByIndices(indexOf(v), indexOf(u));
-    }
-
-    @Override
-    public Edge getEdgeOrDefault(Vertex v, Vertex b) {
-        return isEdge(v, b) ? getEdge(v, b) : factory.emptyEdge();
     }
 
     Edge getEdgeByIndices(int v, int u) {

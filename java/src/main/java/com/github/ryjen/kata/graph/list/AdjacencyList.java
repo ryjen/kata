@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
  */
 public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vertex> {
     private final Map<Vertex, Set<Entry<Vertex>>> vertexList;
-    private final Factory<Vertex> factory;
 
     public AdjacencyList() {
         this(new DefaultFactory<>(), false);
@@ -31,11 +30,9 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     }
 
     public AdjacencyList(Factory<Vertex> factory, boolean directed) {
-        super(directed);
-        assert factory != null;
+        super(factory, directed);
 
         this.vertexList = new LinkedHashMap<>();
-        this.factory = factory;
 
         List<Vertex> initial = factory.initialVertices();
 
@@ -49,11 +46,10 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     public AdjacencyList(AdjacencyList<Vertex> other) {
         super(other);
         this.vertexList = new LinkedHashMap<>(other.vertexList);
-        this.factory = other.factory;
     }
 
     private static <T extends Comparable<T>> Set<Entry<T>> createEntrySet() {
-        return new LinkedHashSet<>();
+        return new HashSet<>();
     }
 
     public Graph<Vertex> clone() {
@@ -85,11 +81,6 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     @Override
     public int size() {
         return vertexList.size();
-    }
-
-    @Override
-    public void addEdge(Vertex a, Vertex b) {
-        addEdge(a, b, factory.createEdge());
     }
 
     @Override
@@ -161,12 +152,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
 
     @Override
     public Edge getEdge(Vertex a, Vertex b) {
-        return isEdge(a, b) ? factory.createEdge() : null;
-    }
-
-    @Override
-    public Edge getEdgeOrDefault(Vertex a, Vertex b) {
-        return isEdge(a, b) ? factory.createEdge() : factory.emptyEdge();
+        return isEdge(a, b) ? getFactory().createEdge() : null;
     }
 
     @Override
@@ -185,6 +171,14 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     @Override
     public Iterable<Edge> edges() {
         return entries().stream().map(e -> e.getEdge()).collect(Collectors.toList());
+    }
+
+    @Override
+    public Iterable<Edge> edges(Vertex v) {
+        if (!vertexList.containsKey(v)) {
+            return Collections.emptySet();
+        }
+        return vertexList.get(v).stream().map(e -> e.getEdge()).collect(Collectors.toList());
     }
 
     Collection<Entry<Vertex>> entries() {

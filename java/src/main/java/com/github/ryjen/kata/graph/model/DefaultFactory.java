@@ -54,6 +54,11 @@ public class DefaultFactory<Vertex extends Comparable<Vertex>> implements Factor
     }
 
     @Override
+    public Edge createEdge(int weight) {
+        return new WeightedEdge(weight);
+    }
+
+    @Override
     public Edge emptyEdge() {
         return EMPTY_EDGE;
     }

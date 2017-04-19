@@ -17,6 +17,13 @@ public interface Factory<V extends Comparable<V>> {
     Edge createEdge();
 
     /**
+     * creates and edge with a weight
+     * @param weight
+     * @return the edge
+     */
+    Edge createEdge(int weight);
+
+    /**
      * creates an empty edge
      *
      * @return an edge object

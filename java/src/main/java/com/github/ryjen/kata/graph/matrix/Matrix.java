@@ -62,17 +62,15 @@ public class Matrix<T> {
             return;
         }
 
-        if (value.length == size) {
-            return;
-        }
+        if (size >= value.length) {
+            T[][] temp = value;
+            value = allocate(size + 1);
+            for (int i = 0; i < value.length; i++) {
+                value[i] = allocate();
 
-        T[][] temp = value;
-        value = allocate(size + 1);
-        for (int i = 0; i < value.length; i++) {
-            value[i] = allocate();
-
-            if (i < temp.length) {
-                System.arraycopy(temp[i], 0, value[i], 0, temp.length);
+                if (i < temp.length) {
+                    System.arraycopy(temp[i], 0, value[i], 0, temp.length);
+                }
             }
         }
     }

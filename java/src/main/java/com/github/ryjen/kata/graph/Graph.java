@@ -4,6 +4,8 @@ import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
+import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
 import com.github.ryjen.kata.graph.search.Ordering;
@@ -18,13 +20,15 @@ import java.util.Set;
  */
 public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgable<Vertex>, Vertexable<Vertex>, Cloneable {
 
+    private final Factory factory;
     private boolean directed;
 
     /**
      * default constructor
      * @param directed true if the graph is directed
      */
-    protected Graph(boolean directed) {
+    protected Graph(Factory<Vertex> factory, boolean directed) {
+        this.factory = factory;
         this.directed = directed;
     }
 
@@ -33,6 +37,7 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
      * @param other
      */
     protected Graph(Graph<Vertex> other) {
+        this.factory = other.factory;
         this.directed = other.directed;
     }
 
@@ -50,6 +55,24 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         for (Vertex v : list) {
             addVertex(v);
         }
+    }
+
+    public void addEdge(Vertex a, Vertex b) {
+        addEdge(a, b, factory.createEdge());
+    }
+
+    public Edge getEdgeOrDefault(Vertex v, Vertex b) {
+        return isEdge(v, b) ? getEdge(v, b) : factory.emptyEdge();
+    }
+
+    /**
+     * adds an edge with a weight between two vertices
+     * @param a the first vertex
+     * @param b the second vertex
+     * @param weight the weight of the edge
+     */
+    public void addEdge(Vertex a, Vertex b, int weight) {
+        addEdge(a, b, factory.createEdge(weight));
     }
 
     /**
@@ -171,5 +194,9 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         formatter.format(buf);
 
         return buf.toString();
+    }
+
+    protected Factory<Vertex> getFactory() {
+        return factory;
     }
 }

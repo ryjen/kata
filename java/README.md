@@ -115,3 +115,13 @@ Setup
 use maven or import maven project
 
 
+TODO
+====
+
+- minimum spanning trees
+- shortest path
+- dynamic programming
+- string matching
+- ropes (text editor strings)
+- binary trees
+- backtracking

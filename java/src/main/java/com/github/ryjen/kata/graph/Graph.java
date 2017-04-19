@@ -4,7 +4,6 @@ import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
-import com.github.ryjen.kata.graph.formatters.VertexFormatter;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
 import com.github.ryjen.kata.graph.search.Ordering;
@@ -89,9 +88,11 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
     public boolean isConnected() {
         Set<Vertex> visited = new HashSet<>();
 
-        for (Vertex v : vertices()) {
-            dfs(v, value -> visited.add(value), Ordering.Pre);
+        if (size() == 0) {
+            return false;
         }
+
+        dfs(vertices().iterator().next(), value -> visited.add(value), Ordering.Pre);
 
         return visited.size() == size();
     }

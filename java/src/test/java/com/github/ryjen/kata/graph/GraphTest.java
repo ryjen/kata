@@ -392,4 +392,17 @@ public abstract class GraphTest {
         Assert.assertEquals(expected, actual);
     }
 
+    @Test
+    public void testConnectedGraph() {
+        Graph<Integer> graph = newGraph(new IndexFactory(3), true);
+
+        Assert.assertFalse(graph.isConnected());
+
+        graph.addEdge(0, 1);
+        graph.addEdge(1, 2);
+
+        Assert.assertTrue(graph.isConnected());
+
+    }
+
 }

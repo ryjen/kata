@@ -2,27 +2,27 @@ package com.github.ryjen.kata.graph.list;
 
 import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
-import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.ListFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.model.Endpoint;
 import com.github.ryjen.kata.graph.model.Factory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by ryanjennings on 2017-03-20.
+ * Created by ryan jennings on 2017-03-20.
  */
 public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vertex> {
-    private final Map<Vertex, Set<Entry<Vertex>>> vertexList;
+    private final Map<Vertex, Set<Endpoint<Vertex>>> vertexList;
 
     public AdjacencyList() {
         this(new DefaultFactory<>(), false);
     }
 
     public AdjacencyList(boolean directed) {
-        this(new DefaultFactory<>(), false);
+        this(new DefaultFactory<>(), directed);
     }
 
     public AdjacencyList(Factory<Vertex> factory) {
@@ -48,12 +48,18 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         this.vertexList = new LinkedHashMap<>(other.vertexList);
     }
 
-    private static <T extends Comparable<T>> Set<Entry<T>> createEntrySet() {
+    private static <T extends Comparable<T>> Set<Endpoint<T>> createEntrySet() {
         return new HashSet<>();
     }
 
+    @Override
     public Graph<Vertex> clone() {
         return new AdjacencyList<>(this);
+    }
+
+    @Override
+    public Graph<Vertex> emptyClone() {
+        return new AdjacencyList<>();
     }
 
     @Override
@@ -70,8 +76,10 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         if (vertexList.containsKey(vertex)) {
             vertexList.remove(vertex);
 
-            for (Set<Entry<Vertex>> list : vertexList.values()) {
-                list.remove(vertex);
+            for (Set<Endpoint<Vertex>> list : vertexList.values()) {
+                if (list.contains(vertex)) {
+                    list.remove(vertex);
+                }
             }
             return true;
         }
@@ -96,16 +104,16 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
             if (!vertexList.containsKey(b)) {
                 throw new NoSuchVertexException();
             }
-            Set<Entry<Vertex>> list = vertexList.get(b);
-            list.add(new Entry(a, edge));
+            Set<Endpoint<Vertex>> list = vertexList.get(b);
+            list.add(new Endpoint<>(a, edge));
         }
 
         if (!vertexList.containsKey(a)) {
             throw new NoSuchVertexException();
         }
 
-        Set<Entry<Vertex>> list = vertexList.get(a);
-        list.add(new Entry(b, edge));
+        Set<Endpoint<Vertex>> list = vertexList.get(a);
+        list.add(new Endpoint<>(b, edge));
     }
 
     @Override
@@ -123,7 +131,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
             }
         }
 
-        for (Set<Entry<Vertex>> list : vertexList.values()) {
+        for (Set<Endpoint<Vertex>> list : vertexList.values()) {
             list.removeIf(e -> (e.getVertex() == a || e.getVertex() == b));
         }
 
@@ -138,12 +146,12 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         boolean value = false;
 
         if (vertexList.containsKey(a)) {
-            Set<Entry<Vertex>> list = vertexList.get(a);
+            Set<Endpoint<Vertex>> list = vertexList.get(a);
             value = list.stream().anyMatch(e -> e.getVertex() == b);
         }
 
         if (!isDirected() && !value && vertexList.containsKey(b)) {
-            Set<Entry<Vertex>> list = vertexList.get(b);
+            Set<Endpoint<Vertex>> list = vertexList.get(b);
             value = list.stream().anyMatch(e -> e.getVertex() == a);
         }
 
@@ -160,7 +168,15 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(e -> e.getVertex()).collect(Collectors.toList());
+        return vertexList.get(v).stream().map(Endpoint::getVertex).collect(Collectors.toList());
+    }
+
+    @Override
+    public Iterable<Endpoint<Vertex>> endpoints(Vertex v) {
+        if (!vertexList.containsKey(v)) {
+            return Collections.emptySet();
+        }
+        return vertexList.get(v);
     }
 
     @Override
@@ -170,7 +186,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
 
     @Override
     public Iterable<Edge> edges() {
-        return entries().stream().map(e -> e.getEdge()).collect(Collectors.toList());
+        return endpoints().stream().map(Endpoint::getEdge).collect(Collectors.toList());
     }
 
     @Override
@@ -178,11 +194,11 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(e -> e.getEdge()).collect(Collectors.toList());
+        return vertexList.get(v).stream().map(Endpoint::getEdge).collect(Collectors.toList());
     }
 
-    Collection<Entry<Vertex>> entries() {
-        return vertexList.values().stream().flatMap(e -> e.stream()).collect(Collectors.toList());
+    private Collection<Endpoint<Vertex>> endpoints() {
+        return vertexList.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     @Override
@@ -198,7 +214,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     public int inDegree(Vertex vertex) {
         int count = 0;
 
-        for (Set<Entry<Vertex>> list : vertexList.values()) {
+        for (Set<Endpoint<Vertex>> list : vertexList.values()) {
             if (list.stream().anyMatch(e -> e.getVertex() == vertex)) {
                 count++;
             }
@@ -211,4 +227,8 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         return toString(new ListFormatter<>(this));
     }
 
+    @Override
+    public void clear() {
+        vertexList.clear();
+    }
 }

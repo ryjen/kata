@@ -1,6 +1,5 @@
 package com.github.ryjen.kata.graph.model;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,7 +17,8 @@ public interface Factory<V extends Comparable<V>> {
 
     /**
      * creates and edge with a weight
-     * @param weight
+     *
+     * @param weight the weight of the edge
      * @return the edge
      */
     Edge createEdge(int weight);
@@ -36,11 +36,4 @@ public interface Factory<V extends Comparable<V>> {
      * @return the list of vertices or null
      */
     List<V> initialVertices();
-
-    /**
-     * creates a comparator for vertices
-     *
-     * @return the comparator or null if default comparison should be used
-     */
-    Comparator<V> createComparator();
 }

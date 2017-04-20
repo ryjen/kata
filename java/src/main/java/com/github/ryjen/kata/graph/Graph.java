@@ -1,10 +1,11 @@
 package com.github.ryjen.kata.graph;
 
-import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
-import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
+import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
+import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
 import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.model.Endpoint;
 import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
@@ -20,21 +21,24 @@ import java.util.Set;
  */
 public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgable<Vertex>, Vertexable<Vertex>, Cloneable {
 
-    private final Factory factory;
+    private final Factory<Vertex> factory;
     private boolean directed;
 
     /**
      * default constructor
+     *
      * @param directed true if the graph is directed
      */
     protected Graph(Factory<Vertex> factory, boolean directed) {
+        assert factory != null;
         this.factory = factory;
         this.directed = directed;
     }
 
     /**
      * copy constructor
-     * @param other
+     *
+     * @param other the graph to copy from
      */
     protected Graph(Graph<Vertex> other) {
         this.factory = other.factory;
@@ -43,13 +47,17 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * clones this instance
+     *
      * @return a copy of this graph
      */
     public abstract Graph<Vertex> clone();
 
+    public abstract Graph<Vertex> emptyClone();
+
     /**
      * add a list of vertices
-     * @param list
+     *
+     * @param list the list of vertices to add
      */
     public void addVertices(Vertex... list) {
         for (Vertex v : list) {
@@ -67,8 +75,9 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * adds an edge with a weight between two vertices
-     * @param a the first vertex
-     * @param b the second vertex
+     *
+     * @param a      the first vertex
+     * @param b      the second vertex
      * @param weight the weight of the edge
      */
     public void addEdge(Vertex a, Vertex b, int weight) {
@@ -77,10 +86,13 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * gets the size of the graph in terms of number of vertices
+     *
      * @return the size
      */
     public abstract int size();
 
+
+    public abstract Iterable<Endpoint<Vertex>> endpoints(Vertex vertex);
 
     /**
      * performs a depth first search
@@ -106,6 +118,7 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * tests if this graph is connected (no stray vertices)
+     *
      * @return true if all vertices are connected
      */
     public boolean isConnected() {
@@ -115,13 +128,14 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
             return false;
         }
 
-        dfs(vertices().iterator().next(), value -> visited.add(value), Ordering.Pre);
+        dfs(vertices().iterator().next(), visited::add, Ordering.Pre);
 
         return visited.size() == size();
     }
 
     /**
      * tests if this graph is cyclic
+     *
      * @return true if one or more vertices are connected in a loop
      */
     public boolean isCyclic() {
@@ -136,9 +150,9 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
             sorter.sort();
 
             return false;
-        } catch (GraphIsCyclicException e) {
+        } catch (GraphCyclicException e) {
             return true;
-        } catch (GraphNotDirectedException e) {
+        } catch (GraphDirectedException e) {
             return false;
         }
     }
@@ -156,6 +170,7 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * test for the number of connections into a vertex
+     *
      * @param vertex the vertex to check
      * @return the number of in connections
      */
@@ -163,13 +178,20 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * test for the number of connections coming from a vertex
+     *
      * @param vertex the vertex to test
      * @return the number of out connections
      */
     public abstract int outDegree(Vertex vertex);
 
     /**
+     * clear all vertices and edges from the instance
+     */
+    public abstract void clear();
+
+    /**
      * tests if this graph is directed
+     *
      * @return true if is directed
      */
     public boolean isDirected() {

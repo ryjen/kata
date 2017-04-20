@@ -24,7 +24,8 @@ public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Forma
                 .mapToInt(value -> String.valueOf(value).length()).max();
         OptionalInt edgeWidth = StreamSupport.stream(graph.edges().spliterator(), false)
                 .mapToInt(edge -> String.valueOf(edge).length()).max();
-        width = Math.max(vertexWidth.getAsInt(), edgeWidth.getAsInt());
+        width = Math.max(vertexWidth.isPresent() ? vertexWidth.getAsInt() : 1,
+                edgeWidth.isPresent() ? edgeWidth.getAsInt() : 1);
     }
 
     /**

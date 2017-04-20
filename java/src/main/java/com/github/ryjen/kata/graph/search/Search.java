@@ -19,7 +19,7 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      *
      * @param graph the graph to search
      */
-    public Search(Graph<Vertex> graph, OnVisit<Vertex> callback) {
+    Search(Graph<Vertex> graph, OnVisit<Vertex> callback) {
         assert graph != null;
         assert callback != null;
 
@@ -35,7 +35,7 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      * @param v the vertex
      * @return an iterable of adjacent vertices
      */
-    public Iterable<Vertex> adjacent(Vertex v) {
+    Iterable<Vertex> adjacent(Vertex v) {
         return graph.adjacent(v);
     }
 
@@ -47,7 +47,7 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      * @param v the vertex
      * @return true if the vertex has been visited
      */
-    protected boolean isVisited(Vertex v) {
+    boolean isVisited(Vertex v) {
         assert v != null;
         return visited.contains(v);
     }
@@ -57,12 +57,12 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      *
      * @param v the vertex
      */
-    protected void visit(Vertex v) {
+    void visit(Vertex v) {
         assert v != null;
         visited.add(v);
     }
 
-    protected void callback(Vertex v) {
+    void callback(Vertex v) {
         callback.onSearchVisit(v);
     }
 

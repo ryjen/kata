@@ -1,9 +1,5 @@
 package com.github.ryjen.kata.graph.matrix;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Stack;
-
 /**
  * an iterable to find adjacent vertices for a vertex
  */

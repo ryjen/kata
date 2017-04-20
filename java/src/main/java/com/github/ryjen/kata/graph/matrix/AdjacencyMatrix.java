@@ -6,10 +6,10 @@ import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.VertexFormatter;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.model.Endpoint;
 import com.github.ryjen.kata.graph.model.Factory;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -21,7 +21,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
     private static final int NOT_FOUND = -1;
     private final Matrix<Edge> edges;
     private final List<Vertex> vertices;
-    private final Comparator<Vertex> comparator;
 
     public AdjacencyMatrix() {
         this(new DefaultFactory<>(), false);
@@ -48,7 +47,6 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      */
     public AdjacencyMatrix(Factory<Vertex> factory, boolean directed) {
         super(factory, directed);
-        this.comparator = factory.createComparator();
         List<Vertex> initial = factory.initialVertices();
         if (initial == null) {
             this.vertices = new ArrayList<>();
@@ -60,23 +58,18 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
 
     public AdjacencyMatrix(AdjacencyMatrix<Vertex> other) {
         super(other);
-        this.comparator = other.comparator;
         this.vertices = new ArrayList<>(other.vertices);
         this.edges = new Matrix<>(other.edges);
     }
 
+    @Override
     public Graph<Vertex> clone() {
         return new AdjacencyMatrix<>(this);
     }
 
-    private boolean equals(Vertex a, Vertex b) {
-        if (a == null || b == null) {
-            return false;
-        }
-        if (comparator != null) {
-            return comparator.compare(a, b) == 0;
-        }
-        return a.compareTo(b) == 0;
+    @Override
+    public Graph<Vertex> emptyClone() {
+        return new AdjacencyMatrix<>();
     }
 
     @Override
@@ -160,12 +153,9 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @return the index of the vertex or NOT_FOUND
      */
     private int indexOf(Vertex vertex) {
-        for (int i = 0; i < vertices.size(); i++) {
-            if (equals(vertices.get(i), vertex)) {
-                return i;
-            }
-        }
-        return NOT_FOUND;
+        assert vertex != null;
+
+        return vertices.indexOf(vertex);
     }
 
     /**
@@ -179,7 +169,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
     }
 
     private void addVertex(Vertex vertex, boolean resize) {
-
+        assert vertex != null;
         if (!vertices.contains(vertex)) {
             vertices.add(vertex);
 
@@ -295,7 +285,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      */
     @Override
     public Iterable<Vertex> vertices() {
-        return new VertexIterator<>(this);
+        return vertices;
     }
 
     /**
@@ -307,6 +297,11 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
     @Override
     public Iterable<Vertex> adjacent(Vertex v) {
         return new AdjacentVertexIterator<>(this, indexOf(v));
+    }
+
+    @Override
+    public Iterable<Endpoint<Vertex>> endpoints(Vertex v) {
+        return new AdjacentEntryIterator<>(this, indexOf(v));
     }
 
     /**
@@ -350,7 +345,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @return the degree
      */
     public int outDegree(Vertex vertex) {
-        return degree(vertex, (v, u) -> isEdgeByRowColumn(v, u));
+        return degree(vertex, this::isEdgeByRowColumn);
     }
 
     /**
@@ -380,5 +375,11 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
         formatter.format(buf);
 
         return buf.toString();
+    }
+
+    @Override
+    public void clear() {
+        vertices.clear();
+        edges.clear();
     }
 }

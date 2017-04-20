@@ -2,7 +2,6 @@ package com.github.ryjen.kata.graph.matrix;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 
 /**
  * an iterable to find adjacent vertices for a vertex
@@ -35,7 +34,7 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
     @Override
     public boolean hasNext() {
 
-        while(this.y < graph.size()) {
+        while (this.y < graph.size()) {
             if (graph.isEdgeByRowColumn(this.x, this.y)) {
                 return true;
             }

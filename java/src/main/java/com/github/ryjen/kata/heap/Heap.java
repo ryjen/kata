@@ -11,7 +11,7 @@ import java.util.*;
  *
  * @param <E> the type of elements in the heap
  */
-public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
+public class Heap<E extends Comparable<E>> implements Queue<E> {
 
     private final List<E> values;
     private final Comparator<E> comparator;
@@ -23,7 +23,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
      * @param capacity   the capacity of the heap
      * @param comparator how to compare heap elements
      */
-    protected Heap(int capacity, Comparator<E> comparator) {
+    public Heap(int capacity, Comparator<E> comparator) {
         this.values = new ArrayList<>(capacity);
         this.comparator = comparator;
         this.capacity = capacity;
@@ -34,7 +34,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
      *
      * @param other the heap to copy from
      */
-    protected Heap(Heap<E> other) {
+    public Heap(Heap<E> other) {
         this.values = new ArrayList<>(other.values);
         this.comparator = other.comparator;
         this.capacity = other.capacity;
@@ -45,7 +45,9 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
      *
      * @return a heap copy of the type
      */
-    public abstract Heap<E> copy();
+    public Heap<E> copy() {
+        return new Heap<>(this);
+    }
 
     /**
      * swap two elements in the heap
@@ -137,10 +139,7 @@ public abstract class Heap<E extends Comparable<E>> implements Queue<E> {
 
         int index = values.indexOf(o);
 
-        if (index == -1) {
-            return false;
-        }
-        return remove(index, () -> null) != null;
+        return index != -1 && remove(index, () -> null) != null;
     }
 
     /**

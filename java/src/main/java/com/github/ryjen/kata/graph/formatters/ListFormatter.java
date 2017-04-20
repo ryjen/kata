@@ -9,7 +9,7 @@ import java.util.StringJoiner;
  */
 public class ListFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
 
-    private Graph<Vertex> graph;
+    private final Graph<Vertex> graph;
 
     public ListFormatter(Graph<Vertex> graph) {
         this.graph = graph;

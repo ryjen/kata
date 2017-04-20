@@ -9,7 +9,7 @@ import java.util.Iterator;
  */
 public class HeapIterator<E extends Comparable<E>> implements Iterator<E>, Iterable<E> {
 
-    private Heap<E> heap;
+    private final Heap<E> heap;
 
     public HeapIterator(Heap<E> heap) {
         this.heap = heap.copy();

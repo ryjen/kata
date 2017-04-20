@@ -9,6 +9,7 @@ public class WeightedEdge extends Edge {
     public WeightedEdge(int weight) {
         this.weight = weight;
     }
+
     @Override
     public String display() {
         return String.valueOf(getWeight());
@@ -22,5 +23,9 @@ public class WeightedEdge extends Edge {
     @Override
     public int getWeight() {
         return weight;
+    }
+
+    public void setWeight(int value) {
+        this.weight = value;
     }
 }

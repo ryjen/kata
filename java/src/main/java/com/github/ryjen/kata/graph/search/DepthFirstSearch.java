@@ -12,7 +12,7 @@ import java.util.Stack;
  */
 public class DepthFirstSearch<Vertex extends Comparable<Vertex>> extends Search<Vertex> {
 
-    Ordering ordering;
+    private final Ordering ordering;
 
     public DepthFirstSearch(Graph<Vertex> graph, OnVisit<Vertex> callback) {
         this(graph, callback, Ordering.Pre);

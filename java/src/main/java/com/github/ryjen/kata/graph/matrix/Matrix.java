@@ -3,9 +3,9 @@ package com.github.ryjen.kata.graph.matrix;
 import java.lang.reflect.Array;
 
 /**
- * Created by ryanjennings on 2017-03-20.
+ * Created by ryan jennings on 2017-03-20.
  */
-public class Matrix<T> {
+class Matrix<T> {
 
     private final Class<T> type;
     private T[][] value;
@@ -22,9 +22,20 @@ public class Matrix<T> {
         }
     }
 
+    public void clear() {
+        if (value == null) {
+            return;
+        }
+        for (int i = 0; i < value.length; i++) {
+            for (int j = 0; j < value.length; j++) {
+                value[i][j] = null;
+            }
+        }
+    }
+
     public void set(int row, int col, T value) {
 
-        resize(Math.max(row, col));
+        resize(Math.max(row, col) + 1);
 
         this.value[row][col] = value;
     }
@@ -55,7 +66,7 @@ public class Matrix<T> {
     public void resize(int size) {
 
         if (value == null) {
-            value = allocate(size + 1);
+            value = allocate(size);
             for (int i = 0; i < value.length; i++) {
                 value[i] = allocate();
             }
@@ -64,7 +75,7 @@ public class Matrix<T> {
 
         if (size >= value.length) {
             T[][] temp = value;
-            value = allocate(size + 1);
+            value = allocate(size);
             for (int i = 0; i < value.length; i++) {
                 value[i] = allocate();
 

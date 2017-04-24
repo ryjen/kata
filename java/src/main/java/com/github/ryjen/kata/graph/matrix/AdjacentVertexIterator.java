@@ -11,7 +11,7 @@ class AdjacentVertexIterator<Vertex extends Comparable<Vertex>> extends Adjacent
      * @param graph  the graph to search
      * @param vertex the vertex index to search from
      */
-    AdjacentVertexIterator(AdjacencyMatrix<Vertex> graph, int vertex) {
+    AdjacentVertexIterator(AdjacencyMatrix<Vertex> graph, Vertex vertex) {
         super(graph, vertex);
     }
 

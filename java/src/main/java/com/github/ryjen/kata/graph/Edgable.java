@@ -18,4 +18,6 @@ public interface Edgable<Vertex extends Comparable<Vertex>> {
     Iterable<Edge> edges();
 
     Iterable<Edge> edges(Vertex v);
+
+    int numberOfEdges();
 }

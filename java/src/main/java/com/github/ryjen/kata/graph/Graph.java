@@ -4,8 +4,8 @@ import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
+import com.github.ryjen.kata.graph.model.Connection;
 import com.github.ryjen.kata.graph.model.Edge;
-import com.github.ryjen.kata.graph.model.Endpoint;
 import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
@@ -15,6 +15,7 @@ import com.github.ryjen.kata.graph.sort.TopologicalSort;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 /**
  * Created by ryan on 2017-03-19.
@@ -84,6 +85,11 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         addEdge(a, b, factory.createEdge(weight));
     }
 
+    @Override
+    public int numberOfEdges() {
+        return Long.valueOf(StreamSupport.stream(edges().spliterator(), false).count()).intValue();
+    }
+
     /**
      * gets the size of the graph in terms of number of vertices
      *
@@ -92,7 +98,20 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
     public abstract int size();
 
 
-    public abstract Iterable<Endpoint<Vertex>> endpoints(Vertex vertex);
+    /**
+     * gets all edges attached to a vertex
+     *
+     * @param vertex
+     * @return the iterator
+     */
+    public abstract Iterable<Connection<Vertex>> connections(Vertex vertex);
+
+    /**
+     * gets all edges with an attached vertex
+     *
+     * @return
+     */
+    public abstract Iterable<Connection<Vertex>> connections();
 
     /**
      * performs a depth first search

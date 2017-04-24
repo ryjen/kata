@@ -11,6 +11,7 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
     private final AdjacencyMatrix<Vertex> graph;
     private final int x;
     private int y;
+    private Vertex vertex;
 
     /**
      * construct an adjacent iterator
@@ -18,12 +19,13 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
      * @param graph  the graph to search
      * @param vertex the vertex index to search from
      */
-    AdjacentIterator(AdjacencyMatrix<Vertex> graph, int vertex) {
+    AdjacentIterator(AdjacencyMatrix<Vertex> graph, Vertex vertex) {
         assert graph != null;
-        assert vertex >= 0 && vertex < graph.size();
+        assert vertex != null;
         this.graph = graph;
-        this.x = vertex;
+        this.x = graph.indexOf(vertex);
         this.y = 0;
+        this.vertex = vertex;
     }
 
     @Override
@@ -54,5 +56,9 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
 
 
         return getPropertyForEntry(graph, this.x, this.y++);
+    }
+
+    public Vertex getVertex() {
+        return vertex;
     }
 }

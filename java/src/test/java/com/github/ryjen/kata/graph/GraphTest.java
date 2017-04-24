@@ -1,17 +1,14 @@
 package com.github.ryjen.kata.graph;
 
-import com.github.ryjen.kata.graph.exceptions.GraphConnectivityException;
 import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.ListFormatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
 import com.github.ryjen.kata.graph.formatters.VertexFormatter;
-import com.github.ryjen.kata.graph.model.DefaultFactory;
-import com.github.ryjen.kata.graph.model.Edge;
-import com.github.ryjen.kata.graph.model.Factory;
-import com.github.ryjen.kata.graph.model.WeightedEdge;
+import com.github.ryjen.kata.graph.model.*;
 import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.sort.TopologicalSort;
+import com.github.ryjen.kata.graph.tree.MinimumSpanningTree;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -425,7 +422,7 @@ public abstract class GraphTest {
     }
 
     @Test
-    public void testMinSpanningTree() {
+    public void testPrimsMinSpanningTree() {
         Graph<Character> graph = newGraph(false);
 
         graph.addVertices('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i');
@@ -447,12 +444,46 @@ public abstract class GraphTest {
         graph.addEdge('e', 'f', 10);
 
         try {
-            Graph<Character> actual = new MinimumSpanningTree.Prims<>(graph).find();
+            Iterable<Connection<Character>> actual = new MinimumSpanningTree.Prims<>(graph).find();
 
-            List<Character> expected = Arrays.asList('a', 'b', 'c', 'i', 'f', 'g', 'h', 'd', 'e');
+            int expected = 37;
 
-            Assert.assertEquals(expected, StreamSupport.stream(actual.vertices().spliterator(), false).collect(Collectors.toList()));
-        } catch (GraphDirectedException | GraphCyclicException | GraphConnectivityException e) {
+            Assert.assertEquals(expected, StreamSupport.stream(actual.spliterator(), false).mapToInt(e -> e.getEdge().getWeight()).sum());
+        } catch (GraphDirectedException | GraphCyclicException e) {
+            Assert.assertTrue(false);
+        }
+    }
+
+
+    @Test
+    public void testKruskalsMinSpanningTree() {
+        Graph<Character> graph = newGraph(false);
+
+        graph.addVertices('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i');
+
+        graph.addEdge('a', 'b', 4);
+        graph.addEdge('b', 'c', 8);
+        graph.addEdge('c', 'i', 2);
+        graph.addEdge('c', 'f', 4);
+        graph.addEdge('f', 'g', 2);
+        graph.addEdge('g', 'h', 1);
+        graph.addEdge('c', 'd', 7);
+        graph.addEdge('d', 'e', 9);
+
+        graph.addEdge('a', 'h', 9);
+        graph.addEdge('b', 'h', 11);
+        graph.addEdge('h', 'i', 7);
+        graph.addEdge('g', 'i', 6);
+        graph.addEdge('d', 'f', 14);
+        graph.addEdge('e', 'f', 10);
+
+        try {
+            Iterable<Connection<Character>> actual = new MinimumSpanningTree.Kruskals<>(graph).find();
+
+            int expected = 37;
+
+            Assert.assertEquals(expected, StreamSupport.stream(actual.spliterator(), false).mapToInt(e -> e.getEdge().getWeight()).sum());
+        } catch (GraphDirectedException | GraphCyclicException e) {
             Assert.assertTrue(false);
         }
     }

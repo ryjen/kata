@@ -4,9 +4,9 @@ import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.VertexFormatter;
+import com.github.ryjen.kata.graph.model.Connection;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
-import com.github.ryjen.kata.graph.model.Endpoint;
 import com.github.ryjen.kata.graph.model.Factory;
 
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
 
     @Override
     public Iterable<Edge> edges(Vertex v) {
-        return new AdjacentEdgeIterator<>(this, indexOf(v));
+        return new AdjacentEdgeIterator<>(this, v);
     }
 
     /**
@@ -152,7 +152,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param vertex the vertex
      * @return the index of the vertex or NOT_FOUND
      */
-    private int indexOf(Vertex vertex) {
+    int indexOf(Vertex vertex) {
         assert vertex != null;
 
         return vertices.indexOf(vertex);
@@ -296,12 +296,17 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      */
     @Override
     public Iterable<Vertex> adjacent(Vertex v) {
-        return new AdjacentVertexIterator<>(this, indexOf(v));
+        return new AdjacentVertexIterator<>(this, v);
     }
 
     @Override
-    public Iterable<Endpoint<Vertex>> endpoints(Vertex v) {
-        return new AdjacentEntryIterator<>(this, indexOf(v));
+    public Iterable<Connection<Vertex>> connections(Vertex v) {
+        return new AdjacentConnectionIterator<>(this, v);
+    }
+
+    @Override
+    public Iterable<Connection<Vertex>> connections() {
+        return new ConnectionIterator<>(this);
     }
 
     /**

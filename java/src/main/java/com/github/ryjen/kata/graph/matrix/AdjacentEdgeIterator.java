@@ -13,7 +13,7 @@ class AdjacentEdgeIterator<Vertex extends Comparable<Vertex>> extends AdjacentIt
      * @param graph  the graph to search
      * @param vertex the vertex index to search from
      */
-    AdjacentEdgeIterator(AdjacencyMatrix<Vertex> graph, int vertex) {
+    AdjacentEdgeIterator(AdjacencyMatrix<Vertex> graph, Vertex vertex) {
         super(graph, vertex);
     }
 

@@ -3,9 +3,9 @@ package com.github.ryjen.kata.graph.list;
 import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.formatters.ListFormatter;
+import com.github.ryjen.kata.graph.model.Connection;
 import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
-import com.github.ryjen.kata.graph.model.Endpoint;
 import com.github.ryjen.kata.graph.model.Factory;
 
 import java.util.*;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Created by ryan jennings on 2017-03-20.
  */
 public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vertex> {
-    private final Map<Vertex, Set<Endpoint<Vertex>>> vertexList;
+    private final Map<Vertex, Set<Connection<Vertex>>> vertexList;
 
     public AdjacencyList() {
         this(new DefaultFactory<>(), false);
@@ -48,7 +48,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         this.vertexList = new LinkedHashMap<>(other.vertexList);
     }
 
-    private static <T extends Comparable<T>> Set<Endpoint<T>> createEntrySet() {
+    private static <T extends Comparable<T>> Set<Connection<T>> createEntrySet() {
         return new HashSet<>();
     }
 
@@ -76,7 +76,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         if (vertexList.containsKey(vertex)) {
             vertexList.remove(vertex);
 
-            for (Set<Endpoint<Vertex>> list : vertexList.values()) {
+            for (Set<Connection<Vertex>> list : vertexList.values()) {
                 if (list.contains(vertex)) {
                     list.remove(vertex);
                 }
@@ -104,16 +104,16 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
             if (!vertexList.containsKey(b)) {
                 throw new NoSuchVertexException();
             }
-            Set<Endpoint<Vertex>> list = vertexList.get(b);
-            list.add(new Endpoint<>(a, edge));
+            Set<Connection<Vertex>> list = vertexList.get(b);
+            list.add(new Connection<>(b, a, edge));
         }
 
         if (!vertexList.containsKey(a)) {
             throw new NoSuchVertexException();
         }
 
-        Set<Endpoint<Vertex>> list = vertexList.get(a);
-        list.add(new Endpoint<>(b, edge));
+        Set<Connection<Vertex>> list = vertexList.get(a);
+        list.add(new Connection<>(a, b, edge));
     }
 
     @Override
@@ -131,8 +131,8 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
             }
         }
 
-        for (Set<Endpoint<Vertex>> list : vertexList.values()) {
-            list.removeIf(e -> (e.getVertex() == a || e.getVertex() == b));
+        for (Set<Connection<Vertex>> list : vertexList.values()) {
+            list.removeIf(e -> (e.getTo() == a || e.getTo() == b));
         }
 
         return true;
@@ -146,13 +146,13 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         boolean value = false;
 
         if (vertexList.containsKey(a)) {
-            Set<Endpoint<Vertex>> list = vertexList.get(a);
-            value = list.stream().anyMatch(e -> e.getVertex() == b);
+            Set<Connection<Vertex>> list = vertexList.get(a);
+            value = list.stream().anyMatch(e -> e.getTo() == b);
         }
 
         if (!isDirected() && !value && vertexList.containsKey(b)) {
-            Set<Endpoint<Vertex>> list = vertexList.get(b);
-            value = list.stream().anyMatch(e -> e.getVertex() == a);
+            Set<Connection<Vertex>> list = vertexList.get(b);
+            value = list.stream().anyMatch(e -> e.getTo() == a);
         }
 
         return value;
@@ -160,7 +160,12 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
 
     @Override
     public Edge getEdge(Vertex a, Vertex b) {
-        return isEdge(a, b) ? getFactory().createEdge() : null;
+        if (vertexList.containsKey(a)) {
+            Set<Connection<Vertex>> list = vertexList.get(a);
+            Optional<Connection<Vertex>> edge = list.stream().filter(e -> e.getTo().equals(b)).findFirst();
+            return edge.isPresent() ? edge.get().getEdge() : null;
+        }
+        return null;
     }
 
     @Override
@@ -168,15 +173,20 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(Endpoint::getVertex).collect(Collectors.toList());
+        return vertexList.get(v).stream().map(Connection::getTo).collect(Collectors.toList());
     }
 
     @Override
-    public Iterable<Endpoint<Vertex>> endpoints(Vertex v) {
+    public Iterable<Connection<Vertex>> connections(Vertex v) {
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
         return vertexList.get(v);
+    }
+
+    @Override
+    public Iterable<Connection<Vertex>> connections() {
+        return vertexList.values().stream().flatMap(Set::stream).collect(Collectors.toList());
     }
 
     @Override
@@ -186,7 +196,7 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
 
     @Override
     public Iterable<Edge> edges() {
-        return endpoints().stream().map(Endpoint::getEdge).collect(Collectors.toList());
+        return endpoints().stream().map(Connection::getEdge).collect(Collectors.toList());
     }
 
     @Override
@@ -194,10 +204,10 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(Endpoint::getEdge).collect(Collectors.toList());
+        return vertexList.get(v).stream().map(Connection::getEdge).collect(Collectors.toList());
     }
 
-    private Collection<Endpoint<Vertex>> endpoints() {
+    private Collection<Connection<Vertex>> endpoints() {
         return vertexList.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
@@ -214,8 +224,8 @@ public class AdjacencyList<Vertex extends Comparable<Vertex>> extends Graph<Vert
     public int inDegree(Vertex vertex) {
         int count = 0;
 
-        for (Set<Endpoint<Vertex>> list : vertexList.values()) {
-            if (list.stream().anyMatch(e -> e.getVertex() == vertex)) {
+        for (Set<Connection<Vertex>> list : vertexList.values()) {
+            if (list.stream().anyMatch(e -> e.getTo() == vertex)) {
                 count++;
             }
         }

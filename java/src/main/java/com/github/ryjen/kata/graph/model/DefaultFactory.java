@@ -1,10 +1,9 @@
 package com.github.ryjen.kata.graph.model;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by ryanjennings on 2017-03-20.
+ * Created by ryan jennings on 2017-03-20.
  */
 public class DefaultFactory<Vertex extends Comparable<Vertex>> implements Factory<Vertex> {
 
@@ -54,17 +53,17 @@ public class DefaultFactory<Vertex extends Comparable<Vertex>> implements Factor
     }
 
     @Override
+    public Edge createEdge(int weight) {
+        return new WeightedEdge(weight);
+    }
+
+    @Override
     public Edge emptyEdge() {
         return EMPTY_EDGE;
     }
 
     @Override
     public List<Vertex> initialVertices() {
-        return null;
-    }
-
-    @Override
-    public Comparator<Vertex> createComparator() {
         return null;
     }
 }

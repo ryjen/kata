@@ -20,13 +20,19 @@ public class BreadthFirstSearch<Vertex extends Comparable<Vertex>> extends Searc
         queue.add(v);
 
         while (!queue.isEmpty()) {
+
             v = queue.remove();
-            if (!isVisited(v)) {
-                visit(v);
-                callback(v);
-                for (Vertex w : adjacent(v)) {
-                    queue.add(w);
-                }
+
+            if (isVisited(v)) {
+                continue;
+            }
+
+            visit(v);
+
+            callback(v);
+
+            for (Vertex w : adjacent(v)) {
+                queue.add(w);
             }
         }
     }

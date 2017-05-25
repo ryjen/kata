@@ -1,6 +1,5 @@
 package com.github.ryjen.kata;
 
-import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,7 +10,7 @@ import java.util.List;
 /**
  * Created by ryan on 2017-02-04.
  */
-public class PermutationTest extends TestCase {
+public class PermutationTest {
 
     private static <T> void assertListEquality(List<T> expected, List<T> actual) {
         Assert.assertEquals(expected.size(), actual.size());

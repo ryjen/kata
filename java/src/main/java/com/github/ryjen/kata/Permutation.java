@@ -9,11 +9,11 @@ import java.util.List;
  */
 public final class Permutation<T> extends ArrayList<List<T>> {
 
-    public Permutation() {
+    private Permutation() {
         super();
     }
 
-    public Permutation(Permutation<T> other) {
+    private Permutation(Permutation<T> other) {
         super(other);
     }
 
@@ -23,7 +23,7 @@ public final class Permutation<T> extends ArrayList<List<T>> {
         result.add(new ArrayList<>());
 
         for (T element : elements) {
-            Permutation<T> current = new Permutation();
+            Permutation<T> current = new Permutation<>();
 
             for (List<T> list : result) {
                 for (int i = 0; i < list.size() + 1; i++) {

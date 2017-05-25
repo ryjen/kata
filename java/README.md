@@ -44,7 +44,7 @@ System.out.println(graph.toString(new VertexFormatter<>(graph)));
 =====
 
 ```Java
-// create a max heap with capcity of 5
+// create a max heap with capacity of 5
 // could also be a MinHeap<>(5) for reverse order output
 
 Heap<Integer> heap = new MaxHeap<>(5);
@@ -115,3 +115,13 @@ Setup
 use maven or import maven project
 
 
+TODO
+====
+
+- minimum spanning trees
+- shortest path
+- dynamic programming
+- string matching
+- ropes (text editor strings)
+- binary trees
+- backtracking

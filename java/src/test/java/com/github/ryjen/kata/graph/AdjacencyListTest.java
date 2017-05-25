@@ -9,6 +9,6 @@ import com.github.ryjen.kata.graph.model.Factory;
 public class AdjacencyListTest extends GraphTest {
     @Override
     public <T extends Comparable<T>> Graph<T> newGraph(Factory<T> factory, boolean directed) {
-        return new AdjacencyList<T>(factory, directed);
+        return new AdjacencyList<>(factory, directed);
     }
 }

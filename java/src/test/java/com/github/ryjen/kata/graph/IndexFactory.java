@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ryanjennings on 2017-03-20.
+ * Created by ryan jennings on 2017-03-20.
  */
 public class IndexFactory extends DefaultFactory<Integer> {
 

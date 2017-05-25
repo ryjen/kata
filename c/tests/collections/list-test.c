@@ -12,7 +12,7 @@
 
 static int create_test_list(void **state)
 {
-    rj_list *list = rj_list_create();
+    RJList *list = rj_list_create();
     *state = list;
 
     return 0;
@@ -26,7 +26,7 @@ static int test_int_compare(const void *a, const void *b, size_t size)
     return *i1 - *i2;
 }
 
-static rj_list_item *random_list_item()
+static RJListItem *random_list_item()
 {
     size_t size = sizeof(int);
     int *data = (int *)malloc(size);
@@ -37,7 +37,7 @@ static rj_list_item *random_list_item()
 
 static int create_and_populate_test_list(void **state)
 {
-    rj_list *list = rj_list_create();
+    RJList *list = rj_list_create();
 
     rj_list_add(list, random_list_item());
 
@@ -52,7 +52,7 @@ static int create_and_populate_test_list(void **state)
 
 static int destroy_test_list(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     rj_list_destroy(list);
 
@@ -61,7 +61,7 @@ static int destroy_test_list(void **state)
 
 static void test_list_add_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     rj_list_add(list, random_list_item());
 
@@ -70,8 +70,8 @@ static void test_list_add_valid(void **state)
 
 static void test_list_add_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
-    rj_list_item *item = random_list_item();
+    RJList *list = (RJList *)*state;
+    RJListItem *item = random_list_item();
 
     rj_list_add(NULL, NULL);
 
@@ -84,11 +84,11 @@ static void test_list_add_invalid(void **state)
 
 static void test_list_add_index_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     size_t size = rj_list_size(list);
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     void *data = NULL;
 
@@ -107,11 +107,11 @@ static void test_list_add_index_valid(void **state)
 
 static void test_list_add_index_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     size_t size = rj_list_size(list);
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     void *data = NULL;
 
@@ -128,11 +128,11 @@ static void test_list_add_index_invalid(void **state)
 
 static void test_list_add_all_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     void *data = rj_list_get(list, 1);
 
-    rj_list *other = rj_list_create();
+    RJList *other = rj_list_create();
 
     rj_list_add(other, random_list_item());
 
@@ -149,7 +149,7 @@ static void test_list_add_all_valid(void **state)
 
 static void test_list_add_all_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     rj_list_add_all(list, NULL);
 
@@ -160,11 +160,11 @@ static void test_list_add_all_invalid(void **state)
 
 static void test_list_add_all_index_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list *other = rj_list_create();
+    RJList *other = rj_list_create();
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     size_t size = rj_list_size(list);
 
@@ -184,9 +184,9 @@ static void test_list_add_all_index_valid(void **state)
 }
 static void test_list_add_all_index_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list *other = rj_list_create();
+    RJList *other = rj_list_create();
 
     rj_list_add(other, random_list_item());
 
@@ -201,7 +201,7 @@ static void test_list_add_all_index_invalid(void **state)
 
 static void test_list_clear_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     assert_int_equal(rj_list_size(list), 3);
 
@@ -211,16 +211,16 @@ static void test_list_clear_valid(void **state)
 }
 static void test_list_clear_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     rj_list_clear(NULL);
 }
 
 static void test_list_contains_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     rj_list_add(list, item);
 
@@ -231,9 +231,9 @@ static void test_list_contains_valid(void **state)
 
 static void test_list_contains_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     assert_int_equal(rj_list_contains(list, item->data), 0);
 
@@ -246,11 +246,11 @@ static void test_list_contains_invalid(void **state)
 
 static void test_list_contains_all_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     size_t size = rj_list_size(list);
 
-    rj_list *other = rj_list_create();
+    RJList *other = rj_list_create();
 
     rj_list_add(other, random_list_item());
     rj_list_add(other, random_list_item());
@@ -266,11 +266,11 @@ static void test_list_contains_all_valid(void **state)
 
 static void test_list_contains_all_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     size_t size = rj_list_size(list);
 
-    rj_list *other = rj_list_create();
+    RJList *other = rj_list_create();
 
     rj_list_add(other, random_list_item());
     rj_list_add(other, random_list_item());
@@ -286,7 +286,7 @@ static void test_list_contains_all_invalid(void **state)
 
 static void test_list_get_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     void *data = rj_list_get(list, 1);
 
@@ -294,7 +294,7 @@ static void test_list_get_valid(void **state)
 }
 static void test_list_get_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     void *data = rj_list_get(list, 100);
 
@@ -307,7 +307,7 @@ static void test_list_get_invalid(void **state)
 
 static void test_list_get_size_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     size_t size = rj_list_get_size(list, 1);
 
@@ -316,7 +316,7 @@ static void test_list_get_size_valid(void **state)
 
 static void test_list_get_size_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     size_t size = rj_list_get_size(list, 100);
 
@@ -329,7 +329,7 @@ static void test_list_get_size_invalid(void **state)
 
 static void test_list_remove_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     void *data = NULL;
 
@@ -343,9 +343,9 @@ static void test_list_remove_valid(void **state)
 }
 static void test_list_remove_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     assert_int_equal(rj_list_remove(list, item->data), 0);
 
@@ -358,7 +358,7 @@ static void test_list_remove_invalid(void **state)
 
 static void test_list_remove_index_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     assert_int_equal(rj_list_size(list), 3);
 
@@ -369,7 +369,7 @@ static void test_list_remove_index_valid(void **state)
 
 static void test_list_remove_index_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     assert_int_equal(rj_list_remove_index(list, 100), 0);
 
@@ -378,9 +378,9 @@ static void test_list_remove_index_invalid(void **state)
 
 static void test_list_remove_all_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list *other = rj_list_create();
+    RJList *other = rj_list_create();
 
     rj_list_add(other, random_list_item());
     rj_list_add(other, random_list_item());
@@ -399,9 +399,9 @@ static void test_list_remove_all_valid(void **state)
 }
 static void test_list_remove_all_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list *other = rj_list_create();
+    RJList *other = rj_list_create();
 
     assert_int_equal(rj_list_remove_all(list, other), 0);
 
@@ -416,7 +416,7 @@ static void test_list_remove_all_invalid(void **state)
 
 static void test_list_index_of_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     void *data = rj_list_get(list, 1);
 
@@ -426,9 +426,9 @@ static void test_list_index_of_valid(void **state)
 }
 static void test_list_index_of_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     assert_int_equal(rj_list_index_of(list, item->data), -1);
 
@@ -437,9 +437,9 @@ static void test_list_index_of_invalid(void **state)
 
 static void test_list_set_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     void *data = NULL;
 
@@ -455,9 +455,9 @@ static void test_list_set_valid(void **state)
 }
 static void test_list_set_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
-    rj_list_item *item = random_list_item();
+    RJListItem *item = random_list_item();
 
     void *data = NULL;
 
@@ -476,7 +476,7 @@ static void test_list_set_invalid(void **state)
 
 static void test_list_size_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     assert_int_equal(rj_list_size(list), 3);
 
@@ -486,14 +486,14 @@ static void test_list_size_valid(void **state)
 }
 static void test_list_size_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     assert_int_equal(rj_list_size(NULL), 0);
 }
 
 static void test_list_is_empty_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     assert_int_equal(rj_list_is_empty(list), 0);
 
@@ -503,14 +503,14 @@ static void test_list_is_empty_valid(void **state)
 }
 static void test_list_is_empty_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     assert_int_not_equal(rj_list_is_empty(NULL), 0);
 }
 
 static void test_list_merge_sort_valid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     int index = 0;
 
@@ -537,7 +537,7 @@ static void test_list_merge_sort_valid(void **state)
 }
 static void test_list_sort_invalid(void **state)
 {
-    rj_list *list = (rj_list *)*state;
+    RJList *list = (RJList *)*state;
 
     rj_list_sort(NULL);
 }
@@ -548,7 +548,8 @@ int run_list_tests()
         cmocka_unit_test_setup_teardown(test_list_add_valid, create_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_add_index_valid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_add_all_valid, create_and_populate_test_list, destroy_test_list),
-        cmocka_unit_test_setup_teardown(test_list_add_all_index_valid, create_and_populate_test_list, destroy_test_list),
+        cmocka_unit_test_setup_teardown(test_list_add_all_index_valid, create_and_populate_test_list,
+                                        destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_clear_valid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_contains_valid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_contains_all_valid, create_and_populate_test_list, destroy_test_list),
@@ -567,14 +568,17 @@ int run_list_tests()
         cmocka_unit_test_setup_teardown(test_list_add_invalid, create_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_add_index_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_add_all_invalid, create_and_populate_test_list, destroy_test_list),
-        cmocka_unit_test_setup_teardown(test_list_add_all_index_invalid, create_and_populate_test_list, destroy_test_list),
+        cmocka_unit_test_setup_teardown(test_list_add_all_index_invalid, create_and_populate_test_list,
+                                        destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_clear_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_contains_invalid, create_and_populate_test_list, destroy_test_list),
-        cmocka_unit_test_setup_teardown(test_list_contains_all_invalid, create_and_populate_test_list, destroy_test_list),
+        cmocka_unit_test_setup_teardown(test_list_contains_all_invalid, create_and_populate_test_list,
+                                        destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_get_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_get_size_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_remove_invalid, create_and_populate_test_list, destroy_test_list),
-        cmocka_unit_test_setup_teardown(test_list_remove_index_invalid, create_and_populate_test_list, destroy_test_list),
+        cmocka_unit_test_setup_teardown(test_list_remove_index_invalid, create_and_populate_test_list,
+                                        destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_remove_all_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_index_of_invalid, create_and_populate_test_list, destroy_test_list),
         cmocka_unit_test_setup_teardown(test_list_set_invalid, create_and_populate_test_list, destroy_test_list),
@@ -590,4 +594,3 @@ int run_list_tests()
 
     return cmocka_run_group_tests_name("list invalid tests", invalid_tests, NULL, NULL);
 }
-

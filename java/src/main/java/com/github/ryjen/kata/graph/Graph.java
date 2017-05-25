@@ -1,10 +1,12 @@
 package com.github.ryjen.kata.graph;
 
-import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
-import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
+import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
+import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
-import com.github.ryjen.kata.graph.formatters.VertexFormatter;
+import com.github.ryjen.kata.graph.model.Connection;
+import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
 import com.github.ryjen.kata.graph.search.Ordering;
@@ -13,39 +15,50 @@ import com.github.ryjen.kata.graph.sort.TopologicalSort;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 /**
  * Created by ryan on 2017-03-19.
  */
 public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgable<Vertex>, Vertexable<Vertex>, Cloneable {
 
+    private final Factory<Vertex> factory;
     private boolean directed;
 
     /**
      * default constructor
+     *
      * @param directed true if the graph is directed
      */
-    protected Graph(boolean directed) {
+    protected Graph(Factory<Vertex> factory, boolean directed) {
+        assert factory != null;
+        this.factory = factory;
         this.directed = directed;
     }
 
     /**
      * copy constructor
-     * @param other
+     *
+     * @param other the graph to copy from
      */
     protected Graph(Graph<Vertex> other) {
+        this.factory = other.factory;
         this.directed = other.directed;
     }
 
     /**
      * clones this instance
+     *
      * @return a copy of this graph
      */
     public abstract Graph<Vertex> clone();
 
+    public abstract Graph<Vertex> emptyClone();
+
     /**
      * add a list of vertices
-     * @param list
+     *
+     * @param list the list of vertices to add
      */
     public void addVertices(Vertex... list) {
         for (Vertex v : list) {
@@ -53,12 +66,52 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         }
     }
 
+    public void addEdge(Vertex a, Vertex b) {
+        addEdge(a, b, factory.createEdge());
+    }
+
+    public Edge getEdgeOrDefault(Vertex v, Vertex b) {
+        return isEdge(v, b) ? getEdge(v, b) : factory.emptyEdge();
+    }
+
+    /**
+     * adds an edge with a weight between two vertices
+     *
+     * @param a      the first vertex
+     * @param b      the second vertex
+     * @param weight the weight of the edge
+     */
+    public void addEdge(Vertex a, Vertex b, int weight) {
+        addEdge(a, b, factory.createEdge(weight));
+    }
+
+    @Override
+    public int numberOfEdges() {
+        return Long.valueOf(StreamSupport.stream(edges().spliterator(), false).count()).intValue();
+    }
+
     /**
      * gets the size of the graph in terms of number of vertices
+     *
      * @return the size
      */
     public abstract int size();
 
+
+    /**
+     * gets all edges attached to a vertex
+     *
+     * @param vertex
+     * @return the iterator
+     */
+    public abstract Iterable<Connection<Vertex>> connections(Vertex vertex);
+
+    /**
+     * gets all edges with an attached vertex
+     *
+     * @return
+     */
+    public abstract Iterable<Connection<Vertex>> connections();
 
     /**
      * performs a depth first search
@@ -84,20 +137,24 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * tests if this graph is connected (no stray vertices)
+     *
      * @return true if all vertices are connected
      */
     public boolean isConnected() {
         Set<Vertex> visited = new HashSet<>();
 
-        for (Vertex v : vertices()) {
-            dfs(v, value -> visited.add(value), Ordering.Pre);
+        if (size() == 0) {
+            return false;
         }
+
+        dfs(vertices().iterator().next(), visited::add, Ordering.Pre);
 
         return visited.size() == size();
     }
 
     /**
      * tests if this graph is cyclic
+     *
      * @return true if one or more vertices are connected in a loop
      */
     public boolean isCyclic() {
@@ -112,9 +169,9 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
             sorter.sort();
 
             return false;
-        } catch (GraphIsCyclicException e) {
+        } catch (GraphCyclicException e) {
             return true;
-        } catch (GraphNotDirectedException e) {
+        } catch (GraphDirectedException e) {
             return false;
         }
     }
@@ -132,6 +189,7 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * test for the number of connections into a vertex
+     *
      * @param vertex the vertex to check
      * @return the number of in connections
      */
@@ -139,13 +197,20 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
 
     /**
      * test for the number of connections coming from a vertex
+     *
      * @param vertex the vertex to test
      * @return the number of out connections
      */
     public abstract int outDegree(Vertex vertex);
 
     /**
+     * clear all vertices and edges from the instance
+     */
+    public abstract void clear();
+
+    /**
      * tests if this graph is directed
+     *
      * @return true if is directed
      */
     public boolean isDirected() {
@@ -170,5 +235,9 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         formatter.format(buf);
 
         return buf.toString();
+    }
+
+    protected Factory<Vertex> getFactory() {
+        return factory;
     }
 }

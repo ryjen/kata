@@ -1,14 +1,14 @@
 package com.github.ryjen.kata.graph;
 
-import com.github.ryjen.kata.graph.exceptions.GraphIsCyclicException;
-import com.github.ryjen.kata.graph.exceptions.GraphNotDirectedException;
+import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
+import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.ListFormatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
 import com.github.ryjen.kata.graph.formatters.VertexFormatter;
-import com.github.ryjen.kata.graph.model.DefaultFactory;
-import com.github.ryjen.kata.graph.model.Factory;
+import com.github.ryjen.kata.graph.model.*;
 import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.sort.TopologicalSort;
+import com.github.ryjen.kata.graph.tree.MinimumSpanningTree;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,13 +24,13 @@ import java.util.stream.StreamSupport;
  */
 public abstract class GraphTest {
 
-    public abstract <T extends Comparable<T>> Graph<T> newGraph(Factory<T> factory, boolean directed);
+    protected abstract <T extends Comparable<T>> Graph<T> newGraph(Factory<T> factory, boolean directed);
 
-    public <T extends Comparable<T>> Graph<T> newGraph(boolean directed) {
+    protected <T extends Comparable<T>> Graph<T> newGraph(boolean directed) {
         return newGraph(new DefaultFactory<T>(), directed);
     }
 
-    public <T extends Comparable<T>> Graph<T> newGraph() {
+    protected <T extends Comparable<T>> Graph<T> newGraph() {
         return newGraph(new DefaultFactory<T>(), false);
     }
 
@@ -306,7 +306,7 @@ public abstract class GraphTest {
 
             Assert.assertEquals(expected, sorted);
 
-        } catch (GraphIsCyclicException | GraphNotDirectedException e) {
+        } catch (GraphCyclicException | GraphDirectedException e) {
             Assert.assertTrue(false);
         }
     }
@@ -344,7 +344,7 @@ public abstract class GraphTest {
         g.addEdge('A', 'E');
         g.addEdge('E', 'F');
 
-        g.dfs('A', e -> actual.add(e), Ordering.Pre);
+        g.dfs('A', actual::add, Ordering.Pre);
 
         List<Character> expected = Arrays.asList('A', 'E', 'F', 'B', 'D', 'C', 'G');
 
@@ -365,7 +365,7 @@ public abstract class GraphTest {
         g.addEdge('C', 'D');
         g.addEdge('A', 'C');
 
-        g.dfs('A', e -> actual.add(e), Ordering.Post);
+        g.dfs('A', actual::add, Ordering.Post);
 
         List<Character> expected = Arrays.asList('C', 'D', 'B', 'A');
 
@@ -385,11 +385,106 @@ public abstract class GraphTest {
         g.addEdge('B', 'D');
         g.addEdge('C', 'D');
 
-        g.dfs('A', e -> actual.add(e), Ordering.ReversePost);
+        g.dfs('A', actual::add, Ordering.ReversePost);
 
         List<Character> expected = Arrays.asList('A', 'C', 'B', 'D');
 
         Assert.assertEquals(expected, actual);
     }
 
+    @Test
+    public void testConnectedGraph() {
+        Graph<Integer> graph = newGraph(new IndexFactory(3), true);
+
+        Assert.assertFalse(graph.isConnected());
+
+        graph.addEdge(0, 1);
+        graph.addEdge(1, 2);
+
+        Assert.assertTrue(graph.isConnected());
+
+    }
+
+    @Test
+    public void testAdjacentEdges() {
+        Graph<Integer> graph = newGraph(new IndexFactory(5), false);
+
+        graph.addEdge(0, 1, 3);
+        graph.addEdge(1, 3, 4);
+        graph.addEdge(2, 1, 1);
+        graph.addEdge(3, 4, 3);
+
+        List<Edge> expected = Arrays.asList(new WeightedEdge(3), new WeightedEdge(1), new WeightedEdge(4));
+
+        List<Edge> actual = StreamSupport.stream(graph.edges(1).spliterator(), false).collect(Collectors.toList());
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testPrimsMinSpanningTree() {
+        Graph<Character> graph = newGraph(false);
+
+        graph.addVertices('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i');
+
+        graph.addEdge('a', 'b', 4);
+        graph.addEdge('b', 'c', 8);
+        graph.addEdge('c', 'i', 2);
+        graph.addEdge('c', 'f', 4);
+        graph.addEdge('f', 'g', 2);
+        graph.addEdge('g', 'h', 1);
+        graph.addEdge('c', 'd', 7);
+        graph.addEdge('d', 'e', 9);
+
+        graph.addEdge('a', 'h', 9);
+        graph.addEdge('b', 'h', 11);
+        graph.addEdge('h', 'i', 7);
+        graph.addEdge('g', 'i', 6);
+        graph.addEdge('d', 'f', 14);
+        graph.addEdge('e', 'f', 10);
+
+        try {
+            Iterable<Connection<Character>> actual = new MinimumSpanningTree.Prims<>(graph).find();
+
+            int expected = 37;
+
+            Assert.assertEquals(expected, StreamSupport.stream(actual.spliterator(), false).mapToInt(e -> e.getEdge().getWeight()).sum());
+        } catch (GraphDirectedException | GraphCyclicException e) {
+            Assert.assertTrue(false);
+        }
+    }
+
+
+    @Test
+    public void testKruskalsMinSpanningTree() {
+        Graph<Character> graph = newGraph(false);
+
+        graph.addVertices('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i');
+
+        graph.addEdge('a', 'b', 4);
+        graph.addEdge('b', 'c', 8);
+        graph.addEdge('c', 'i', 2);
+        graph.addEdge('c', 'f', 4);
+        graph.addEdge('f', 'g', 2);
+        graph.addEdge('g', 'h', 1);
+        graph.addEdge('c', 'd', 7);
+        graph.addEdge('d', 'e', 9);
+
+        graph.addEdge('a', 'h', 9);
+        graph.addEdge('b', 'h', 11);
+        graph.addEdge('h', 'i', 7);
+        graph.addEdge('g', 'i', 6);
+        graph.addEdge('d', 'f', 14);
+        graph.addEdge('e', 'f', 10);
+
+        try {
+            Iterable<Connection<Character>> actual = new MinimumSpanningTree.Kruskals<>(graph).find();
+
+            int expected = 37;
+
+            Assert.assertEquals(expected, StreamSupport.stream(actual.spliterator(), false).mapToInt(e -> e.getEdge().getWeight()).sum());
+        } catch (GraphDirectedException | GraphCyclicException e) {
+            Assert.assertTrue(false);
+        }
+    }
 }

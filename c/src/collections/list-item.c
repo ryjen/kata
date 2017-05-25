@@ -5,20 +5,21 @@
 
 #include "list-item.h"
 
-rj_list_item *rj_list_item_create(void *data, size_t size, rj_list_compare_fn comparer)
+RJListItem *rj_list_item_create(void *data, size_t size, RJListCompareCallback comparer)
 {
     return rj_list_item_create_transient(data, size, comparer, malloc, free, memmove);
 }
 
-rj_list_item *rj_list_item_create_static(void *data, size_t size, rj_list_compare_fn comparer)
+RJListItem *rj_list_item_create_static(void *data, size_t size, RJListCompareCallback comparer)
 {
     return rj_list_item_create_transient(data, size, comparer, NULL, NULL, NULL);
 }
 
-rj_list_item *rj_list_item_create_transient(void *data, size_t size, rj_list_compare_fn comparer, rj_list_alloc_fn allocator,
-                                          rj_list_destroy_fn destructor, rj_list_copy_fn copier)
+RJListItem *rj_list_item_create_transient(void *data, size_t size, RJListCompareCallback comparer,
+                                          RJListAllocCallback allocator, RJListDestroyCallback destructor,
+                                          RJListCopyCallback copier)
 {
-    rj_list_item *item = malloc(sizeof(*item));
+    RJListItem *item = malloc(sizeof(*item));
     assert(item != NULL);
     item->data = data;
     item->size = size;
@@ -29,7 +30,7 @@ rj_list_item *rj_list_item_create_transient(void *data, size_t size, rj_list_com
     return item;
 }
 
-void rj_list_item_destroy(rj_list_item *item)
+void rj_list_item_destroy(RJListItem *item)
 {
     if (item == NULL) {
         return;
@@ -42,15 +43,15 @@ void rj_list_item_destroy(rj_list_item *item)
     free(item);
 }
 
-rj_list_item *rj_list_item_copy(const rj_list_item *orig)
+RJListItem *rj_list_item_copy(const RJListItem *orig)
 {
-    rj_list_item *item = NULL;
+    RJListItem *item = NULL;
 
     if (orig == NULL) {
         return NULL;
     }
 
-    item = malloc(sizeof(*item));
+    item = malloc(sizeof(RJListItem));
     assert(item != NULL);
     if (orig->copier && orig->allocator) {
         item->data = (*orig->allocator)(orig->size);
@@ -68,7 +69,7 @@ rj_list_item *rj_list_item_copy(const rj_list_item *orig)
     return item;
 }
 
-int rj_list_item_compare(const rj_list_item *item, const void *data)
+int rj_list_item_compare(const RJListItem *item, const void *data)
 {
     assert(item != NULL);
 

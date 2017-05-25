@@ -4,6 +4,7 @@ file(GLOB_RECURSE COLLECTIONS_SRC ${CMAKE_CURRENT_SOURCE_DIR}/collections/*.c)
 
 add_executable(${KATA_TEST}
 	kata.c
+	challenge.c
 	${ALGORITHMS_SRC}
 	${COLLECTIONS_SRC}
 )

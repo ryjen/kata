@@ -542,6 +542,27 @@ static void test_list_sort_invalid(void **state)
     rj_list_sort(NULL);
 }
 
+static void test_list_partition(void **state)
+{
+    RJList *list = (RJList *)*state;
+
+    int partition = 5;
+
+    int values[] = {3, 5, 8, 5, 10, 2, 1};
+
+    int expected[] = {3, 1, 2, 10, 5, 5, 8};
+
+    size_t num_values = sizeof(values) / sizeof(values[0]);
+
+    for (int i = 0; i < num_values; i++) {
+        rj_list_add(list, rj_list_item_create_static(&values[i], sizeof(int), test_int_compare));
+    }
+
+    assert_int_equals(rj_list_size(list), num_values);
+
+    RJListItem *head;
+}
+
 int run_list_tests()
 {
     const struct CMUnitTest valid_tests[] = {

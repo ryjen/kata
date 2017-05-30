@@ -1,6 +1,10 @@
 #ifndef RYJEN_KATA_LIST_SINGLE_H
 #define RYJEN_KATA_LIST_SINGLE_H
 
+typedef enum { RJListIterateNext, RJListIteratorDelete } RJListCallbackReturn;
+
+typedef RJListCallbackReturn (*)(RJList *list, RJListItem *node) RJListCallback;
+
 /**
  * a singly linked list
  */
@@ -152,6 +156,12 @@ size_t rj_list_size(const RJList *list);
  */
 int rj_list_is_empty(const RJList *list);
 
+/**
+ * iterates a list for each item
+ * @param list the list to iterator
+ * @param callback the callback for each item
+ */
+void rj_list_for_each(RJList *list, RJListCallback callback);
 
 /**
  * sorts the list based on the comparator

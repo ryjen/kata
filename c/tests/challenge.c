@@ -7,6 +7,11 @@
 
 #include <cmocka.h>
 
+/**
+ * sorts an array by separating a value to the front, keeping
+ * the remaining values in order
+ * effeciency is O(n log n)
+ */
 static void sort_value(int *values, int *result, size_t size, int to_sort)
 {
     int indexes[size];

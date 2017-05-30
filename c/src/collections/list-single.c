@@ -143,7 +143,6 @@ void rj_list_add_all(RJList *list, const RJList *other)
     }
 }
 
-
 void rj_list_add_all_index(RJList *list, size_t index, const RJList *other)
 {
     RJListNode *node = NULL, *other_node = NULL;
@@ -274,10 +273,8 @@ size_t rj_list_get_size(const RJList *list, size_t index)
     return node->item->size;
 }
 
-static void __rj_list_node_unlink(RJList *list, RJListNode *node)
+static void __rj_list_node_unlink(RJList *list, RJListNode *node, RJListNode *prev)
 {
-    RJListNode *prev = NULL;
-
     if (list == NULL || node == NULL) {
         return;
     }
@@ -289,13 +286,18 @@ static void __rj_list_node_unlink(RJList *list, RJListNode *node)
         return;
     }
 
-    for (prev = list->first; prev; prev = prev->next) {
-        if (prev->next == node) {
-            prev->next = node->next;
-            node->next = NULL;
-            list->size--;
-            return;
+    if (prev == NULL) {
+        for (prev = list->first; prev; prev = prev->next) {
+            if (prev->next == node) {
+                break;
+            }
         }
+    }
+
+    if (prev != NULL) {
+        prev->next = node->next;
+        node->next = NULL;
+        list->size--;
     }
 }
 
@@ -500,8 +502,7 @@ static RJListNode *__rj_list_merge_sort(RJListNode *first)
     }
 
     /* this divides the list into two seperate lists.
-     * doesn't split down the middle as calculating the size is
-     * extra overhead, instead just alternating each consecutive item
+     * just alternating each consecutive item
      */
     for (node = first; node; node = node_next, pos++) {
         node_next = node->next;
@@ -528,4 +529,25 @@ void rj_list_sort(RJList *list)
     }
 
     list->first = __rj_list_merge_sort(list->first);
+}
+
+void rj_list_for_each(RJList *list, RJListCallback callback)
+{
+    RJListNode *node = NULL;
+    RJListNode *prev = NULL;
+
+    if (list == NULL || callback == NULL) {
+        return;
+    }
+    for (node = list->first; node; node = node->next, prev = node) {
+        if (callback(list, node->item) == RJListCallbackDelete) {
+            if (prev == NULL) {
+                __rj_list_node_unlink(list, node);
+            } else {
+                __rj_list_node_unlink_prev(list, node, prev);
+            }
+
+            __rj_list_node_destroy(node);
+        }
+    }
 }

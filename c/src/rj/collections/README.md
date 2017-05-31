@@ -8,7 +8,8 @@ examples:
 
 ### creating a list
 ```c
-	rj_list *list = rj_list_create();
+	RJList *list = rj_list_create_single();
+  // list = rj_list_create_double();
 ```
 
 ### create a list item
@@ -17,7 +18,7 @@ examples:
   void *data = ...
 
   /* create an item using stdlib memory function */
-	rj_list_item *item = rj_list_item_create(data, data_size, memcmp);
+	RJListItem *item = rj_list_item_create(data, data_size, memcmp);
 
   /* create an item with no memory functions, data will not be destroyed or copied */
 	item = rj_list_item_create_static(data, data_size, memcmp);

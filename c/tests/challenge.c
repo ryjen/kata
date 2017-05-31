@@ -10,7 +10,7 @@
 /**
  * sorts an array by separating a value to the front, keeping
  * the remaining values in order
- * effeciency is O(n log n)
+ * effeciency is O(n^2)
  */
 static void sort_value(int *values, int *result, size_t size, int to_sort)
 {

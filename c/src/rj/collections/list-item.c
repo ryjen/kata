@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "list-item.h"
+#include <rj/collections/list-item.h>
 
 RJListItem *rj_list_item_create(void *data, size_t size, RJListCompareCallback comparer)
 {

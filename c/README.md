@@ -7,7 +7,7 @@ rj_list
 =======
 
 
-See [README](src/collections/README.md)
+See [README](src/rj/collections/README.md)
 
 
 

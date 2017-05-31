@@ -9,7 +9,7 @@ import java.util.Stack;
 /**
  * Created by ryanjennings on 2017-05-29.
  */
-public class Challenge {
+public class LinkList {
 
     public static class Node<T> {
         public T data;
@@ -100,6 +100,9 @@ public class Challenge {
         Node<T> p2 = node;
 
         for(int i = 0; i < k; i++) {
+            if (p1 == null) {
+                return null;
+            }
             p1 = p1.next;
         }
 

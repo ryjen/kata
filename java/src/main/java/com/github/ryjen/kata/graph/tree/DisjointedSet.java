@@ -1,5 +1,6 @@
 package com.github.ryjen.kata.graph.tree;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,12 +13,12 @@ public class DisjointedSet<Vertex extends Comparable<Vertex>> {
     private final Set<Set<Vertex>> value;
 
     public DisjointedSet() {
-        value = new LinkedHashSet<>();
+        value = new HashSet<>();
     }
 
 
     public void makeSet(Vertex v) {
-        Set<Vertex> set = new LinkedHashSet<>(1);
+        Set<Vertex> set = new HashSet<>(1);
         set.add(v);
         value.add(set);
     }

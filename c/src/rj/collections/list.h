@@ -1,20 +1,15 @@
-#ifndef RYJEN_KATA_LIST_SINGLE_H
-#define RYJEN_KATA_LIST_SINGLE_H
+#ifndef RJ_KATA_LIST_H
+#define RJ_KATA_LIST_H
 
-typedef enum { RJListIterateNext, RJListIteratorDelete } RJListCallbackReturn;
+#include <rj/collections/list-item.h>
 
-typedef RJListCallbackReturn (*)(RJList *list, RJListItem *node) RJListCallback;
-
-/**
- * a singly linked list
- */
 typedef struct __rj_list RJList;
 
 /**
  * creates a new list
  * @return an allocated list object
  */
-RJList *rj_list_create();
+RJList *rj_list_create_single();
 
 /**
  * destroys a created list
@@ -93,14 +88,6 @@ int rj_list_contains_all(const RJList *list, const RJList *other);
 void *rj_list_get(const RJList *list, size_t index);
 
 /**
- * gets the size of the data from a list
- * @param  list  the list instance
- * @param  index the index of the data
- * @return       the size of the data at the given index
- */
-size_t rj_list_get_size(const RJList *list, size_t index);
-
-/**
  * removes an item from a list
  * items must have a compare function set
  * @param  list the list instance
@@ -157,17 +144,21 @@ size_t rj_list_size(const RJList *list);
 int rj_list_is_empty(const RJList *list);
 
 /**
- * iterates a list for each item
- * @param list the list to iterator
- * @param callback the callback for each item
- */
-void rj_list_for_each(RJList *list, RJListCallback callback);
-
-/**
  * sorts the list based on the comparator
  * NOTE: the implementation is subject to change
  * @param  list the list instance
  */
 void rj_list_sort(RJList *list);
+
+typedef enum { RJListIterateNext, RJListIteratorBreak, RJListIteratorDelete } RJListCallbackReturn;
+
+typedef RJListCallbackReturn (*RJListCallback)(RJList *list, size_t index, RJListItem *node);
+
+/**
+ * iterates a list for each item
+ * @param list the list to iterator
+ * @param callback the callback for each item
+ */
+void rj_list_for_each(RJList *list, RJListCallback callback);
 
 #endif

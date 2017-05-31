@@ -1,5 +1,7 @@
-#ifndef RYJEN_KATA_LIST_ITEM_H
-#define RYJEN_KATA_LIST_ITEM_H
+#ifndef RJ_KATA_LIST_ITEM_H
+#define RJ_KATA_LIST_ITEM_H
+
+#include <stdlib.h>
 
 typedef void (*RJListDestroyCallback)(void *);
 typedef void *(*RJListAllocCallback)(size_t);

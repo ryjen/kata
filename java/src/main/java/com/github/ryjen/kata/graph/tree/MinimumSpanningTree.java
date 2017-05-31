@@ -28,7 +28,7 @@ public abstract class MinimumSpanningTree<Vertex extends Comparable<Vertex>> {
     /**
      * finds the minimum spanning tree for the graph
      *
-     * @return the graph that makes the minimum spanning tree
+     * @return the set of vertexes and edges that makes the minimum spanning tree
      */
     public abstract Iterable<Connection<Vertex>> find();
 

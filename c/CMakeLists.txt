@@ -16,10 +16,15 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(CreatePackage)
 create_package("code kata")
 
-set(COLLECTIONS_LIB ${PROJECT_NAME}-collections)
-set(ALGORITHMS_LIB ${PROJECT_NAME}-algorithms)
+set(COLLECTIONS_LIB ${PROJECT_NAME}_collections)
+set(ALGORITHMS_LIB ${PROJECT_NAME}_algorithms)
+set(GRAPHS_LIB ${PROJECT_NAME}_graphs)
+set(LOGGING_LIB ${PROJECT_NAME}_logging)
+set(STRING_LIB ${PROJECT_NAME}_strings)
 
 set(KATA_TEST ${PROJECT_NAME}-test)
+
+include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/src)
 
 # add directories
 add_subdirectory(src)

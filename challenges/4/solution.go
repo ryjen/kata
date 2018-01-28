@@ -1,7 +1,7 @@
 package main
 
 import (
-				"container/heap"
+	"container/heap"
 )
 
 /**
@@ -22,37 +22,37 @@ output: 3
 
 // O(n^2 using selection sort
 func SolutionBruteForce(input []int) int {
-				
-				n := len(input)
 
-				// selection sort in-place algorithm until we find the first missing positive
-				
-				for j := 0; j < n - 1; j++ {
-								
-								imin := j
+	n := len(input)
 
-								for i := j + 1; i < n; i++ {
-												if input[i] < input[imin] {
-																imin = i
-												}
-								}
+	// selection sort in-place algorithm until we find the first missing positive
 
-								if imin != j {
-												tmp := input[j]
-												input[j] = input[imin]
-												input[imin] = tmp
-								}
-				}
+	for j := 0; j < n-1; j++ {
 
-				for j := 0; j < n - 1; j++ {
-								val := input[j] + 1
+		imin := j
 
-								if val > 0 && val != input[j + 1] {
-												return val
-								}
-				}
+		for i := j + 1; i < n; i++ {
+			if input[i] < input[imin] {
+				imin = i
+			}
+		}
 
-				return input[n-1] + 1
+		if imin != j {
+			tmp := input[j]
+			input[j] = input[imin]
+			input[imin] = tmp
+		}
+	}
+
+	for j := 0; j < n-1; j++ {
+		val := input[j] + 1
+
+		if val > 0 && val != input[j+1] {
+			return val
+		}
+	}
+
+	return input[n-1] + 1
 }
 
 // array based heap math
@@ -68,53 +68,51 @@ func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
 func (h IntHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
 func (h *IntHeap) Push(x interface{}) {
-				// pointers to modify the array
-				// push appends value
-				*h = append(*h, x.(int))
+	// pointers to modify the array
+	// push appends value
+	*h = append(*h, x.(int))
 }
 
 func (h *IntHeap) Pop() interface{} {
-				// get the array value
-				old := *h
-				// and the size
-				n := len(old)
-				// get the last value
-				x := old[n-1]
-				// assign the new array without the last value
-				*h = old[0 : n-1]
-				// return the leftover value
-				return x
+	// get the array value
+	old := *h
+	// and the size
+	n := len(old)
+	// get the last value
+	x := old[n-1]
+	// assign the new array without the last value
+	*h = old[0 : n-1]
+	// return the leftover value
+	return x
 }
 
 func Solution(input []int) int {
 
-				impl := new(IntHeap)
-				
-				heap.Init(impl)
+	impl := new(IntHeap)
 
-				for _, val := range input {
-								heap.Push(impl, val)
-				}
+	heap.Init(impl)
 
-				if impl.Len() == 0 {
-								return -1
-				}
+	for _, val := range input {
+		heap.Push(impl, val)
+	}
 
-				last := heap.Pop(impl).(int)
+	if impl.Len() == 0 {
+		return -1
+	}
 
-				for impl.Len() > 0 {
-								next := heap.Pop(impl).(int)
+	last := heap.Pop(impl).(int)
 
-								val := last + 1
+	for impl.Len() > 0 {
+		next := heap.Pop(impl).(int)
 
-								if val > 0 && val != next {
-												return val
-								}
+		val := last + 1
 
-								last = next
-				}
+		if val > 0 && val != next {
+			return val
+		}
 
-				return last + 1
+		last = next
+	}
+
+	return last + 1
 }
-
-

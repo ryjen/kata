@@ -47,6 +47,9 @@ func SolutionBruteForce(input []uint) []uint {
 // How to get the answer without without using division. Bitwise operators? multiplication?
 
 // a divide method that uses bit shifts instead
+// this particular version is hard to tell the run time
+// it would be more clear with a version that looped a
+// constant 32 bits so its clear it doesn't mess the linear time
 func fastDiv(dividend uint, divisor uint) uint {
 	if divisor == 0 {
 		return 0

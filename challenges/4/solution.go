@@ -55,7 +55,7 @@ func SolutionBruteForce(input []int) int {
 	return input[n-1] + 1
 }
 
-// array based heap math
+// array based heap math should satisfy constant space
 type IntHeap []int
 
 // heap.Interface implementations
@@ -88,31 +88,41 @@ func (h *IntHeap) Pop() interface{} {
 
 func Solution(input []int) int {
 
-	impl := new(IntHeap)
+	if len(input) == 0 {
+		return -1
+	}
 
+	// preallocate heap
+	impl := make([]int, len(input))
+
+	// initialzie interface
 	heap.Init(impl)
 
+	// push all values in input
 	for _, val := range input {
 		heap.Push(impl, val)
 	}
 
-	if impl.Len() == 0 {
-		return -1
-	}
-
+	// pop the first value
 	last := heap.Pop(impl).(int)
 
-	for impl.Len() > 0 {
+	// do while still values
+	for ok := true; ok; ok = impl.Len() > 0 {
+
+		// pop the next value
 		next := heap.Pop(impl).(int)
 
-		val := last + 1
+		// set the expected value
+		expected := last + 1
 
-		if val > 0 && val != next {
-			return val
+		// positive and not whats next
+		if expected > 0 && expected != next {
+			return expected
 		}
 
 		last = next
 	}
 
+	// return what we expect
 	return last + 1
 }

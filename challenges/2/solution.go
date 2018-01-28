@@ -39,6 +39,14 @@ func SolutionBruteForce(input []uint) []uint {
 	return output
 }
 
+// Knowns:
+// so to loop once you have the product in total
+// the answer for each index is the total product without the value at index
+
+// Questions:
+// How to get the answer without without using division. Bitwise operators? multiplication?
+
+// a divide method that uses bit shifts instead
 func fastDiv(dividend uint, divisor uint) uint {
 	if divisor == 0 {
 		return 0
@@ -68,28 +76,14 @@ func Solution(input []uint) []uint {
 
 	output := make([]uint, len(input))
 
-	// Knowns:
-	// so to loop once you have the product in total
-	// the answer for each index is the total product without the value at index
-
-	// Questions:
-	// How to get the answer without without using division. Bitwise operators? multiplication?
-
-	// Theory 1:
-	// index, multiply a floating point based on the value to the total product to get the value
-	// for that index.  careful with that conversion, eugene.
-
-	// Theory 2:
-	// a map of the total for each index, return the values.  might even have dynamic programming benefits
-	// always seems the best solution ends up being a map, fuck space time
-
 	var total uint = 1
 
+	// set the total product
 	for _, val := range input {
 		total *= val
 	}
 
-	// hmmm
+	// fast divide the index value for each output
 	for i := range input {
 		output[i] = fastDiv(total, input[i])
 	}

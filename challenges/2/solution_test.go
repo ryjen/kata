@@ -5,7 +5,8 @@ import (
 	"testing"
 )
 
-func compareIntArray(a1 []uint, a2 []uint) bool {
+// compares two uint arrays
+func compareUintArray(a1 []uint, a2 []uint) bool {
 
 	if len(a1) != len(a2) {
 		return false
@@ -22,13 +23,11 @@ func compareIntArray(a1 []uint, a2 []uint) bool {
 func TestSolution(t *testing.T) {
 	input := []uint{1, 2, 3, 4, 5}
 
-	// haha that was kotlin.  cobwebs in the head.
-
 	expected := []uint{120, 60, 40, 30, 24}
 
 	actual := Solution(input)
 
-	if !compareIntArray(expected, actual) {
+	if !compareUintArray(expected, actual) {
 		t.Fatal("expected ", expected, " got ", actual)
 	}
 }
@@ -53,7 +52,7 @@ func BenchmarkSolution(b *testing.B) {
 
 }
 
-func BenchmarkSolutionBruteForce(b *testing.B) {
+func BenchmarkBruteForce(b *testing.B) {
 
 	input := generateBenchmarkInput()
 

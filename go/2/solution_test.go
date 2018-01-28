@@ -1,73 +1,61 @@
 package main
 
 import (
-				"testing"
+	"math/rand"
+	"testing"
 )
 
-func TestSolution1(t *testing.T) {
-				
-				input := []int{3,4,-1,1}
-				
-				expected := 2
+func compareIntArray(a1 []uint, a2 []uint) bool {
 
-				actual := Solution(input)
+	if len(a1) != len(a2) {
+		return false
+	}
 
-				if expected != actual {
-								t.Fatal("expected ", expected, " got ", actual)
-				}
-
-				actual = SolutionBruteForce(input)
-
-				if expected != actual {
-								t.Fatal("brute force expected ", expected, " got ", actual)
-				}
+	for i, v := range a1 {
+		if v != a2[i] {
+			return false
+		}
+	}
+	return true
 }
 
-func TestSolution2(t *testing.T) {
+func TestSolution(t *testing.T) {
+	input := []uint{1, 2, 3, 4, 5}
 
-				input := []int{1,2,0}
+	// haha that was kotlin.  cobwebs in the head.
 
-				expected := 3
+	expected := []uint{120, 60, 40, 30, 24}
 
-				actual := Solution(input)
+	actual := Solution(input)
 
-				if expected != actual {
-								t.Fatal("expected ", expected, " got ", actual)
-				}
-
-				actual = SolutionBruteForce(input)
-
-				if expected != actual {
-								t.Fatal("expected ", expected, " got ", actual)
-				}
+	if !compareIntArray(expected, actual) {
+		t.Fatal("expected ", expected, " got ", actual)
+	}
 }
 
-func generateBenchmarkValue() []int {
-				const size = 100000
+func generateBenchmarkInput() []uint {
+	const size = 10000
 
-				input := make([]int, size)
+	input := make([]uint, size)
 
-				for i := 0; i < size; i++ {
-								input[i] = i
-				}
+	for i := 0; i < size; i++ {
+		input[i] = uint(rand.Uint32())
+	}
 
-				input[size-2] = input[size-3]
-
-				return input
+	return input
 }
 
-func BenchmarkSolutionBruteForce(t *testing.B) {
+func BenchmarkSolution(b *testing.B) {
 
-				input := generateBenchmarkValue()
+	input := generateBenchmarkInput()
 
-				_ = SolutionBruteForce(input)
+	_ = Solution(input)
+
 }
 
-func BenchmarkSolution(t *testing.B) {
-				
-				input := generateBenchmarkValue()
+func BenchmarkSolutionBruteForce(b *testing.B) {
 
-				_ = Solution(input)
+	input := generateBenchmarkInput()
+
+	_ = SolutionBruteForce(input)
 }
-
-

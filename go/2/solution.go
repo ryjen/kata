@@ -1,120 +1,98 @@
 package main
 
-import (
-				"container/heap"
-)
-
 /**
 
-Given an array of integers, find the first missing positive integer in linear time and constant space.
-In other words, find the lowest positive integer that does not exist in the array.
-The array can contain duplicates and negative numbers as well.  You can modify the array in-place.
+Given an array of integers, return a new array such that each element at index i of the new array is the product of all the numbers in the original array except the one at i.  Solve it without division and in O(n) time.
 
 Examples:
 
-input: [3,4,-1,1]
-output: 2
+input: [1,2,3,4,5]
+output: [120,60,40,30,24]
 
-input: [1,2,0]
-output: 3
+input: [3,2,1]
+output: [2,3,6]
 
 **/
 
-// O(n^2 using selection sort
-func SolutionBruteForce(input []int) int {
-				
-				n := len(input)
+func SolutionBruteForce(input []uint) []uint {
 
-				// selection sort in-place algorithm until we find the first missing positive
-				
-				for j := 0; j < n - 1; j++ {
-								
-								imin := j
+	// better start with brute force
 
-								for i := j + 1; i < n; i++ {
-												if input[i] < input[imin] {
-																imin = i
-												}
-								}
+	output := make([]uint, len(input))
 
-								if imin != j {
-												tmp := input[j]
-												input[j] = input[imin]
-												input[imin] = tmp
-								}
-				}
+	for i := range output {
+		output[i] = 1
+	}
 
-				for j := 0; j < n - 1; j++ {
-								val := input[j] + 1
+	// O(n^2)
+	for i := range input {
 
-								if val > 0 && val != input[j + 1] {
-												return val
-								}
-				}
+		for j := range input {
+			if i == j {
+				continue
+			}
 
-				return input[n-1] + 1
+			output[i] = output[i] * input[j]
+		}
+	}
+
+	return output
 }
 
-// array based heap math
-type IntHeap []int
+func fastDiv(dividend uint, divisor uint) uint {
+	if divisor == 0 {
+		return 0
+	}
 
-// heap.Interface implementations
+	var scaled_divisor uint = divisor
+	var remain uint = dividend
+	var result uint = 0
+	var multiple uint = 1
 
-func (h IntHeap) Len() int { return len(h) }
-
-func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
-
-// a beatiful swap method
-func (h IntHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
-
-func (h *IntHeap) Push(x interface{}) {
-				// pointers to modify the array
-				// push appends value
-				*h = append(*h, x.(int))
+	for scaled_divisor < dividend {
+		scaled_divisor = scaled_divisor + scaled_divisor
+		multiple = multiple + multiple
+	}
+	for ok := true; ok; ok = multiple != 0 {
+		if remain >= scaled_divisor {
+			remain = remain - scaled_divisor
+			result = result + multiple
+		}
+		scaled_divisor = scaled_divisor >> 1
+		multiple = multiple >> 1
+	}
+	return result
 }
 
-func (h *IntHeap) Pop() interface{} {
-				// get the array value
-				old := *h
-				// and the size
-				n := len(old)
-				// get the last value
-				x := old[n-1]
-				// assign the new array without the last value
-				*h = old[0 : n-1]
-				// return the leftover value
-				return x
+func Solution(input []uint) []uint {
+
+	output := make([]uint, len(input))
+
+	// Knowns:
+	// so to loop once you have the product in total
+	// the answer for each index is the total product without the value at index
+
+	// Questions:
+	// How to get the answer without without using division. Bitwise operators? multiplication?
+
+	// Theory 1:
+	// index, multiply a floating point based on the value to the total product to get the value
+	// for that index.  careful with that conversion, eugene.
+
+	// Theory 2:
+	// a map of the total for each index, return the values.  might even have dynamic programming benefits
+	// always seems the best solution ends up being a map, fuck space time
+
+	var total uint = 1
+
+	for _, val := range input {
+		total *= val
+	}
+
+	// hmmm
+	for i := range input {
+		output[i] = fastDiv(total, input[i])
+	}
+
+	return output
 }
-
-func Solution(input []int) int {
-
-				impl := new(IntHeap)
-				
-				heap.Init(impl)
-
-				for _, val := range input {
-								heap.Push(impl, val)
-				}
-
-				if impl.Len() == 0 {
-								return -1
-				}
-
-				last := heap.Pop(impl).(int)
-
-				for impl.Len() > 0 {
-								next := heap.Pop(impl).(int)
-
-								val := last + 1
-
-								if val > 0 && val != next {
-												return val
-								}
-
-								last = next
-				}
-
-				return last + 1
-}
-
-

@@ -93,7 +93,7 @@ func Solution(input []int) int {
 	}
 
 	// preallocate heap
-	impl := make([]int, len(input))
+	impl := new(IntHeap)
 
 	// initialzie interface
 	heap.Init(impl)

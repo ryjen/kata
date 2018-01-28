@@ -1,6 +1,0 @@
-[package]
-name = "tictactoe"
-version = "0.1.0"
-authors = ["Ryan Jennings <info@ryan-jennings.net>"]
-
-[dependencies]

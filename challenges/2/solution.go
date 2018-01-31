@@ -64,6 +64,8 @@ func abs(x int) uint {
 // How to get the answer without without using division. Bitwise operators? multiplication?
 
 // a divide method that uses bit shifts instead
+// is a constant loop, so doesn't affect linear time
+// negatives are handles based on whether either the divisor or numerator input is negative
 func fastDiv(numerator int, divisor int) (int, error) {
 	neg := false
 
@@ -91,16 +93,14 @@ func fastDiv(numerator int, divisor int) (int, error) {
 	var quotient uint = 0
 	var remainder uint = 0
 	var i uint
-	for i = 31; i >= 0; i-- {
-		if i > 31 {
-			break
-		}
+	for i = 32; i > 0; i-- {
 		remainder <<= 1
+		bit := i - 1
 		// set the least significant bit of remainder to bit i of the numerator
-		remainder = (remainder & 0xFE) | ((n >> i) & 1)
+		remainder = (remainder & 0xFE) | ((n >> bit) & 1)
 		if remainder >= d {
 			remainder -= d
-			quotient |= (1 << i)
+			quotient |= (1 << bit)
 		}
 	}
 

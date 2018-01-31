@@ -14,11 +14,15 @@ output: [2,3,6]
 
 **/
 
-func SolutionBruteForce(input []uint) []uint {
+import (
+	"errors"
+)
+
+func SolutionBruteForce(input []int) []int {
 
 	// better start with brute force
 
-	output := make([]uint, len(input))
+	output := make([]int, len(input))
 
 	for i := range output {
 		output[i] = 1
@@ -39,6 +43,19 @@ func SolutionBruteForce(input []uint) []uint {
 	return output
 }
 
+const MaxUint = ^uint(0)
+const MaxInt = int(MaxUint >> 1)
+
+func abs(x int) uint {
+	if x < 0 {
+		return uint(-x)
+	}
+	if x == 0 {
+		return 0
+	}
+	return uint(x)
+}
+
 // Knowns:
 // so to loop once you have the product in total
 // the answer for each index is the total product without the value at index
@@ -47,39 +64,62 @@ func SolutionBruteForce(input []uint) []uint {
 // How to get the answer without without using division. Bitwise operators? multiplication?
 
 // a divide method that uses bit shifts instead
-// this particular version is hard to tell the run time
-// it would be more clear with a version that looped a
-// constant 32 bits so its clear it doesn't mess the linear time
-func fastDiv(dividend uint, divisor uint) uint {
-	if divisor == 0 {
-		return 0
+func fastDiv(numerator int, divisor int) (int, error) {
+	neg := false
+
+	var n uint
+	var d uint
+
+	if numerator < 0 {
+		n = abs(numerator)
+		neg = true
+	} else {
+		n = uint(numerator)
 	}
 
-	var scaled_divisor uint = divisor
-	var remain uint = dividend
-	var result uint = 0
-	var multiple uint = 1
-
-	for scaled_divisor < dividend {
-		scaled_divisor = scaled_divisor + scaled_divisor
-		multiple = multiple + multiple
+	if divisor < 0 {
+		d = abs(divisor)
+		neg = !neg
+	} else {
+		d = uint(divisor)
 	}
-	for ok := true; ok; ok = multiple != 0 {
-		if remain >= scaled_divisor {
-			remain = remain - scaled_divisor
-			result = result + multiple
+
+	if d == 0 {
+		return 0, errors.New("divide by zero")
+	}
+
+	var quotient uint = 0
+	var remainder uint = 0
+	var i uint
+	for i = 31; i >= 0; i-- {
+		if i > 31 {
+			break
 		}
-		scaled_divisor = scaled_divisor >> 1
-		multiple = multiple >> 1
+		remainder <<= 1
+		// set the least significant bit of remainder to bit i of the numerator
+		remainder = (remainder & 0xFE) | ((n >> i) & 1)
+		if remainder >= d {
+			remainder -= d
+			quotient |= (1 << i)
+		}
 	}
-	return result
+
+	if quotient >= uint(MaxInt) {
+		return int(quotient), errors.New("overflow")
+	}
+
+	if neg {
+		return -int(quotient), nil
+	} else {
+		return int(quotient), nil
+	}
 }
 
-func Solution(input []uint) []uint {
+func Solution(input []int) ([]int, error) {
 
-	output := make([]uint, len(input))
+	output := make([]int, len(input))
 
-	var total uint = 1
+	var total int = 1
 
 	// set the total product
 	for _, val := range input {
@@ -88,8 +128,12 @@ func Solution(input []uint) []uint {
 
 	// fast divide the index value for each output
 	for i := range input {
-		output[i] = fastDiv(total, input[i])
+		val, err := fastDiv(total, input[i])
+		if err != nil {
+			return output, err
+		}
+		output[i] = val
 	}
 
-	return output
+	return output, nil
 }

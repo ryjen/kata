@@ -58,10 +58,10 @@ func abs(x int) uint {
 
 // Knowns:
 // so to loop once you have the product in total
-// the answer for each index is the total product without the value at index
+// the answer for each index is the total product divided by the value at index
 
 // Questions:
-// How to get the answer without without using division. Bitwise operators? multiplication?
+// How to get the answer without without using division. Bitwise operators? floating point multiplication?
 
 // a divide method that uses bit shifts instead
 // is a constant loop, so doesn't affect linear time

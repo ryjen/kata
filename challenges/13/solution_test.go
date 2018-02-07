@@ -25,7 +25,7 @@ func TestSolution(t *testing.T) {
 
 	expected := 3
 
-	actual := Solution(input, k)
+	actual := Solution(input, k, false)
 
 	if expected != actual {
 		t.Fatal("expected ", expected, " got ", actual)
@@ -67,5 +67,5 @@ func BenchmarkSolution(b *testing.B) {
 
 	input, k := generateBenchmarkInput()
 
-	_ = Solution(input, k)
+	_ = Solution(input, k, false)
 }

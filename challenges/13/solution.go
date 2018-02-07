@@ -22,26 +22,51 @@ func SolutionBruteForce(s string, k int) int {
 	return 0
 }
 
-func Solution(s string, k int) int {
+const (
+	MaxUint = ^uint(0)
+	MaxInt  = int(MaxUint >> 1)
+)
+
+/*
+ * trade some time complexity for space complexity.
+ *
+ */
+func Solution(s string, k int, unicode bool) int {
+
+	var tableSize int
+
+	if unicode {
+		// max rune size (defined as int32)
+		tableSize = MaxInt
+	} else {
+		// max char size
+		tableSize = 255
+	}
 
 	size := len(s)
 
-	counts := make([]int, 255)
-	starts := make([]int, 255)
-	ends := make([]int, 255)
+	type Entry struct {
+		count int
+		start int
+		end   int
+	}
 
-	for i := 0; i < size; i++ {
-		c := s[i]
-		counts[c]++
+	values := make([]*Entry, tableSize)
 
-		if starts[c] == 0 {
-			starts[c] = i
+	for i, c := range s {
+
+		val := values[c]
+
+		if val == nil {
+			val = &Entry{1, i, i}
+			values[c] = val
 		} else {
-			ends[c] = i
+			val.count++
+			val.end = i
 		}
 
-		if counts[c] == k {
-			sub := ends[c] - starts[c] + 1
+		if val.count == k {
+			sub := val.end - val.start + 1
 
 			if sub != size {
 				return sub

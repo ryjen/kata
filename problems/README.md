@@ -2,6 +2,7 @@
 
 These are problems delivered through [https://dailycodingproblem.com](https://dailycodingproblem.com)
 
+The solutions are my own, not official.
 
 ### Dev
 

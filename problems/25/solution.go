@@ -9,6 +9,10 @@ func Solution(input string, regex string) (bool, error) {
 	j := 0
 
 	for i, c := range regex {
+		// ran out of input to match
+		if j == len(input) {
+			return false, nil
+		}
 
 		if c == '.' {
 			// match any character
@@ -21,25 +25,29 @@ func Solution(input string, regex string) (bool, error) {
 				return false, errors.New("invalid regex, a valid pattern or character must precede *")
 			}
 
-			last := regex[i-1]
+			match := regex[i-1]
 
-			if last == '.' {
-				// nothing left to match
+			if match == '.' {
+				// perform a match any character until next
+
+				// no next pattern, then the rest of input matches
 				if i+1 == len(regex) {
 					return true, nil
 				}
-				// zero or more until the next character is found
-				last = regex[i+1]
-			}
 
-			// skip input as necessary
-			for j < len(input) && input[j] != last {
-				j++
-			}
+				// get the next pattern match
+				match = regex[i+1]
 
-			// doesn't match next character
-			if j == len(input) {
-				return false, nil
+				// skip input that doesn't match the next pattern
+				for j < len(input) && input[j] != match {
+					j++
+				}
+
+			} else {
+				// skip input that matches
+				for j < len(input) && input[j] == match {
+					j++
+				}
 			}
 			continue
 		}
@@ -52,9 +60,12 @@ func Solution(input string, regex string) (bool, error) {
 		j++
 	}
 
+	// if we still have input after the whole regex
+	// we did not match everything
 	if j < len(input) {
 		return false, nil
 	}
 
+	// win
 	return true, nil
 }

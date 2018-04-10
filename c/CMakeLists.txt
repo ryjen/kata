@@ -14,13 +14,13 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # create the package config install
 include(CreatePackage)
-create_package("code kata")
+create_package("coda" DESCRIPTION "a code kata library in c")
 
 set(COLLECTIONS_LIB ${PROJECT_NAME}_collections)
 set(ALGORITHMS_LIB ${PROJECT_NAME}_algorithms)
 set(GRAPHS_LIB ${PROJECT_NAME}_graphs)
 set(LOGGING_LIB ${PROJECT_NAME}_logging)
-set(STRING_LIB ${PROJECT_NAME}_strings)
+set(STRINGS_LIB ${PROJECT_NAME}_strings)
 
 set(KATA_TEST ${PROJECT_NAME}-test)
 

@@ -8,11 +8,11 @@
 
 #include <cmocka.h>
 
-#include <rj/collections/list.h>
+#include <coda/life/collections/list.h>
 
 static int create_test_list(void **state)
 {
-    RJList *list = rj_list_create_single();
+    CodaList *list = coda_list_new_single();
     *state = list;
 
     return 0;
@@ -26,24 +26,24 @@ static int test_int_compare(const void *a, const void *b, size_t size)
     return *i1 - *i2;
 }
 
-static RJListItem *random_list_item()
+static CodaListItem *random_list_item()
 {
     size_t size = sizeof(int);
     int *data = (int *)malloc(size);
     assert(data != NULL);
     *data = rand() % 1000;
-    return rj_list_item_create(data, size, test_int_compare);
+    return coda_list_item_new(data, size, test_int_compare);
 }
 
 static int create_and_populate_test_list(void **state)
 {
-    RJList *list = rj_list_create_single();
+    CodaList *list = coda_list_new_single();
 
-    rj_list_add(list, random_list_item());
+    coda_list_add(list, random_list_item());
 
-    rj_list_add(list, random_list_item());
+    coda_list_add(list, random_list_item());
 
-    rj_list_add(list, random_list_item());
+    coda_list_add(list, random_list_item());
 
     *state = list;
 
@@ -52,443 +52,443 @@ static int create_and_populate_test_list(void **state)
 
 static int destroy_test_list(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    rj_list_destroy(list);
+    coda_list_delete(list);
 
     return 0;
 }
 
 static void test_list_add_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    rj_list_add(list, random_list_item());
+    coda_list_add(list, random_list_item());
 
-    assert_int_equal(rj_list_size(list), 1);
+    assert_int_equal(coda_list_size(list), 1);
 }
 
 static void test_list_add_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
-    RJListItem *item = random_list_item();
+    CodaList *list = (CodaList *)*state;
+    CodaListItem *item = random_list_item();
 
-    rj_list_add(NULL, NULL);
+    coda_list_add(NULL, NULL);
 
-    rj_list_add(NULL, item);
+    coda_list_add(NULL, item);
 
-    assert_int_equal(rj_list_size(list), 0);
+    assert_int_equal(coda_list_size(list), 0);
 
-    rj_list_item_destroy(item);
+    coda_list_item_delete(item);
 }
 
 static void test_list_add_index_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    size_t size = rj_list_size(list);
+    size_t size = coda_list_size(list);
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
     void *data = NULL;
 
     assert_int_equal(size, 3);
 
-    rj_list_add_index(list, 1, item);
+    coda_list_add_index(list, 1, item);
 
-    assert_int_equal(rj_list_size(list), 4);
+    assert_int_equal(coda_list_size(list), 4);
 
-    data = rj_list_get(list, 2);
+    data = coda_list_get(list, 2);
 
     assert_non_null(data);
 
-    assert_int_equal(rj_list_item_compare(item, data), 0);
+    assert_int_equal(coda_list_item_compare(item, data), 0);
 }
 
 static void test_list_add_index_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    size_t size = rj_list_size(list);
+    size_t size = coda_list_size(list);
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
     void *data = NULL;
 
     assert_int_equal(size, 3);
 
-    rj_list_add_index(list, 100, item);
+    coda_list_add_index(list, 100, item);
 
-    rj_list_add_index(NULL, 1, item);
+    coda_list_add_index(NULL, 1, item);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    rj_list_item_destroy(item);
+    coda_list_item_delete(item);
 }
 
 static void test_list_add_all_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    void *data = rj_list_get(list, 1);
+    void *data = coda_list_get(list, 1);
 
-    RJList *other = rj_list_create_single();
+    CodaList *other = coda_list_new_single();
 
-    rj_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
 
-    assert_int_equal(rj_list_size(other), 1);
+    assert_int_equal(coda_list_size(other), 1);
 
-    rj_list_add_all(other, list);
+    coda_list_add_all(other, list);
 
-    assert_int_equal(rj_list_size(other), rj_list_size(list) + 1);
+    assert_int_equal(coda_list_size(other), coda_list_size(list) + 1);
 
-    assert_int_not_equal(rj_list_contains(other, data), 0);
+    assert_int_not_equal(coda_list_contains(other, data), 0);
 
-    rj_list_destroy(other);
+    coda_list_delete(other);
 }
 
 static void test_list_add_all_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    rj_list_add_all(list, NULL);
+    coda_list_add_all(list, NULL);
 
-    rj_list_add_all(NULL, list);
+    coda_list_add_all(NULL, list);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 }
 
 static void test_list_add_all_index_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJList *other = rj_list_create_single();
+    CodaList *other = coda_list_new_single();
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
-    size_t size = rj_list_size(list);
+    size_t size = coda_list_size(list);
 
-    rj_list_add(other, item);
+    coda_list_add(other, item);
 
-    rj_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
 
-    assert_int_equal(rj_list_size(other), 2);
+    assert_int_equal(coda_list_size(other), 2);
 
-    rj_list_add_all_index(list, 1, other);
+    coda_list_add_all_index(list, 1, other);
 
-    assert_int_equal(rj_list_size(list), rj_list_size(other) + size);
+    assert_int_equal(coda_list_size(list), coda_list_size(other) + size);
 
-    assert_int_not_equal(rj_list_contains(list, item->data), 0);
+    assert_int_not_equal(coda_list_contains(list, coda_list_item_data(item)), 0);
 
-    rj_list_destroy(other);
+    coda_list_delete(other);
 }
 static void test_list_add_all_index_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJList *other = rj_list_create_single();
+    CodaList *other = coda_list_new_single();
 
-    rj_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
 
-    rj_list_add_all_index(list, 100, other);
+    coda_list_add_all_index(list, 100, other);
 
-    rj_list_add_all_index(NULL, 1, other);
+    coda_list_add_all_index(NULL, 1, other);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    rj_list_destroy(other);
+    coda_list_delete(other);
 }
 
 static void test_list_clear_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    rj_list_clear(list);
+    coda_list_clear(list);
 
-    assert_int_equal(rj_list_size(list), 0);
+    assert_int_equal(coda_list_size(list), 0);
 }
 static void test_list_clear_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    rj_list_clear(NULL);
+    coda_list_clear(NULL);
 }
 
 static void test_list_contains_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
-    rj_list_add(list, item);
+    coda_list_add(list, item);
 
-    assert_int_equal(rj_list_size(list), 4);
+    assert_int_equal(coda_list_size(list), 4);
 
-    assert_int_not_equal(rj_list_contains(list, item->data), 0);
+    assert_int_not_equal(coda_list_contains(list, coda_list_item_data(item)), 0);
 }
 
 static void test_list_contains_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
-    assert_int_equal(rj_list_contains(list, item->data), 0);
+    assert_int_equal(coda_list_contains(list, coda_list_item_data(item)), 0);
 
-    assert_int_equal(rj_list_contains(list, NULL), 0);
+    assert_int_equal(coda_list_contains(list, NULL), 0);
 
-    assert_int_equal(rj_list_contains(NULL, item->data), 0);
+    assert_int_equal(coda_list_contains(NULL, coda_list_item_data(item)), 0);
 
-    assert_int_equal(rj_list_contains(NULL, NULL), 0);
+    assert_int_equal(coda_list_contains(NULL, NULL), 0);
 }
 
 static void test_list_contains_all_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    size_t size = rj_list_size(list);
+    size_t size = coda_list_size(list);
 
-    RJList *other = rj_list_create_single();
+    CodaList *other = coda_list_new_single();
 
-    rj_list_add(other, random_list_item());
-    rj_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
 
-    rj_list_add_all(list, other);
+    coda_list_add_all(list, other);
 
-    assert_int_equal(rj_list_size(list), size + rj_list_size(other));
+    assert_int_equal(coda_list_size(list), size + coda_list_size(other));
 
-    assert_int_not_equal(rj_list_contains_all(list, other), 0);
+    assert_int_not_equal(coda_list_contains_all(list, other), 0);
 
-    rj_list_destroy(other);
+    coda_list_delete(other);
 }
 
 static void test_list_contains_all_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    size_t size = rj_list_size(list);
+    size_t size = coda_list_size(list);
 
-    RJList *other = rj_list_create_single();
+    CodaList *other = coda_list_new_single();
 
-    rj_list_add(other, random_list_item());
-    rj_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
 
-    assert_int_equal(rj_list_contains_all(list, other), 0);
+    assert_int_equal(coda_list_contains_all(list, other), 0);
 
-    assert_int_equal(rj_list_contains_all(list, NULL), 0);
+    assert_int_equal(coda_list_contains_all(list, NULL), 0);
 
-    assert_int_equal(rj_list_contains_all(NULL, other), 0);
+    assert_int_equal(coda_list_contains_all(NULL, other), 0);
 
-    assert_int_equal(rj_list_contains_all(NULL, NULL), 0);
+    assert_int_equal(coda_list_contains_all(NULL, NULL), 0);
 }
 
 static void test_list_get_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    void *data = rj_list_get(list, 1);
+    void *data = coda_list_get(list, 1);
 
     assert_non_null(data);
 }
 static void test_list_get_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    void *data = rj_list_get(list, 100);
+    void *data = coda_list_get(list, 100);
 
     assert_null(data);
 
-    data = rj_list_get(NULL, 1);
+    data = coda_list_get(NULL, 1);
 
     assert_null(data);
 }
 
 static void test_list_remove_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
     void *data = NULL;
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    data = rj_list_get(list, 1);
+    data = coda_list_get(list, 1);
 
-    assert_int_not_equal(rj_list_remove(list, data), 0);
+    assert_int_not_equal(coda_list_remove(list, data), 0);
 
-    assert_int_equal(rj_list_size(list), 2);
+    assert_int_equal(coda_list_size(list), 2);
 }
 static void test_list_remove_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
-    assert_int_equal(rj_list_remove(list, item->data), 0);
+    assert_int_equal(coda_list_remove(list, coda_list_item_data(item)), 0);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    assert_int_equal(rj_list_remove(NULL, item->data), 0);
+    assert_int_equal(coda_list_remove(NULL, coda_list_item_data(item)), 0);
 
-    rj_list_item_destroy(item);
+    coda_list_item_delete(item);
 }
 
 static void test_list_remove_index_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    assert_int_not_equal(rj_list_remove_index(list, 1), 0);
+    assert_int_not_equal(coda_list_remove_index(list, 1), 0);
 
-    assert_int_equal(rj_list_size(list), 2);
+    assert_int_equal(coda_list_size(list), 2);
 }
 
 static void test_list_remove_index_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    assert_int_equal(rj_list_remove_index(list, 100), 0);
+    assert_int_equal(coda_list_remove_index(list, 100), 0);
 
-    assert_int_equal(rj_list_remove_index(NULL, 1), 0);
+    assert_int_equal(coda_list_remove_index(NULL, 1), 0);
 }
 
 static void test_list_remove_all_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJList *other = rj_list_create_single();
+    CodaList *other = coda_list_new_single();
 
-    rj_list_add(other, random_list_item());
-    rj_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
+    coda_list_add(other, random_list_item());
 
-    assert_int_equal(rj_list_size(other), 2);
+    assert_int_equal(coda_list_size(other), 2);
 
-    rj_list_add_all(list, other);
+    coda_list_add_all(list, other);
 
-    assert_int_equal(rj_list_size(list), 5);
+    assert_int_equal(coda_list_size(list), 5);
 
-    assert_int_equal(rj_list_remove_all(list, other), 2);
+    assert_int_equal(coda_list_remove_all(list, other), 2);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    rj_list_destroy(other);
+    coda_list_delete(other);
 }
 static void test_list_remove_all_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJList *other = rj_list_create_single();
+    CodaList *other = coda_list_new_single();
 
-    assert_int_equal(rj_list_remove_all(list, other), 0);
+    assert_int_equal(coda_list_remove_all(list, other), 0);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    assert_int_equal(rj_list_remove_all(list, NULL), 0);
+    assert_int_equal(coda_list_remove_all(list, NULL), 0);
 
-    assert_int_equal(rj_list_remove_all(NULL, other), 0);
+    assert_int_equal(coda_list_remove_all(NULL, other), 0);
 
-    rj_list_destroy(other);
+    coda_list_delete(other);
 }
 
 static void test_list_index_of_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    void *data = rj_list_get(list, 1);
+    void *data = coda_list_get(list, 1);
 
     assert_non_null(data);
 
-    assert_int_equal(rj_list_index_of(list, data), 1);
+    assert_int_equal(coda_list_index_of(list, data), 1);
 }
 static void test_list_index_of_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
-    assert_int_equal(rj_list_index_of(list, item->data), -1);
+    assert_int_equal(coda_list_index_of(list, coda_list_item_data(item)), -1);
 
-    assert_int_equal(rj_list_index_of(NULL, item->data), -1);
+    assert_int_equal(coda_list_index_of(NULL, coda_list_item_data(item)), -1);
 }
 
 static void test_list_set_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
     void *data = NULL;
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    rj_list_set(list, 1, item);
+    coda_list_set(list, 1, item);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    data = rj_list_get(list, 1);
+    data = coda_list_get(list, 1);
 
-    assert_int_equal(rj_list_item_compare(item, data), 0);
+    assert_int_equal(coda_list_item_compare(item, data), 0);
 }
 static void test_list_set_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    RJListItem *item = random_list_item();
+    CodaListItem *item = random_list_item();
 
     void *data = NULL;
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    rj_list_set(list, 100, item);
+    coda_list_set(list, 100, item);
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    data = rj_list_get(list, 1);
+    data = coda_list_get(list, 1);
 
-    assert_int_not_equal(rj_list_item_compare(item, data), 0);
+    assert_int_not_equal(coda_list_item_compare(item, data), 0);
 
-    rj_list_item_destroy(item);
+    coda_list_item_delete(item);
 }
 
 static void test_list_size_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    assert_int_equal(rj_list_size(list), 3);
+    assert_int_equal(coda_list_size(list), 3);
 
-    rj_list_add(list, random_list_item());
+    coda_list_add(list, random_list_item());
 
-    assert_int_equal(rj_list_size(list), 4);
+    assert_int_equal(coda_list_size(list), 4);
 }
 static void test_list_size_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    assert_int_equal(rj_list_size(NULL), 0);
+    assert_int_equal(coda_list_size(NULL), 0);
 }
 
 static void test_list_is_empty_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    assert_int_equal(rj_list_is_empty(list), 0);
+    assert_int_equal(coda_list_is_empty(list), 0);
 
-    rj_list_clear(list);
+    coda_list_clear(list);
 
-    assert_int_not_equal(rj_list_is_empty(list), 0);
+    assert_int_not_equal(coda_list_is_empty(list), 0);
 }
 static void test_list_is_empty_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    assert_int_not_equal(rj_list_is_empty(NULL), 0);
+    assert_int_not_equal(coda_list_is_empty(NULL), 0);
 }
 
 static void test_list_merge_sort_valid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
     int index = 0;
 
@@ -499,30 +499,30 @@ static void test_list_merge_sort_valid(void **state)
     size_t num_values = sizeof(values) / sizeof(values[0]);
 
     for (index = 0; index < num_values; index++) {
-        rj_list_add(list, rj_list_item_create_static(&values[index], sizeof(int), test_int_compare));
+        coda_list_add(list, coda_list_item_new_static(&values[index], sizeof(int), test_int_compare));
     }
 
-    assert_int_equal(rj_list_size(list), num_values);
+    assert_int_equal(coda_list_size(list), num_values);
 
-    rj_list_sort(list);
+    coda_list_sort(list);
 
-    assert_int_equal(rj_list_size(list), num_values);
+    assert_int_equal(coda_list_size(list), num_values);
 
     for (index = 0; index < num_values; index++) {
-        int *item = (int *)rj_list_get(list, index);
+        int *item = (int *)coda_list_get(list, index);
         assert_int_equal(*item, sorted_values[index]);
     }
 }
 static void test_list_sort_invalid(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
-    rj_list_sort(NULL);
+    coda_list_sort(NULL);
 }
 
 static void test_list_partition(void **state)
 {
-    RJList *list = (RJList *)*state;
+    CodaList *list = (CodaList *)*state;
 
     int partition = 5;
 
@@ -533,12 +533,12 @@ static void test_list_partition(void **state)
     size_t num_values = sizeof(values) / sizeof(values[0]);
 
     for (int i = 0; i < num_values; i++) {
-        rj_list_add(list, rj_list_item_create_static(&values[i], sizeof(int), test_int_compare));
+        coda_list_add(list, coda_list_item_new_static(&values[i], sizeof(int), test_int_compare));
     }
 
-    assert_int_equal(rj_list_size(list), num_values);
+    assert_int_equal(coda_list_size(list), num_values);
 
-    RJListItem *head;
+    CodaListItem *head;
 }
 
 int run_list_tests()

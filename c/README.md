@@ -1,18 +1,25 @@
 # C Kata
 
-Varios code kata in C.
+Various code kata in C.  Mostly data structures right now.
 
 
-rj_list
+coda_list
 =======
 
 
-See [README](src/rj/collections/README.md)
+See [README](src/coda/collections/README.md)
 
 
+TODO
+=====
+
+- add more math algorithims
+- finish graphs
+- add string utility methods like prefix/suffix/contains/indexOf/size/replace/etc
 
 Setup
 =====
 
 - Run ```git submodule update --init --recursive```
+
 - install cmocka ```brew install cmocka``` for tests

@@ -8,7 +8,7 @@
 
 #include <cmocka.h>
 
-#include <coda/life/collections/list.h>
+#include <coda/life/lists/list.h>
 
 static int create_test_list(void **state)
 {

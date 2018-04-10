@@ -1,5 +1,5 @@
 #include <errno.h>
-#include <rj/logging/error.h>
+#include <coda/life/logging/error.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,8 +10,7 @@ struct __coda_error {
     char *message;
 };
 
-CodaError *coda_error_new()
-{
+CodaError *coda_error_new() {
     CodaError *e = malloc(sizeof(CodaError));
 
     if (e == NULL) {
@@ -25,8 +24,7 @@ CodaError *coda_error_new()
     return e;
 }
 
-CodaError *coda_error_with_message(const char *message)
-{
+CodaError *coda_error_with_message(const char *message) {
     CodaError *e = coda_error_new();
 
     if (e == NULL) {
@@ -38,8 +36,7 @@ CodaError *coda_error_with_message(const char *message)
     return e;
 }
 
-CodaError *coda_error_with_code_and_message(int code, const char *message)
-{
+CodaError *coda_error_with_code_and_message(int code, const char *message) {
     CodaError *e = coda_error_new();
 
     if (e == NULL) {
@@ -52,8 +49,7 @@ CodaError *coda_error_with_code_and_message(int code, const char *message)
     return e;
 }
 
-void coda_error_free(struct __coda_error *e)
-{
+void coda_error_free(CodaError *e) {
     if (!e) {
         return;
     }
@@ -65,25 +61,21 @@ void coda_error_free(struct __coda_error *e)
     free(e);
 }
 
-const char *coda_error_message(struct __coda_error *error)
-{
+const char *coda_error_message(CodaError *error) {
     return !error ? NULL : error->message;
 }
 
-void coda_error_set_message(struct __coda_error *error, const char *message)
-{
+void coda_error_set_message(CodaError *error, const char *message) {
     if (error) {
         error->message = strdup(message);
     }
 }
 
-int coda_error_code(struct __coda_error *error)
-{
+int coda_error_code(CodaError *error) {
     return !error ? -1 : error->code;
 }
 
-void coda_error_set_code(struct __coda_error *error, int code)
-{
+void coda_error_set_code(CodaError *error, int code) {
     if (error) {
         error->code = code;
     }

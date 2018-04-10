@@ -33,10 +33,10 @@ void coda_log_debug(const char *const format, ...) __attribute__((format(printf,
 
 void coda_log_trace(const char *const format, ...) __attribute__((format(printf, 1, 2)));
 
-#define coda_log_errno(errnum) rj_log_error("%s:%d %s (%d)", __FILE__, __LINE__, strerror(errnum), errnum)
+#define coda_log_errno(errnum) coda_log_error("%s:%d %s (%d)", __FILE__, __LINE__, strerror(errnum), errnum)
 
-void coda_log_set_error(RJError **error, const char *const format, ...) __attribute__((format(printf, 2, 3)));
+void coda_log_set_error(CodaError **error, const char *const format, ...) __attribute__((format(printf, 2, 3)));
 
-void coda_log_set_errno(RJError **error, int errnum);
+void coda_log_set_errno(CodaError **error, int errnum);
 
 #endif

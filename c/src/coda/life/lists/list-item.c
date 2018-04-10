@@ -4,23 +4,20 @@
 #include <string.h>
 
 #include "internal.h"
-#include <coda/life/collections/list-item.h>
+#include <coda/life/lists/list-item.h>
 
-CodaListItem *coda_list_item_new(void *data, size_t size, CodaListCompareCallback comparer)
-{
+CodaListItem *coda_list_item_new(void *data, size_t size, CodaListCompareCallback comparer) {
     return coda_list_item_new_transient(data, size, comparer, malloc, free, memmove);
 }
 
-CodaListItem *coda_list_item_new_static(void *data, size_t size, CodaListCompareCallback comparer)
-{
+CodaListItem *coda_list_item_new_static(void *data, size_t size, CodaListCompareCallback comparer) {
     return coda_list_item_new_transient(data, size, comparer, NULL, NULL, NULL);
 }
 
 CodaListItem *coda_list_item_new_transient(void *data, size_t size,
                                            CodaListCompareCallback comparer,
                                            CodaListAllocCallback allocator, CodaListDestroyCallback destructor,
-                                           CodaListCopyCallback copier)
-{
+                                           CodaListCopyCallback copier) {
     CodaListItem *item = malloc(sizeof(*item));
     assert(item != NULL);
     item->data = data;
@@ -32,8 +29,7 @@ CodaListItem *coda_list_item_new_transient(void *data, size_t size,
     return item;
 }
 
-void coda_list_item_delete(struct __coda_list_item *item)
-{
+void coda_list_item_delete(struct __coda_list_item *item) {
     if (item == NULL) {
         return;
     }
@@ -53,8 +49,7 @@ size_t coda_list_item_size(const CodaListItem *item) {
     return item->size;
 }
 
-CodaListItem *coda_list_item_copy(const CodaListItem *orig)
-{
+CodaListItem *coda_list_item_copy(const CodaListItem *orig) {
     CodaListItem *item = NULL;
 
     if (orig == NULL) {
@@ -79,8 +74,7 @@ CodaListItem *coda_list_item_copy(const CodaListItem *orig)
     return item;
 }
 
-int coda_list_item_compare(const CodaListItem *item, const void *data)
-{
+int coda_list_item_compare(const CodaListItem *item, const void *data) {
     assert(item != NULL);
 
     if (item->data == NULL && data == NULL) {

@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <coda/life/collections/list-item.h>
-#include <coda/life/collections/list-vtable.h>
+#include <coda/life/lists/list-item.h>
+#include <coda/life/lists/list-vtable.h>
 #include "internal.h"
 
 typedef struct __coda_slist CodaSList;
@@ -22,14 +22,12 @@ struct __coda_slist {
 
 extern void coda_list_single_clear(CodaList *list);
 
-static inline CodaSList *__coda_slist_impl(const CodaList *arg)
-{
+static inline CodaSList *__coda_slist_impl(const CodaList *arg) {
     assert(arg->impl != NULL);
-    return (CodaSList *)arg->impl;
+    return (CodaSList *) arg->impl;
 }
 
-static CodaSListNode *__coda_slist_node_create(CodaListItem *item)
-{
+static CodaSListNode *__coda_slist_node_create(CodaListItem *item) {
     CodaSListNode *node = NULL;
     assert(item != NULL);
     node = malloc(sizeof(CodaSListNode));
@@ -39,8 +37,7 @@ static CodaSListNode *__coda_slist_node_create(CodaListItem *item)
     return node;
 }
 
-static void __coda_slist_node_destroy(CodaSListNode *node)
-{
+static void __coda_slist_node_destroy(CodaSListNode *node) {
     assert(node != NULL);
 
     if (node->item != NULL) {
@@ -50,8 +47,7 @@ static void __coda_slist_node_destroy(CodaSListNode *node)
     free(node);
 }
 
-void *coda_list_single_new()
-{
+void *coda_list_single_new() {
     CodaSList *list = malloc(sizeof(CodaSList));
     assert(list != NULL);
     list->first = NULL;
@@ -59,8 +55,7 @@ void *coda_list_single_new()
     return list;
 }
 
-void coda_list_single_delete(CodaList *list)
-{
+void coda_list_single_delete(CodaList *list) {
     assert(list != NULL);
 
     coda_list_single_clear(list);
@@ -68,8 +63,7 @@ void coda_list_single_delete(CodaList *list)
     free(__coda_slist_impl(list));
 }
 
-static void __coda_slist_node_insert_after(CodaSListNode *node, CodaListItem *item)
-{
+static void __coda_slist_node_insert_after(CodaSListNode *node, CodaListItem *item) {
     CodaSListNode *other = NULL;
 
     assert(node != NULL);
@@ -81,8 +75,7 @@ static void __coda_slist_node_insert_after(CodaSListNode *node, CodaListItem *it
     node->next = other;
 }
 
-static CodaSListNode *__coda_slist_get_node(const CodaSList *list, size_t index)
-{
+static CodaSListNode *__coda_slist_get_node(const CodaSList *list, size_t index) {
     CodaSListNode *node = NULL;
     size_t pos = 0;
 
@@ -96,8 +89,7 @@ static CodaSListNode *__coda_slist_get_node(const CodaSList *list, size_t index)
     return NULL;
 }
 
-static void __coda_slist_add_node(CodaSList *list, CodaSListNode *node)
-{
+static void __coda_slist_add_node(CodaSList *list, CodaSListNode *node) {
     assert(list != NULL);
     assert(node != NULL);
 
@@ -106,8 +98,7 @@ static void __coda_slist_add_node(CodaSList *list, CodaSListNode *node)
     list->size++;
 }
 
-void coda_list_single_add(CodaList *list, CodaListItem *item)
-{
+void coda_list_single_add(CodaList *list, CodaListItem *item) {
     CodaSListNode *node = NULL;
 
     assert(list != NULL);
@@ -118,8 +109,7 @@ void coda_list_single_add(CodaList *list, CodaListItem *item)
     __coda_slist_add_node(__coda_slist_impl(list), node);
 }
 
-void coda_list_single_add_index(CodaList *list, size_t index, CodaListItem *item)
-{
+void coda_list_single_add_index(CodaList *list, size_t index, CodaListItem *item) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL;
 
@@ -136,8 +126,7 @@ void coda_list_single_add_index(CodaList *list, size_t index, CodaListItem *item
     }
 }
 
-void coda_list_single_add_all(CodaList *list, const CodaList *other)
-{
+void coda_list_single_add_all(CodaList *list, const CodaList *other) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL;
 
@@ -151,8 +140,7 @@ void coda_list_single_add_all(CodaList *list, const CodaList *other)
     }
 }
 
-void coda_list_single_add_all_index(CodaList *list, size_t index, const CodaList *other)
-{
+void coda_list_single_add_all_index(CodaList *list, size_t index, const CodaList *other) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL, *other_node = NULL;
 
@@ -172,8 +160,7 @@ void coda_list_single_add_all_index(CodaList *list, size_t index, const CodaList
     }
 }
 
-void coda_list_single_clear(CodaList *list)
-{
+void coda_list_single_clear(CodaList *list) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL, *next_node = NULL;
 
@@ -189,8 +176,7 @@ void coda_list_single_clear(CodaList *list)
     impl->size = 0;
 }
 
-static CodaSListNode *__coda_slist_find_node_data(const CodaSList *list, const void *data)
-{
+static CodaSListNode *__coda_slist_find_node_data(const CodaSList *list, const void *data) {
     CodaSListNode *node = NULL;
 
     assert(list != NULL);
@@ -213,8 +199,7 @@ static CodaSListNode *__coda_slist_find_node_data(const CodaSList *list, const v
     return NULL;
 }
 
-int coda_list_single_contains(const CodaList *list, const void *data)
-{
+int coda_list_single_contains(const CodaList *list, const void *data) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL;
     CodaListItem *item = NULL;
@@ -232,8 +217,7 @@ int coda_list_single_contains(const CodaList *list, const void *data)
     return 1;
 }
 
-int coda_list_single_contains_all(const CodaList *list, const CodaList *other)
-{
+int coda_list_single_contains_all(const CodaList *list, const CodaList *other) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL;
 
@@ -256,8 +240,7 @@ int coda_list_single_contains_all(const CodaList *list, const CodaList *other)
     return 0;
 }
 
-void *coda_list_single_get(const CodaList *list, size_t index)
-{
+void *coda_list_single_get(const CodaList *list, size_t index) {
     CodaSListNode *node = NULL;
 
     if (list == NULL) {
@@ -272,8 +255,7 @@ void *coda_list_single_get(const CodaList *list, size_t index)
     return node->item->data;
 }
 
-static void __coda_slist_node_unlink(CodaSList *list, CodaSListNode *node, CodaSListNode *prev)
-{
+static void __coda_slist_node_unlink(CodaSList *list, CodaSListNode *node, CodaSListNode *prev) {
     if (list == NULL || node == NULL) {
         return;
     }
@@ -300,8 +282,7 @@ static void __coda_slist_node_unlink(CodaSList *list, CodaSListNode *node, CodaS
     }
 }
 
-int coda_list_single_remove(CodaList *list, const void *item)
-{
+int coda_list_single_remove(CodaList *list, const void *item) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL;
 
@@ -324,8 +305,7 @@ int coda_list_single_remove(CodaList *list, const void *item)
     return 1;
 }
 
-int coda_list_single_remove_index(CodaList *list, size_t index)
-{
+int coda_list_single_remove_index(CodaList *list, size_t index) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL;
 
@@ -348,8 +328,7 @@ int coda_list_single_remove_index(CodaList *list, size_t index)
     return 1;
 }
 
-int coda_list_single_remove_all(CodaList *list, const CodaList *other)
-{
+int coda_list_single_remove_all(CodaList *list, const CodaList *other) {
     CodaSList *impl = NULL, *oimpl = NULL;
     CodaSListNode *node = NULL, *found = NULL, *prev = NULL;
     int result = 0;
@@ -380,8 +359,7 @@ int coda_list_single_remove_all(CodaList *list, const CodaList *other)
     return result;
 }
 
-int coda_list_single_index_of(const CodaList *list, const void *data)
-{
+int coda_list_single_index_of(const CodaList *list, const void *data) {
     CodaSList *impl = NULL;
     CodaSListNode *node = NULL;
     int pos = 0;
@@ -407,8 +385,7 @@ int coda_list_single_index_of(const CodaList *list, const void *data)
     return -1;
 }
 
-void coda_list_single_set(CodaList *list, size_t index, CodaListItem *item)
-{
+void coda_list_single_set(CodaList *list, size_t index, CodaListItem *item) {
     CodaSListNode *node = NULL;
 
     if (list == NULL) {
@@ -426,8 +403,7 @@ void coda_list_single_set(CodaList *list, size_t index, CodaListItem *item)
     node->item = item;
 }
 
-size_t coda_list_single_size(const CodaList *list)
-{
+size_t coda_list_single_size(const CodaList *list) {
     CodaSList *impl = NULL;
 
     if (list == NULL) {
@@ -439,16 +415,14 @@ size_t coda_list_single_size(const CodaList *list)
     return impl->size;
 }
 
-int coda_list_single_is_empty(const CodaList *list)
-{
+int coda_list_single_is_empty(const CodaList *list) {
     CodaSList *impl = NULL;
     assert(list != NULL);
     impl = __coda_slist_impl(list);
     return impl->size == 0 || impl->first == NULL;
 }
 
-static CodaSListNode *__coda_slist_merge_nodes(CodaSListNode *left, CodaSListNode *right)
-{
+static CodaSListNode *__coda_slist_merge_nodes(CodaSListNode *left, CodaSListNode *right) {
     CodaSListNode *result = NULL, *last = NULL;
     CodaSListNode *next = NULL;
 
@@ -509,8 +483,7 @@ static CodaSListNode *__coda_slist_merge_nodes(CodaSListNode *left, CodaSListNod
  * standard merge sort, O(n log n)
  * TODO: more efficient algorithm
  */
-static CodaSListNode *__coda_slist_merge_sort(CodaSListNode *first)
-{
+static CodaSListNode *__coda_slist_merge_sort(CodaSListNode *first) {
     CodaSListNode *left = NULL;
     CodaSListNode *right = NULL;
     CodaSListNode *node = NULL, *node_next = NULL;
@@ -541,8 +514,7 @@ static CodaSListNode *__coda_slist_merge_sort(CodaSListNode *first)
     return __coda_slist_merge_nodes(left, right);
 }
 
-void coda_list_single_sort(CodaList *list)
-{
+void coda_list_single_sort(CodaList *list) {
     CodaSList *impl = NULL;
 
     // Base case. A list of zero or one elements is sorted, by definition.
@@ -555,8 +527,7 @@ void coda_list_single_sort(CodaList *list)
     impl->first = __coda_slist_merge_sort(impl->first);
 }
 
-void coda_list_single_for_each(CodaList *list, CodaListCallback callback)
-{
+void coda_list_single_for_each(CodaList *list, CodaListCallback callback) {
     CodaSListNode *node = NULL;
     CodaSListNode *prev = NULL;
     CodaSList *impl = NULL;
@@ -577,26 +548,25 @@ void coda_list_single_for_each(CodaList *list, CodaListCallback callback)
 }
 
 static CodaListVtable __coda_slist_vtable = {.create = coda_list_single_new,
-                                         .destroy = coda_list_single_delete,
-                                         .add = coda_list_single_add,
-                                         .add_all = coda_list_single_add_all,
-                                         .add_index = coda_list_single_add_index,
-                                         .add_all_index = coda_list_single_add_all_index,
-                                         .clear = coda_list_single_clear,
-                                         .contains = coda_list_single_contains,
-                                         .contains_all = coda_list_single_contains_all,
-                                         .get = coda_list_single_get,
-                                         .remove = coda_list_single_remove,
-                                         .remove_index = coda_list_single_remove_index,
-                                         .remove_all = coda_list_single_remove_all,
-                                         .index_of = coda_list_single_index_of,
-                                         .set = coda_list_single_set,
-                                         .size = coda_list_single_size,
-                                         .is_empty = coda_list_single_is_empty,
-                                         .sort = coda_list_single_sort,
-                                         .for_each = coda_list_single_for_each};
+        .destroy = coda_list_single_delete,
+        .add = coda_list_single_add,
+        .add_all = coda_list_single_add_all,
+        .add_index = coda_list_single_add_index,
+        .add_all_index = coda_list_single_add_all_index,
+        .clear = coda_list_single_clear,
+        .contains = coda_list_single_contains,
+        .contains_all = coda_list_single_contains_all,
+        .get = coda_list_single_get,
+        .remove = coda_list_single_remove,
+        .remove_index = coda_list_single_remove_index,
+        .remove_all = coda_list_single_remove_all,
+        .index_of = coda_list_single_index_of,
+        .set = coda_list_single_set,
+        .size = coda_list_single_size,
+        .is_empty = coda_list_single_is_empty,
+        .sort = coda_list_single_sort,
+        .for_each = coda_list_single_for_each};
 
-CodaListVtable *coda_list_single_vtable()
-{
+CodaListVtable *coda_list_single_vtable() {
     return &__coda_slist_vtable;
 }

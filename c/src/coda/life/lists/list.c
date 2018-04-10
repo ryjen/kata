@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <coda/life/collections/list.h>
+#include <coda/life/lists/list.h>
 #include "internal.h"
 
 #define coda_assert_vtable(list, fun) assert((list)->vtable->fun != NULL)
@@ -14,8 +14,7 @@
  * creates a new list
  * @return an allocated list object
  */
-CodaList *coda_list_new_single()
-{
+CodaList *coda_list_new_single() {
     CodaList *list = malloc(sizeof(CodaList));
 
     list->vtable = coda_list_single_vtable();
@@ -33,8 +32,7 @@ CodaList *coda_list_new_single()
  * destroys a created list
  * @param list the list instance
  */
-void coda_list_delete(CodaList *list)
-{
+void coda_list_delete(CodaList *list) {
     assert(list != NULL);
 
     coda_assert_vtable(list, destroy);
@@ -50,8 +48,7 @@ void coda_list_delete(CodaList *list)
  * @param item the item to add to the list
  * @see rj_list_item_create
  */
-void coda_list_add(CodaList *list, CodaListItem *item)
-{
+void coda_list_add(CodaList *list, CodaListItem *item) {
     assert(list != NULL);
 
     coda_assert_vtable(list, add);
@@ -66,8 +63,7 @@ void coda_list_add(CodaList *list, CodaListItem *item)
  * @param item  the item to add
  * @see rj_list_item_create
  */
-void coda_list_add_index(CodaList *list, size_t index, CodaListItem *item)
-{
+void coda_list_add_index(CodaList *list, size_t index, CodaListItem *item) {
     assert(list != NULL);
 
     coda_assert_vtable(list, add_index);
@@ -82,8 +78,7 @@ void coda_list_add_index(CodaList *list, size_t index, CodaListItem *item)
  * @param list  the list instance
  * @param other the list to add from
  */
-void coda_list_add_all(CodaList *list, const CodaList *other)
-{
+void coda_list_add_all(CodaList *list, const CodaList *other) {
     assert(list != NULL);
 
     coda_assert_vtable(list, add_all);
@@ -99,8 +94,7 @@ void coda_list_add_all(CodaList *list, const CodaList *other)
  * @param index the index to add after
  * @param other the list to add from
  */
-void coda_list_add_all_index(CodaList *list, size_t index, const CodaList *other)
-{
+void coda_list_add_all_index(CodaList *list, size_t index, const CodaList *other) {
     assert(list != NULL);
 
     coda_assert_vtable(list, add_all_index);
@@ -113,8 +107,7 @@ void coda_list_add_all_index(CodaList *list, size_t index, const CodaList *other
  * if the items have a destructor set, it will be called
  * @param list the list instance
  */
-void coda_list_clear(CodaList *list)
-{
+void coda_list_clear(CodaList *list) {
     assert(list != NULL);
 
     coda_assert_vtable(list, clear);
@@ -129,8 +122,7 @@ void coda_list_clear(CodaList *list)
  * @param  item the item (memory) to check for
  * @return      zero if not found, positive if found
  */
-int coda_list_contains(const CodaList *list, const void *item)
-{
+int coda_list_contains(const CodaList *list, const void *item) {
     assert(list != NULL);
 
     coda_assert_vtable(list, contains);
@@ -145,8 +137,7 @@ int coda_list_contains(const CodaList *list, const void *item)
  * @param  other the list to check
  * @return       zero if nothing found, otherwise the number of items found
  */
-int coda_list_contains_all(const CodaList *list, const CodaList *other)
-{
+int coda_list_contains_all(const CodaList *list, const CodaList *other) {
     assert(list != NULL);
 
     coda_assert_vtable(list, contains_all);
@@ -161,8 +152,7 @@ int coda_list_contains_all(const CodaList *list, const CodaList *other)
  * @return       bytes of the item
  * @see rj_list_get_size to get the size of the data
  */
-void *coda_list_get(const CodaList *list, size_t index)
-{
+void *coda_list_get(const CodaList *list, size_t index) {
     assert(list != NULL);
 
     coda_assert_vtable(list, get);
@@ -177,8 +167,7 @@ void *coda_list_get(const CodaList *list, size_t index)
  * @param  item the item to remove
  * @return      zero if nothing was removed, otherwise a positive value
  */
-int coda_list_remove(CodaList *list, const void *item)
-{
+int coda_list_remove(CodaList *list, const void *item) {
     assert(list != NULL);
 
     coda_assert_vtable(list, remove);
@@ -192,8 +181,7 @@ int coda_list_remove(CodaList *list, const void *item)
  * @param  index the index to remove
  * @return       positive value if the index was removed
  */
-int coda_list_remove_index(CodaList *list, size_t index)
-{
+int coda_list_remove_index(CodaList *list, size_t index) {
     assert(list != NULL);
 
     coda_assert_vtable(list, remove_index);
@@ -208,8 +196,7 @@ int coda_list_remove_index(CodaList *list, size_t index)
  * @param  other the list to remove
  * @return       zero if nothing removed, otherwise the number of items removed
  */
-int coda_list_remove_all(CodaList *list, const CodaList *other)
-{
+int coda_list_remove_all(CodaList *list, const CodaList *other) {
     assert(list != NULL);
 
     coda_assert_vtable(list, remove_all);
@@ -223,8 +210,7 @@ int coda_list_remove_all(CodaList *list, const CodaList *other)
  * @param  item the item to find
  * @return      the index of the item in the list
  */
-int coda_list_index_of(const CodaList *list, const void *item)
-{
+int coda_list_index_of(const CodaList *list, const void *item) {
     assert(list != NULL);
 
     coda_assert_vtable(list, index_of);
@@ -238,8 +224,7 @@ int coda_list_index_of(const CodaList *list, const void *item)
  * @param index the index to set
  * @param item  the item to set
  */
-void coda_list_set(CodaList *list, size_t index, CodaListItem *item)
-{
+void coda_list_set(CodaList *list, size_t index, CodaListItem *item) {
     assert(list != NULL);
 
     coda_assert_vtable(list, set);
@@ -252,8 +237,7 @@ void coda_list_set(CodaList *list, size_t index, CodaListItem *item)
  * @param  list the list instance
  * @return      the size (number of items)
  */
-size_t coda_list_size(const CodaList *list)
-{
+size_t coda_list_size(const CodaList *list) {
     assert(list != NULL);
 
     coda_assert_vtable(list, size);
@@ -266,8 +250,7 @@ size_t coda_list_size(const CodaList *list)
  * @param  list the list instance
  * @return      a positive value if the list is empty, otherwise zero
  */
-int coda_list_is_empty(const CodaList *list)
-{
+int coda_list_is_empty(const CodaList *list) {
     assert(list != NULL);
 
     coda_assert_vtable(list, is_empty);
@@ -280,8 +263,7 @@ int coda_list_is_empty(const CodaList *list)
  * NOTE: the implementation is subject to change
  * @param  list the list instance
  */
-void coda_list_sort(CodaList *list)
-{
+void coda_list_sort(CodaList *list) {
     assert(list != NULL);
 
     coda_assert_vtable(list, sort);

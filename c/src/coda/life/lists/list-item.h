@@ -4,8 +4,11 @@
 #include <stdlib.h>
 
 typedef void (*CodaListDestroyCallback)(void *);
+
 typedef void *(*CodaListAllocCallback)(size_t);
+
 typedef int (*CodaListCompareCallback)(const void *, const void *, size_t);
+
 typedef void *(*CodaListCopyCallback)(void *, const void *, size_t);
 
 typedef struct __coda_list_item CodaListItem;

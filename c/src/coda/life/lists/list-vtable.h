@@ -1,7 +1,7 @@
 #ifndef CODA_KATA_LIST_VTABLE_H
 #define CODA_KATA_LIST_VTABLE_H
 
-#include <coda/life/collections/list.h>
+#include <coda/life/lists/list.h>
 
 typedef struct coda_list_vtable CodaListVtable;
 

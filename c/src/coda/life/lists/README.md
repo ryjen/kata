@@ -9,7 +9,7 @@ examples:
 ### creating a list
 ```c
 CodaList *list = coda_list_new_single();
-// list = rj_list_create_double();
+// list = coda_list_create_double();
 ```
 
 ### create a list item
@@ -62,7 +62,7 @@ val = coda_list_contains_all(list, other_list);
 ```c
 void *data = coda_list_get(list, 1);
 
-size_t size = rj_list_get_size(list, 1);
+size_t size = coda_list_get_size(list, 1);
 ```
 
 ### properties

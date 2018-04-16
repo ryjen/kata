@@ -8,16 +8,16 @@ import java.util.stream.StreamSupport;
 /**
  * a formatter that displays vertices
  */
-public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
+public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> implements Formatter {
     private final int width;
-    private final Graph<Vertex> graph;
+    private final Graph<E, V> graph;
 
     /**
      * construct a new graph vertex formatter
      *
      * @param graph the graph to format
      */
-    public VertexFormatter(Graph<Vertex> graph) {
+    public VertexFormatter(Graph<E, V> graph) {
         assert graph != null;
         this.graph = graph;
         OptionalInt vertexWidth = StreamSupport.stream(graph.vertices().spliterator(), false)
@@ -43,14 +43,14 @@ public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Forma
     public void format(StringBuilder buf) {
         header(buf);
 
-        for (Vertex a : graph.vertices()) {
+        for (V a : graph.vertices()) {
 
             buf.append(format(a));
 
             buf.append(" │ ");
 
-            for (Vertex b : graph.vertices()) {
-                buf.append(format(graph.getEdgeOrDefault(a, b)));
+            for (V b : graph.vertices()) {
+                buf.append(format(graph.getEdgeOrEmpty(a, b)));
                 buf.append(' ');
             }
             buf.append('\n');
@@ -67,7 +67,7 @@ public class VertexFormatter<Vertex extends Comparable<Vertex>> implements Forma
             buf.append(' ');
         }
         buf.append(" │ ");
-        for (Vertex v : graph.vertices()) {
+        for (V v : graph.vertices()) {
             buf.append(format(v)).append(' ');
         }
         buf.append('\n');

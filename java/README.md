@@ -118,6 +118,7 @@ use maven or import maven project
 TODO
 ====
 
+- move directedness into edges
 - minimum spanning trees
 - shortest path
 - dynamic programming

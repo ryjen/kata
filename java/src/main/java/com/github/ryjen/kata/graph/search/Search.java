@@ -9,17 +9,17 @@ import java.util.Set;
 /**
  * an abstract class to implement a search on an graph
  */
-public abstract class Search<Vertex extends Comparable<Vertex>> {
-    private final Set<Vertex> visited;
-    private final Graph<Vertex> graph;
-    private final OnVisit<Vertex> callback;
+public abstract class Search<E extends Comparable<E>, V extends Comparable<V>> {
+    private final Set<V> visited;
+    private final Graph<E,V> graph;
+    private final OnVisit<V> callback;
 
     /**
      * construct a new search
      *
      * @param graph the graph to search
      */
-    Search(Graph<Vertex> graph, OnVisit<Vertex> callback) {
+    Search(Graph<E,V> graph, OnVisit<V> callback) {
         assert graph != null;
         assert callback != null;
 
@@ -35,11 +35,11 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      * @param v the vertex
      * @return an iterable of adjacent vertices
      */
-    Iterable<Vertex> adjacent(Vertex v) {
+    Iterable<V> adjacent(V v) {
         return graph.adjacent(v);
     }
 
-    public abstract void search(Vertex v);
+    public abstract void search(V v);
 
     /**
      * tests if a vertex has been visited
@@ -47,7 +47,7 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      * @param v the vertex
      * @return true if the vertex has been visited
      */
-    boolean isVisited(Vertex v) {
+    boolean isVisited(V v) {
         assert v != null;
         return visited.contains(v);
     }
@@ -57,20 +57,20 @@ public abstract class Search<Vertex extends Comparable<Vertex>> {
      *
      * @param v the vertex
      */
-    void visit(Vertex v) {
+    void visit(V v) {
         assert v != null;
         visited.add(v);
     }
 
-    void callback(Vertex v) {
+    void callback(V v) {
         callback.onSearchVisit(v);
     }
 
-    public Set<Vertex> getVisited() {
+    public Set<V> getVisited() {
         return Collections.unmodifiableSet(visited);
     }
 
-    public Graph<Vertex> getGraph() {
+    public Graph<E, V> getGraph() {
         return graph;
     }
 

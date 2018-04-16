@@ -3,18 +3,18 @@ package com.github.ryjen.kata.graph.tree;
 import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
-import com.github.ryjen.kata.graph.model.Connection;
+import com.github.ryjen.kata.graph.model.Edge;
 
 import java.util.*;
 
 /**
  * Created by ryan on 2017-04-18.
  */
-public abstract class MinimumSpanningTree<Vertex extends Comparable<Vertex>> {
+public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Comparable<V>> {
 
-    final Graph<Vertex> graph;
+    final Graph<E, V> graph;
 
-    MinimumSpanningTree(Graph<Vertex> graph) throws GraphDirectedException, GraphCyclicException {
+    MinimumSpanningTree(Graph<E, V> graph) throws GraphDirectedException, GraphCyclicException {
         assert graph != null;
         this.graph = graph;
         if (graph.isDirected()) {
@@ -30,16 +30,16 @@ public abstract class MinimumSpanningTree<Vertex extends Comparable<Vertex>> {
      *
      * @return the set of vertexes and edges that makes the minimum spanning tree
      */
-    public abstract Iterable<Connection<Vertex>> find();
+    public abstract Iterable<Edge<E, V>> find();
 
-    public static class Prims<Vertex extends Comparable<Vertex>> extends MinimumSpanningTree<Vertex> {
+    public static class Prims<E extends Comparable<E>, V extends Comparable<V>> extends MinimumSpanningTree<E, V> {
 
-        public Prims(Graph<Vertex> graph) throws GraphDirectedException, GraphCyclicException {
+        public Prims(Graph<E, V> graph) throws GraphDirectedException, GraphCyclicException {
             super(graph);
         }
 
-        public Iterable<Connection<Vertex>> find() {
-            Iterator<Vertex> it = graph.vertices().iterator();
+        public Iterable<Edge<E, V>> find() {
+            Iterator<V> it = graph.vertices().iterator();
 
             if (!it.hasNext()) {
                 return Collections.emptySet();
@@ -47,39 +47,40 @@ public abstract class MinimumSpanningTree<Vertex extends Comparable<Vertex>> {
             return find(it.next());
         }
 
-        public Iterable<Connection<Vertex>> find(Vertex vertex) {
+        public Iterable<Edge<E, V>> find(V vertex) {
 
             if (vertex == null) {
                 return null;
             }
 
-            Set<Connection<Vertex>> result = new HashSet<>();
+            Set<Edge<E, V>> result = new HashSet<>();
 
-            Set<Vertex> reached = new HashSet<>();
+            Set<V> reached = new HashSet<>();
 
             reached.add(vertex);
 
             while (reached.size() < graph.size()) {
-                Connection<Vertex> min = findNextPriority(reached);
+                Edge<E, V> min = findNextPriority(reached);
 
                 if (min == null) {
                     break;
                 }
 
-                reached.add(min.getTo());
+                reached.addAll(min.getEndpoints());
                 result.add(min);
             }
 
             return result;
         }
 
-        private Connection<Vertex> findNextPriority(Set<Vertex> reached) {
-            Connection<Vertex> min = null;
+        // TODO: improve
+        private Edge<E, V> findNextPriority(Set<V> reached) {
+            Edge<E, V> min = null;
 
-            for (Vertex vertex : reached) {
-                for (Connection<Vertex> adj : graph.connections(vertex)) {
+            for (V vertex : reached) {
+                for (Edge<E, V> adj : graph.edges(vertex)) {
 
-                    if (!reached.contains(adj.getTo()) && (min == null || min.getEdge().getWeight() > adj.getEdge().getWeight())) {
+                    if (!reached.containsAll(adj.getEndpoints()) && (min == null || min.getLabel().compareTo(adj.getLabel()) > 0)) {
                         min = adj;
                     }
                 }
@@ -89,58 +90,53 @@ public abstract class MinimumSpanningTree<Vertex extends Comparable<Vertex>> {
 
     }
 
-    public static class Kruskals<Vertex extends Comparable<Vertex>> extends MinimumSpanningTree<Vertex> {
+    public static class Kruskals<E extends Comparable<E>, V extends Comparable<V>> extends MinimumSpanningTree<E, V> {
 
-        final DisjointedSet<Vertex> sets;
-        final PriorityQueue<Connection<Vertex>> queue;
+        final DisjointedSet<V> sets;
+        final PriorityQueue<Edge<E, V>> queue;
 
-        public Kruskals(Graph<Vertex> graph) throws GraphDirectedException, GraphCyclicException {
+        public Kruskals(Graph<E, V> graph) throws GraphDirectedException, GraphCyclicException {
             super(graph);
 
             sets = new DisjointedSet<>();
 
-            Comparator<Connection<Vertex>> comparator = Comparator.comparing(Connection::getEdge);
-            queue = new PriorityQueue<>(comparator);
+            queue = new PriorityQueue<>(Edge::compareTo);
         }
 
         @Override
-        public Iterable<Connection<Vertex>> find() {
+        public Iterable<Edge<E, V>> find() {
 
-            Set<Connection<Vertex>> result = new TreeSet<>((o1, o2) -> {
-                int edge = o1.getEdge().compareTo(o2.getEdge());
+            Set<Edge<E,V>> result = new TreeSet<>(Edge::compareTo);
 
-                if (edge == 0) {
-                    return o1.getTo().compareTo(o2.getFrom());
-                }
-                return edge;
-            });
-
-            for (Vertex v : graph.vertices()) {
+            for (V v : graph.vertices()) {
                 sets.makeSet(v);
             }
 
-            for (Connection<Vertex> endpoint : graph.connections()) {
+            for (Edge<E, V> endpoint : graph.edges()) {
                 queue.offer(endpoint);
             }
 
             while (!queue.isEmpty() && result.size() < graph.numberOfEdges() - 1) {
-                Connection<Vertex> edge = queue.poll();
+                Edge<E, V> edge = queue.poll();
 
-                Set<Vertex> a = sets.find(edge.getFrom());
+                Set<V> a = sets.find(edge.getFrom());
 
                 if (a == null) {
                     continue;
                 }
 
-                Set<Vertex> b = sets.find(edge.getTo());
+                for (V v : edge.getEndpoints()) {
 
-                if (b == null) {
-                    continue;
-                }
+                    Set<V> b = sets.find(v);
 
-                if (!a.containsAll(b)) {
-                    if (sets.union(a, b)) {
-                        result.add(new Connection<>(edge.getFrom(), edge.getTo(), edge.getEdge()));
+                    if (b == null) {
+                        continue;
+                    }
+
+                    if (!a.containsAll(b)) {
+                        if (sets.union(a, b)) {
+                            result.add(edge);
+                        }
                     }
                 }
             }

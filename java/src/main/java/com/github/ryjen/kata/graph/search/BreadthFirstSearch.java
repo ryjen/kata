@@ -8,15 +8,15 @@ import java.util.Queue;
 /**
  * A Breadth-First implementation of search
  */
-public class BreadthFirstSearch<Vertex extends Comparable<Vertex>> extends Search<Vertex> {
+public class BreadthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> extends Search<E,V> {
 
-    public BreadthFirstSearch(Graph<Vertex> graph, OnVisit<Vertex> callback) {
+    public BreadthFirstSearch(Graph<E,V> graph, OnVisit<V> callback) {
         super(graph, callback);
     }
 
     @Override
-    public void search(Vertex v) {
-        Queue<Vertex> queue = new LinkedList<>();
+    public void search(V v) {
+        Queue<V> queue = new LinkedList<>();
         queue.add(v);
 
         while (!queue.isEmpty()) {
@@ -31,7 +31,7 @@ public class BreadthFirstSearch<Vertex extends Comparable<Vertex>> extends Searc
 
             callback(v);
 
-            for (Vertex w : adjacent(v)) {
+            for (V w : adjacent(v)) {
                 queue.add(w);
             }
         }

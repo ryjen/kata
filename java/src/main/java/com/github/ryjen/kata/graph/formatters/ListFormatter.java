@@ -7,19 +7,19 @@ import java.util.StringJoiner;
 /**
  * Created by ryan on 2017-03-29.
  */
-public class ListFormatter<Vertex extends Comparable<Vertex>> implements Formatter {
+public class ListFormatter<E extends Comparable<E>, V extends Comparable<V>> implements Formatter {
 
-    private final Graph<Vertex> graph;
+    private final Graph<E, V> graph;
 
-    public ListFormatter(Graph<Vertex> graph) {
+    public ListFormatter(Graph<E, V> graph) {
         this.graph = graph;
     }
 
     public void format(StringBuilder buf) {
-        for (Vertex v : graph.vertices()) {
+        for (V v : graph.vertices()) {
             buf.append(v).append(graph.isDirected() ? " → " : " : ");
             StringJoiner sj = new StringJoiner(", ");
-            for (Vertex a : graph.adjacent(v)) {
+            for (V a : graph.adjacent(v)) {
                 sj.add(a.toString());
             }
             buf.append(sj).append('\n');

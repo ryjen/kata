@@ -1,28 +1,19 @@
 package com.github.ryjen.kata.graph;
 
 
-import com.github.ryjen.kata.graph.model.DefaultFactory;
+import com.github.ryjen.kata.graph.model.SimpleFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ryan jennings on 2017-03-20.
  */
-public class IndexFactory extends DefaultFactory<Integer> {
+public class IndexFactory extends SimpleFactory<Character,Integer> {
 
-    private final int size;
+    public IndexFactory(Graphable<Character, Integer> impl, int size) {
+        super(impl, '●', '○');
 
-    public IndexFactory(int size) {
-        this.size = size;
-    }
-
-    @Override
-    public List<Integer> initialVertices() {
-        List<Integer> value = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            value.add(i);
+            impl.addVertex(i);
         }
-        return value;
     }
 }

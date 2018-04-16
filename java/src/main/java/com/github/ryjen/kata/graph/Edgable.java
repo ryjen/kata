@@ -3,21 +3,19 @@ package com.github.ryjen.kata.graph;
 import com.github.ryjen.kata.graph.model.Edge;
 
 /**
- * Created by ryan on 2017-04-10.
+ * Interface for an entity that supports edges
  */
-public interface Edgable<Vertex extends Comparable<Vertex>> {
+public interface Edgable<E extends Comparable<E>, V extends Comparable<V>> {
 
-    void addEdge(Vertex a, Vertex b, Edge edge);
+    void addEdge(V a, V b, Edge<E,V> edge);
 
-    boolean isEdge(Vertex a, Vertex b);
+    boolean isEdge(V a, V b);
 
-    Edge getEdge(Vertex a, Vertex b);
+    Edge<E,V> getEdge(V a, V b);
 
-    boolean removeEdge(Vertex a, Vertex b);
+    boolean removeEdge(V a, V b);
 
-    Iterable<Edge> edges();
+    Iterable<Edge<E,V>> edges();
 
-    Iterable<Edge> edges(Vertex v);
-
-    int numberOfEdges();
+    Iterable<Edge<E,V>> edges(V v);
 }

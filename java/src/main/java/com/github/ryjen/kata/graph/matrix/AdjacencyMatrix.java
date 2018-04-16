@@ -1,15 +1,12 @@
 package com.github.ryjen.kata.graph.matrix;
 
-import com.github.ryjen.kata.graph.Graph;
+import com.github.ryjen.kata.graph.Graphable;
+import com.github.ryjen.kata.graph.Vertexable;
 import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
-import com.github.ryjen.kata.graph.formatters.Formatter;
-import com.github.ryjen.kata.graph.formatters.VertexFormatter;
-import com.github.ryjen.kata.graph.model.Connection;
-import com.github.ryjen.kata.graph.model.DefaultFactory;
 import com.github.ryjen.kata.graph.model.Edge;
-import com.github.ryjen.kata.graph.model.Factory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -17,68 +14,28 @@ import java.util.function.BiFunction;
  * Created by ryan on 2017-03-18.
  * A graph implementation using an adjacency matrix
  */
-public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Vertex> {
+public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> implements Graphable<E, V> {
     private static final int NOT_FOUND = -1;
-    private final Matrix<Edge> edges;
-    private final List<Vertex> vertices;
+    private final Matrix<Edge<E,V>> edges;
+    private final List<V> vertices;
 
     public AdjacencyMatrix() {
-        this(new DefaultFactory<>(), false);
+        this.vertices = new ArrayList<>();
+        this.edges = new Matrix<>();
     }
 
-    public AdjacencyMatrix(boolean directed) {
-        this(new DefaultFactory<>(), directed);
-    }
-
-    /**
-     * creates an undirected graph
-     *
-     * @param factory the factor to create objects
-     */
-    public AdjacencyMatrix(Factory<Vertex> factory) {
-        this(factory, false);
-    }
-
-    /**
-     * constructs a graph
-     *
-     * @param factory  the factory to create objects
-     * @param directed true if this is a directed graph
-     */
-    public AdjacencyMatrix(Factory<Vertex> factory, boolean directed) {
-        super(factory, directed);
-        List<Vertex> initial = factory.initialVertices();
-        if (initial == null) {
-            this.vertices = new ArrayList<>();
-        } else {
-            this.vertices = initial;
-        }
-        this.edges = new Matrix<>(Edge.class);
-    }
-
-    public AdjacencyMatrix(AdjacencyMatrix<Vertex> other) {
-        super(other);
+    public AdjacencyMatrix(AdjacencyMatrix<E, V> other) {
         this.vertices = new ArrayList<>(other.vertices);
         this.edges = new Matrix<>(other.edges);
     }
 
     @Override
-    public Graph<Vertex> clone() {
-        return new AdjacencyMatrix<>(this);
+    public Iterable<Edge<E,V>> edges() {
+        return new EdgeIterator<>(this);
     }
 
     @Override
-    public Graph<Vertex> emptyClone() {
-        return new AdjacencyMatrix<>();
-    }
-
-    @Override
-    public Iterable<Edge> edges() {
-        return new EdgeIterator(this);
-    }
-
-    @Override
-    public Iterable<Edge> edges(Vertex v) {
+    public Iterable<Edge<E,V>> edges(V v) {
         return new AdjacentEdgeIterator<>(this, v);
     }
 
@@ -89,7 +46,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param u    the upper vertex
      * @param edge the edge to set
      */
-    public void addEdge(Vertex v, Vertex u, Edge edge) {
+    public void addEdge(V v, V u, Edge<E,V> edge) {
         assert v != null;
         assert u != null;
 
@@ -105,12 +62,14 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
             throw new NoSuchVertexException();
         }
 
-        if (!isDirected()) {
+        Edge<E,V> existing = edges.get(index1, index2);
 
-            edges.set(index2, index1, edge);
+        if (existing == null) {
+            edges.set(index1, index2, edge);
+            edge.setFrom(v).addVertex(u);
+        } else {
+            existing.addVertex(u);
         }
-
-        edges.set(index1, index2, edge);
     }
 
     /**
@@ -121,7 +80,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @return true if removed
      */
     @Override
-    public boolean removeEdge(Vertex a, Vertex b) {
+    public boolean removeEdge(V a, V b) {
         assert a != null;
         assert b != null;
 
@@ -139,11 +98,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
             throw new NoSuchVertexException();
         }
 
-        if (!isDirected()) {
-            rval = edges.remove(index2, index1);
-        }
-
-        return edges.remove(index1, index2) && rval;
+        return edges.remove(index1, index2);
     }
 
     /**
@@ -152,7 +107,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param vertex the vertex
      * @return the index of the vertex or NOT_FOUND
      */
-    int indexOf(Vertex vertex) {
+    int indexOf(V vertex) {
         assert vertex != null;
 
         return vertices.indexOf(vertex);
@@ -164,11 +119,12 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param vertex the vertex
      */
     @Override
-    public void addVertex(Vertex vertex) {
+    public Vertexable<V> addVertex(V vertex) {
         addVertex(vertex, true);
+        return this;
     }
 
-    private void addVertex(Vertex vertex, boolean resize) {
+    private void addVertex(V vertex, boolean resize) {
         assert vertex != null;
         if (!vertices.contains(vertex)) {
             vertices.add(vertex);
@@ -185,16 +141,17 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param list the vertices to add
      */
     @Override
-    public void addVertices(Vertex... list) {
-        for (Vertex v : list) {
+    public Vertexable<V> addVertices(Collection<V> list) {
+        for (V v : list) {
             // don't resize on each vertex
             addVertex(v, false);
         }
         edges.resize(vertices.size());
+        return this;
     }
 
     @Override
-    public boolean removeVertex(Vertex vertex) {
+    public boolean removeVertex(V vertex) {
         assert vertex != null;
 
         int index = indexOf(vertex);
@@ -217,6 +174,11 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
         return false;
     }
 
+    @Override
+    public boolean containsVertex(V vertex) {
+        return vertices.contains(vertex);
+    }
+
     /**
      * gets the size of the graph
      *
@@ -235,18 +197,18 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @return true if there is an edge between vertices
      */
     @Override
-    public Edge getEdge(Vertex v, Vertex u) {
+    public Edge<E,V> getEdge(V v, V u) {
         assert v != null;
         assert u != null;
 
         return getEdgeByIndices(indexOf(v), indexOf(u));
     }
 
-    Edge getEdgeByIndices(int v, int u) {
+    Edge<E,V> getEdgeByIndices(int v, int u) {
         return edges.get(v, u);
     }
 
-    Vertex getVertexByRow(int v) {
+    V getVertexByRow(int v) {
         assert v >= 0 && v < size();
 
         return vertices.get(v);
@@ -260,7 +222,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @return true if there is a non-empty edge
      */
     @Override
-    public boolean isEdge(Vertex v, Vertex u) {
+    public boolean isEdge(V v, V u) {
         assert v != null;
         assert u != null;
 
@@ -284,7 +246,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @return an iterator of vertices
      */
     @Override
-    public Iterable<Vertex> vertices() {
+    public Iterable<V> vertices() {
         return vertices;
     }
 
@@ -295,18 +257,8 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @return an iterable list of adjacent vertices
      */
     @Override
-    public Iterable<Vertex> adjacent(Vertex v) {
+    public Iterable<V> adjacent(V v) {
         return new AdjacentVertexIterator<>(this, v);
-    }
-
-    @Override
-    public Iterable<Connection<Vertex>> connections(Vertex v) {
-        return new AdjacentConnectionIterator<>(this, v);
-    }
-
-    @Override
-    public Iterable<Connection<Vertex>> connections() {
-        return new ConnectionIterator<>(this);
     }
 
     /**
@@ -316,7 +268,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param comparator how to test the graph for connections
      * @return the degree of the vertex
      */
-    private int degree(Vertex vertex, BiFunction<Integer, Integer, Boolean> comparator) {
+    private long degree(V vertex, BiFunction<Integer, Integer, Boolean> comparator) {
 
         assert vertex != null;
         assert comparator != null;
@@ -327,7 +279,7 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
             return 0;
         }
 
-        int count = 0;
+        long count = 0;
 
         for (int i = 0; i < size(); i++) {
 
@@ -349,7 +301,8 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param vertex the vertex
      * @return the degree
      */
-    public int outDegree(Vertex vertex) {
+    @Override
+    public long outDegree(V vertex) {
         return degree(vertex, this::isEdgeByRowColumn);
     }
 
@@ -359,27 +312,9 @@ public class AdjacencyMatrix<Vertex extends Comparable<Vertex>> extends Graph<Ve
      * @param vertex the vertex
      * @return the degree
      */
-    public int inDegree(Vertex vertex) {
-        return degree(vertex, (v, u) -> isEdgeByRowColumn(u, v));
-    }
-
     @Override
-    public String toString() {
-        return toString(new VertexFormatter<>(this));
-    }
-
-    /**
-     * custom toString() with option to show vertices
-     *
-     * @param formatter how to format the graph
-     * @return the string representation
-     */
-    public String toString(Formatter formatter) {
-        StringBuilder buf = new StringBuilder();
-
-        formatter.format(buf);
-
-        return buf.toString();
+    public long inDegree(V vertex) {
+        return degree(vertex, (v, u) -> isEdgeByRowColumn(u, v));
     }
 
     @Override

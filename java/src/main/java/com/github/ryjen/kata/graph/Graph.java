@@ -4,7 +4,6 @@ import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
-import com.github.ryjen.kata.graph.model.Connection;
 import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
@@ -13,27 +12,42 @@ import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.search.Search;
 import com.github.ryjen.kata.graph.sort.TopologicalSort;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 
 /**
- * Created by ryan on 2017-03-19.
+ * base class for graph implementations
  */
-public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgable<Vertex>, Vertexable<Vertex>, Cloneable {
+public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements Edgable<E, V>, Vertexable<V>, Degreable<V>, Cloneable {
 
-    private final Factory<Vertex> factory;
+    private Factory<E, V> factory;
+    private Graphable<E, V> impl;
     private boolean directed;
 
     /**
-     * default constructor
+     * factory constructor
      *
      * @param directed true if the graph is directed
      */
-    protected Graph(Factory<Vertex> factory, boolean directed) {
+    protected Graph(Factory<E, V> factory, boolean directed) {
         assert factory != null;
         this.factory = factory;
         this.directed = directed;
+        this.impl = factory.getImplementation();
+        assert impl != null;
+    }
+
+    /**
+     *
+     * @param impl
+     * @param directed
+     */
+    protected Graph(Graphable<E, V> impl, boolean directed) {
+        assert impl != null;
+        this.directed = directed;
+        this.impl = impl;
     }
 
     /**
@@ -41,37 +55,56 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
      *
      * @param other the graph to copy from
      */
-    protected Graph(Graph<Vertex> other) {
+    protected Graph(Graph<E, V> other) {
         this.factory = other.factory;
         this.directed = other.directed;
+        this.impl = other.impl;
     }
 
-    /**
-     * clones this instance
-     *
-     * @return a copy of this graph
-     */
-    public abstract Graph<Vertex> clone();
-
-    public abstract Graph<Vertex> emptyClone();
+    @Override
+    public Vertexable<V> addVertex(V v) {
+        return impl.addVertex(v);
+    }
 
     /**
      * add a list of vertices
      *
      * @param list the list of vertices to add
      */
-    public void addVertices(Vertex... list) {
-        for (Vertex v : list) {
+    @Override
+    public Vertexable<V> addVertices(Collection<V> list) {
+        for (V v : list) {
             addVertex(v);
         }
+        return this;
     }
 
-    public void addEdge(Vertex a, Vertex b) {
-        addEdge(a, b, factory.createEdge());
+    @Override
+    public boolean removeVertex(V v) {
+        return impl.removeVertex(v);
     }
 
-    public Edge getEdgeOrDefault(Vertex v, Vertex b) {
-        return isEdge(v, b) ? getEdge(v, b) : factory.emptyEdge();
+    @Override
+    public boolean containsVertex(V v) {
+        return impl.containsVertex(v);
+    }
+
+    @Override
+    public Iterable<V> adjacent(V v) {
+        return impl.adjacent(v);
+    }
+
+    @Override
+    public Iterable<V> vertices() {
+        return impl.vertices();
+    }
+
+    public Edge<E,V> getEdgeOrEmpty(V v, V b) {
+        return isEdge(v, b) ? getEdge(v, b) : factory == null ? null : factory.getEmptyEdge();
+    }
+
+    public void addEdge(V a, V b) {
+        addEdge(a, b, factory == null ? new Edge<>() : factory.getDefaultEdge());
     }
 
     /**
@@ -79,47 +112,27 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
      *
      * @param a      the first vertex
      * @param b      the second vertex
-     * @param weight the weight of the edge
+     * @param label  the label of the edge
      */
-    public void addEdge(Vertex a, Vertex b, int weight) {
-        addEdge(a, b, factory.createEdge(weight));
+    public void addEdge(V a, V b, E label) {
+        addEdge(a, b, new Edge<>(label));
     }
 
-    @Override
     public int numberOfEdges() {
         return Long.valueOf(StreamSupport.stream(edges().spliterator(), false).count()).intValue();
     }
 
-    /**
-     * gets the size of the graph in terms of number of vertices
-     *
-     * @return the size
-     */
-    public abstract int size();
-
-
-    /**
-     * gets all edges attached to a vertex
-     *
-     * @param vertex
-     * @return the iterator
-     */
-    public abstract Iterable<Connection<Vertex>> connections(Vertex vertex);
-
-    /**
-     * gets all edges with an attached vertex
-     *
-     * @return
-     */
-    public abstract Iterable<Connection<Vertex>> connections();
+    public int size() {
+        return impl.size();
+    }
 
     /**
      * performs a depth first search
      *
      * @see Search
      */
-    public void dfs(Vertex start, Search.OnVisit<Vertex> callback, Ordering ordering) {
-        Search<Vertex> dfs = new DepthFirstSearch<>(this, callback, ordering);
+    public void dfs(V start, Search.OnVisit<V> callback, Ordering ordering) {
+        Search<E,V> dfs = new DepthFirstSearch<>(this, callback, ordering);
 
         dfs.search(start);
     }
@@ -129,8 +142,8 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
      *
      * @see Search
      */
-    public void bfs(Vertex start, Search.OnVisit<Vertex> callback) {
-        Search<Vertex> bfs = new BreadthFirstSearch<>(this, callback);
+    public void bfs(V start, Search.OnVisit<V> callback) {
+        Search<E,V> bfs = new BreadthFirstSearch<>(this, callback);
 
         bfs.search(start);
     }
@@ -141,15 +154,17 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
      * @return true if all vertices are connected
      */
     public boolean isConnected() {
-        Set<Vertex> visited = new HashSet<>();
+        Set<V> visited = new HashSet<>();
 
-        if (size() == 0) {
+        int size = impl.size();
+
+        if (size == 0) {
             return false;
         }
 
         dfs(vertices().iterator().next(), visited::add, Ordering.Pre);
 
-        return visited.size() == size();
+        return visited.size() == size;
     }
 
     /**
@@ -164,7 +179,7 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         }
 
         try {
-            TopologicalSort<Vertex> sorter = new TopologicalSort<>(this);
+            TopologicalSort<E, V> sorter = new TopologicalSort<>(this);
 
             sorter.sort();
 
@@ -182,31 +197,10 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
      * @param vertex the vertex
      * @return the degree
      */
-    public int degree(Vertex vertex) {
-        return inDegree(vertex) + outDegree(vertex);
+    public long degree(V vertex) {
+        return impl.inDegree(vertex) + impl.outDegree(vertex);
     }
 
-
-    /**
-     * test for the number of connections into a vertex
-     *
-     * @param vertex the vertex to check
-     * @return the number of in connections
-     */
-    public abstract int inDegree(Vertex vertex);
-
-    /**
-     * test for the number of connections coming from a vertex
-     *
-     * @param vertex the vertex to test
-     * @return the number of out connections
-     */
-    public abstract int outDegree(Vertex vertex);
-
-    /**
-     * clear all vertices and edges from the instance
-     */
-    public abstract void clear();
 
     /**
      * tests if this graph is directed
@@ -237,7 +231,47 @@ public abstract class Graph<Vertex extends Comparable<Vertex>> implements Edgabl
         return buf.toString();
     }
 
-    protected Factory<Vertex> getFactory() {
-        return factory;
+    @Override
+    public void addEdge(V a, V b, Edge<E, V> edge) {
+        impl.addEdge(a, b, edge);
+
+        if (!isDirected()) {
+            impl.addEdge(b, a, new Edge<>(edge));
+        }
+    }
+
+    @Override
+    public boolean isEdge(V a, V b) {
+        return impl.isEdge(a, b);
+    }
+
+    @Override
+    public Edge<E, V> getEdge(V a, V b) {
+        return impl.getEdge(a, b);
+    }
+
+    @Override
+    public boolean removeEdge(V a, V b) {
+        return impl.removeEdge(a, b);
+    }
+
+    @Override
+    public Iterable<Edge<E, V>> edges() {
+        return impl.edges();
+    }
+
+    @Override
+    public Iterable<Edge<E, V>> edges(V v) {
+        return impl.edges(v);
+    }
+
+    @Override
+    public long inDegree(V vertex) {
+        return impl.inDegree(vertex);
+    }
+
+    @Override
+    public long outDegree(V vertex) {
+        return impl.outDegree(vertex);
     }
 }

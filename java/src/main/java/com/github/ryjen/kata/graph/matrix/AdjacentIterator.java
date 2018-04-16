@@ -6,12 +6,12 @@ import java.util.NoSuchElementException;
 /**
  * an iterable to find adjacent vertices for a vertex
  */
-abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements Iterator<T>, Iterable<T> {
+abstract class AdjacentIterator<P extends Comparable<P>, E extends Comparable<E>, V extends Comparable<V>> implements Iterator<P>, Iterable<P> {
 
-    private final AdjacencyMatrix<Vertex> graph;
+    private final AdjacencyMatrix<E,V> graph;
     private final int x;
     private int y;
-    private Vertex vertex;
+    private V vertex;
 
     /**
      * construct an adjacent iterator
@@ -19,7 +19,7 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
      * @param graph  the graph to search
      * @param vertex the vertex index to search from
      */
-    AdjacentIterator(AdjacencyMatrix<Vertex> graph, Vertex vertex) {
+    AdjacentIterator(AdjacencyMatrix<E,V> graph, V vertex) {
         assert graph != null;
         assert vertex != null;
         this.graph = graph;
@@ -29,7 +29,7 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
     }
 
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<P> iterator() {
         return this;
     }
 
@@ -46,10 +46,10 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
         return false;
     }
 
-    protected abstract T getPropertyForEntry(AdjacencyMatrix<Vertex> graph, int row, int col);
+    protected abstract P getPropertyForEntry(AdjacencyMatrix<E,V> graph, int row, int col);
 
     @Override
-    public T next() {
+    public P next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
@@ -58,7 +58,7 @@ abstract class AdjacentIterator<T, Vertex extends Comparable<Vertex>> implements
         return getPropertyForEntry(graph, this.x, this.y++);
     }
 
-    public Vertex getVertex() {
+    public V getVertex() {
         return vertex;
     }
 }

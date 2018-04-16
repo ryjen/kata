@@ -2,12 +2,14 @@ package com.github.ryjen.kata.graph.model;
 
 import com.github.ryjen.kata.graph.Graphable;
 
-public class DefaultFactory<E extends Comparable<E>, V extends Comparable<V>> implements Factory<E,V> {
+public class SimpleFactory<E extends Comparable<E>, V extends Comparable<V>> implements Factory<E,V> {
+    private final E label;
     private final Edge<E,V> empty;
     private final Graphable<E,V> impl;
 
-    public DefaultFactory(Graphable<E, V> impl) {
-        this.empty = new Edge<>();
+    public SimpleFactory(Graphable<E, V> impl, E label, E empty) {
+        this.label = label;
+        this.empty = new Edge<>(empty);
         this.impl = impl;
     }
 
@@ -18,7 +20,7 @@ public class DefaultFactory<E extends Comparable<E>, V extends Comparable<V>> im
 
     @Override
     public Edge<E,V> getDefaultEdge() {
-        return new Edge<>();
+        return new Edge<>(label);
     }
 
     @Override

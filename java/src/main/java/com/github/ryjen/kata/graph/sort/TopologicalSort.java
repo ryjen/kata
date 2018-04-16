@@ -12,15 +12,15 @@ import java.util.Map;
 /**
  * Created by ryan on 2017-04-01.
  */
-public class TopologicalSort<T extends Comparable<T>> {
+public class TopologicalSort<E extends Comparable<E>, V extends Comparable<V>> {
 
     private static final int MARK_TEMP = 1;
     private static final int MARK_PERM = 2;
 
-    private final Graph<T> graph;
-    private final Map<T, Integer> marked;
+    private final Graph<E, V> graph;
+    private final Map<V, Integer> marked;
 
-    public TopologicalSort(Graph<T> graph) throws GraphDirectedException {
+    public TopologicalSort(Graph<E, V> graph) throws GraphDirectedException {
         if (!graph.isDirected()) {
             throw new GraphDirectedException();
         }
@@ -28,10 +28,10 @@ public class TopologicalSort<T extends Comparable<T>> {
         this.marked = new HashMap<>();
     }
 
-    public Collection<T> sort() throws GraphCyclicException {
-        LinkedList<T> result = new LinkedList<>();
+    public Collection<V> sort() throws GraphCyclicException {
+        LinkedList<V> result = new LinkedList<>();
 
-        for (T v : graph.vertices()) {
+        for (V v : graph.vertices()) {
 
             sort(v, result);
         }
@@ -39,7 +39,7 @@ public class TopologicalSort<T extends Comparable<T>> {
         return result;
     }
 
-    private boolean isMarked(T vertex) throws GraphCyclicException {
+    private boolean isMarked(V vertex) throws GraphCyclicException {
         int mark = marked.getOrDefault(vertex, 0);
 
         if (mark == MARK_TEMP) {
@@ -49,11 +49,11 @@ public class TopologicalSort<T extends Comparable<T>> {
         return mark == MARK_PERM;
     }
 
-    private void sort(T vertex, LinkedList<T> result) throws GraphCyclicException {
+    private void sort(V vertex, LinkedList<V> result) throws GraphCyclicException {
         if (!isMarked(vertex)) {
             marked.put(vertex, MARK_TEMP);
 
-            for (T w : graph.adjacent(vertex)) {
+            for (V w : graph.adjacent(vertex)) {
                 sort(w, result);
             }
 

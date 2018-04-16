@@ -1,39 +1,19 @@
 package com.github.ryjen.kata.graph.model;
 
-import java.util.List;
+import com.github.ryjen.kata.graph.Graphable;
 
 /**
  * Describes how to create vertices and edges in a graph
  *
  * @param <V> the type of vertex
  */
-public interface Factory<V extends Comparable<V>> {
-    /**
-     * creates an edge
-     *
-     * @return an edge object
-     */
-    Edge createEdge();
+public interface Factory<E extends Comparable<E>, V extends Comparable<V>> {
 
-    /**
-     * creates and edge with a weight
-     *
-     * @param weight the weight of the edge
-     * @return the edge
-     */
-    Edge createEdge(int weight);
+    Graphable<E,V> getImplementation();
 
-    /**
-     * creates an empty edge
-     *
-     * @return an edge object
-     */
-    Edge emptyEdge();
+    Edge<E,V> getDefaultEdge();
 
-    /**
-     * initializes the vertices
-     *
-     * @return the list of vertices or null
-     */
-    List<V> initialVertices();
+    boolean isEmptyEdge(Edge<E,V> other);
+
+    Edge<E,V> getEmptyEdge();
 }

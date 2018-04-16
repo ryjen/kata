@@ -10,21 +10,21 @@ import java.util.Stack;
 /**
  * A Depth-First implementation of search
  */
-public class DepthFirstSearch<Vertex extends Comparable<Vertex>> extends Search<Vertex> {
+public class DepthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> extends Search<E,V> {
 
     private final Ordering ordering;
 
-    public DepthFirstSearch(Graph<Vertex> graph, OnVisit<Vertex> callback) {
+    public DepthFirstSearch(Graph<E,V> graph, OnVisit<V> callback) {
         this(graph, callback, Ordering.Pre);
     }
 
-    public DepthFirstSearch(Graph<Vertex> graph, OnVisit<Vertex> callback, Ordering ordering) {
+    public DepthFirstSearch(Graph<E,V> graph, OnVisit<V> callback, Ordering ordering) {
         super(graph, callback);
         this.ordering = ordering;
     }
 
     @Override
-    public void search(Vertex v) {
+    public void search(V v) {
         switch (ordering) {
             default:
             case Pre:
@@ -42,8 +42,8 @@ public class DepthFirstSearch<Vertex extends Comparable<Vertex>> extends Search<
     /**
      * starts the search
      */
-    private void searchPreOrder(Vertex v) {
-        Stack<Vertex> stack = new Stack<>();
+    private void searchPreOrder(V v) {
+        Stack<V> stack = new Stack<>();
         stack.add(v);
 
         while (!stack.isEmpty()) {
@@ -58,13 +58,13 @@ public class DepthFirstSearch<Vertex extends Comparable<Vertex>> extends Search<
 
             callback(v);
 
-            for (Vertex w : adjacent(v)) {
+            for (V w : adjacent(v)) {
                 stack.push(w);
             }
         }
     }
 
-    private void searchPostOrder(Vertex v) {
+    private void searchPostOrder(V v) {
 
         if (isVisited(v)) {
             return;
@@ -72,7 +72,7 @@ public class DepthFirstSearch<Vertex extends Comparable<Vertex>> extends Search<
 
         visit(v);
 
-        for (Vertex w : adjacent(v)) {
+        for (V w : adjacent(v)) {
             searchPostOrder(w);
         }
 
@@ -80,29 +80,29 @@ public class DepthFirstSearch<Vertex extends Comparable<Vertex>> extends Search<
     }
 
 
-    private void searchReversePostOrder(Vertex v, List<Vertex> scratch) {
+    private void searchReversePostOrder(V v, List<V> scratch) {
         if (isVisited(v)) {
             return;
         }
 
         visit(v);
 
-        for (Vertex w : adjacent(v)) {
+        for (V w : adjacent(v)) {
             searchReversePostOrder(w, scratch);
         }
 
         scratch.add(v);
     }
 
-    private void searchReversePostOrder(Vertex v) {
+    private void searchReversePostOrder(V v) {
 
-        List<Vertex> scratch = new ArrayList<>();
+        List<V> scratch = new ArrayList<>();
 
         searchReversePostOrder(v, scratch);
 
         Collections.reverse(scratch);
 
-        for (Vertex w : scratch) {
+        for (V w : scratch) {
             callback(w);
         }
     }

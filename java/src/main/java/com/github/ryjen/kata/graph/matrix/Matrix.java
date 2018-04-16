@@ -1,24 +1,27 @@
 package com.github.ryjen.kata.graph.matrix;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * Created by ryan jennings on 2017-03-20.
+ * Wrapper for a 2d array for a type
  */
 class Matrix<T> {
 
-    private final Class<T> type;
-    private T[][] value;
+    private List<List<Optional<T>>> value;
 
-    public Matrix(Class<T> type) {
-        this.type = type;
+    public Matrix() {
     }
 
     public Matrix(Matrix<T> other) {
-        this.type = other.type;
-        resize(other.value.length);
-        for (int i = 0; i < other.value.length; i++) {
-            System.arraycopy(other.value[i], 0, this.value[i], 0, this.value[i].length);
+
+        value = new ArrayList<>();
+
+        for (List<Optional<T>> l : other.value) {
+            List<Optional<T>> n = new ArrayList<>();
+            n.addAll(l);
+            value.add(n);
         }
     }
 
@@ -26,38 +29,36 @@ class Matrix<T> {
         if (value == null) {
             return;
         }
-        for (int i = 0; i < value.length; i++) {
-            for (int j = 0; j < value.length; j++) {
-                value[i][j] = null;
-            }
-        }
+        value.clear();
     }
 
     public void set(int row, int col, T value) {
 
         resize(Math.max(row, col) + 1);
 
-        this.value[row][col] = value;
+        this.value.get(row).set(col, Optional.of(value));
     }
 
     private boolean isValid(int row, int col) {
-        return value != null && Math.min(row, col) >= 0 && Math.max(row, col) < value.length;
+        return value != null && Math.min(row, col) >= 0 && Math.max(row, col) < value.size();
     }
 
     private boolean isEmpty(int row, int col) {
-        return !isValid(row, col) || value[row][col] == null;
+        return !isValid(row, col) || !value.get(row).get(col).isPresent();
     }
 
     public T get(int row, int col) {
         if (!isValid(row, col)) {
             return null;
         }
-        return value[row][col];
+        Optional<T> val = value.get(row).get(col);
+
+        return val.orElse(null);
     }
 
     public boolean remove(int row, int col) {
         if (!isEmpty(row, col)) {
-            value[row][col] = null;
+            value.get(row).set(col, Optional.empty());
             return true;
         }
         return false;
@@ -66,32 +67,59 @@ class Matrix<T> {
     public void resize(int size) {
 
         if (value == null) {
+
             value = allocate(size);
-            for (int i = 0; i < value.length; i++) {
-                value[i] = allocate();
+
+            for (int i = 0; i < value.size(); i++) {
+                value.set(i, allocate());
             }
             return;
         }
 
-        if (size >= value.length) {
-            T[][] temp = value;
-            value = allocate(size);
-            for (int i = 0; i < value.length; i++) {
-                value[i] = allocate();
+        if (size >= value.size()) {
+            List<List<Optional<T>>> temp = value;
 
-                if (i < temp.length) {
-                    System.arraycopy(temp[i], 0, value[i], 0, temp.length);
+            value = allocate(size);
+
+            for (int i = 0; i < value.size(); i++) {
+                List<Optional<T>> row = allocate();
+
+                if (row == null) {
+                    break;
+                }
+
+                value.set(i, row);
+
+                if (i < temp.size()) {
+                    List<Optional<T>> old = temp.get(i);
+                    for (int j = 0; j < old.size(); j++) {
+                        row.set(j, old.get(j));
+                    }
                 }
             }
         }
     }
 
-    private T[][] allocate(int size) {
-        return (T[][]) Array.newInstance(type, size, size);
+    private List<List<Optional<T>>> allocate(int size) {
+
+        List<List<Optional<T>>> list = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+            list.add(new ArrayList<>());
+        }
+        return list;
     }
 
-    private T[] allocate() {
-        return (T[]) Array.newInstance(type, value.length);
+    private List<Optional<T>> allocate() {
+        if (value == null) {
+            return null;
+        }
+        List<Optional<T>> list = new ArrayList<>(value.size());
+
+        for (int i = 0; i < value.size(); i++) {
+            list.add(Optional.empty());
+        }
+        return list;
     }
 
 }

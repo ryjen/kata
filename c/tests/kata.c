@@ -2,7 +2,6 @@
 
 extern int run_euclid_tests();
 extern int run_list_tests();
-extern int run_challenge_tests();
 
 int main(int argc, char *argv[])
 {
@@ -18,5 +17,7 @@ int main(int argc, char *argv[])
         return rval;
     }
 
-    return run_challenge_tests();
+    // TODO: run other tests
+
+    return 0;
 }

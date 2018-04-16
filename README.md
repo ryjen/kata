@@ -1,15 +1,7 @@
 # kata
-code kata for practice
 
-# c lang
+code kata for practice.  nothing terribly of interest, just coding problems.
 
-See [README](c)
+some stuff could be pulled into a library.
 
-# java lang
-
-See [README](java)
-
-# rust lang
-
-See [README](rust)
 

@@ -13,11 +13,14 @@ public class Dijkstra<V extends Comparable<V>> extends Search<Integer, V> implem
     public Dijkstra(Graph<Integer, V> graph, OnVisit<V> callback) {
         super(graph, callback);
 
+        // a heap min queue based on distance
         queue = new Heap<>(graph.size(), Collections.reverseOrder(this));
 
-        visited = new TreeSet<>(Comparator.comparingInt(o -> dist.getOrDefault(o, Integer.MAX_VALUE)));
+        // a set based on distance of a vector
+        visited = new TreeSet<>(this);
     }
 
+    @Override
     public void search(V source) {
 
         dist.put(source, 0);
@@ -28,9 +31,9 @@ public class Dijkstra<V extends Comparable<V>> extends Search<Integer, V> implem
             V u = queue.remove();
 
             for (V v : adjacent(u)) {
-                int alt = dist.get(u) + length(u, v);
+                int alt = length(u, v);
 
-                if (alt >= 0 && alt < dist.getOrDefault(v, Integer.MAX_VALUE)) {
+                if (alt < dist.getOrDefault(v, Integer.MAX_VALUE)) {
                     dist.put(v, alt);
                     queue.add(v);
                 }
@@ -54,15 +57,16 @@ public class Dijkstra<V extends Comparable<V>> extends Search<Integer, V> implem
     }
 
     private int length(V u, V v) {
+        Integer d = dist.getOrDefault(u, Integer.MAX_VALUE);
+        if (d == Integer.MAX_VALUE) {
+            return d;
+        }
         Integer i = getGraph().getEdge(u, v).getLabel();
-        return i == null ? 0 : i;
+        return i == null ? d : d+i;
     }
 
     @Override
     public int compare(V o1, V o2) {
-        if (!dist.containsKey(o1) || !dist.containsKey(o2)) {
-            return Integer.MAX_VALUE;
-        }
-        return Integer.compare(dist.get(o1), dist.get(o2));
+        return Integer.compare(dist.getOrDefault(o1, Integer.MAX_VALUE), dist.getOrDefault(o2, Integer.MAX_VALUE));
     }
 }

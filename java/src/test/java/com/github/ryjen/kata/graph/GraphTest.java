@@ -4,6 +4,7 @@ import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.*;
 import com.github.ryjen.kata.graph.model.Edge;
+import com.github.ryjen.kata.graph.search.Dijkstra;
 import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.sort.TopologicalSort;
 import com.github.ryjen.kata.graph.tree.MinimumSpanningTree;
@@ -502,6 +503,8 @@ public abstract class GraphTest {
 
         graph.addVertices(Arrays.asList('a', 'b', 'c', 'd', 'e'));
 
+        // see kruskal wiki for the expected tree
+        // https://en.wikipedia.org/wiki/Kruskal%27s_algorithm
         graph.addEdge('a', 'e', 1);
         graph.addEdge('c', 'd', 2);
         graph.addEdge('a', 'b', 3);
@@ -529,6 +532,9 @@ public abstract class GraphTest {
 
         graph.addVertices(Arrays.asList('a', 'b', 'c', 'd', 'e'));
 
+        // see kruskal wiki for the expected tree
+        // https://en.wikipedia.org/wiki/Kruskal%27s_algorithm
+
         graph.addEdge('a', 'e', 1);
         graph.addEdge('c', 'd', 2);
         graph.addEdge('a', 'b', 3);
@@ -536,8 +542,6 @@ public abstract class GraphTest {
         graph.addEdge('b', 'c', 5);
         graph.addEdge('e', 'c', 6);
         graph.addEdge('e', 'd', 7);
-
-        // see kruskal wiki for the expected tree
 
         try {
             Iterable<Edge<Integer, Character>> actual = new MinimumSpanningTree.Kruskals<>(graph).find();
@@ -549,5 +553,35 @@ public abstract class GraphTest {
         } catch (GraphDirectedException | GraphCyclicException e) {
             Assert.assertTrue(false);
         }
+    }
+
+    @Test
+    public void testDijkstra() {
+        Graph<Integer,Integer> graph = new Graph<>(true);
+
+        graph.addVertices(Arrays.asList(1,2,3,4,5,6));
+
+        // See example on wiki for Dijkstra's algorithm
+        // https://en.wikipedia.org/wiki/Dijkstra's_algorithm
+
+        graph.addEdge(1, 2, 7);
+        graph.addEdge(1, 3, 9);
+        graph.addEdge(1, 6, 14);
+        graph.addEdge(2, 3, 10);
+        graph.addEdge(2, 4, 15);
+        graph.addEdge(3, 4, 11);
+        graph.addEdge(3, 6, 2);
+        graph.addEdge(6, 5, 9);
+        graph.addEdge(5, 4, 6);
+
+        List<Integer> actual = new ArrayList<>();
+
+        Dijkstra<Integer> path = new Dijkstra<>(graph, actual::add);
+
+        path.search(1);
+
+        List<Integer> expected = Arrays.asList(1,2,3,6,5);
+
+        Assert.assertEquals(expected, actual);
     }
 }

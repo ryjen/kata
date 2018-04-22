@@ -27,6 +27,11 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
     }
 
     @Override
+    public Graphable<E, V> copy() {
+        return new AdjacencyList<>(this);
+    }
+
+    @Override
     public Vertexable<V> addVertex(V vertex) {
         if (vertexList.containsKey(vertex)) {
             return this;
@@ -117,7 +122,7 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(Edge::getTo).collect(Collectors.toList());
+        return vertexList.get(v).stream().map(Edge::getTo).collect(Collectors.toSet());
     }
 
     @Override

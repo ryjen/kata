@@ -18,16 +18,17 @@ import java.util.Set;
 import java.util.stream.StreamSupport;
 
 /**
- * base class for graph implementations
+ * A graph with vertices (V) and edges (E)
+ * Default implementation is an adjacency list
  */
-public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements Edgable<E, V>, Vertexable<V>, Degreable<V>, Cloneable {
+public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements Graphable<E, V> {
 
     private final Graphable<E, V> impl;
     private final boolean directed;
 
     /**
-     * @param impl
-     * @param directed
+     * @param impl     the graph implementation to use
+     * @param directed true if the graph edges are directed
      */
     public Graph(Graphable<E, V> impl, boolean directed) {
         assert impl != null;
@@ -35,10 +36,18 @@ public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements 
         this.impl = impl;
     }
 
+    /**
+     * a default graph (adjacency list implementation)
+     *
+     * @param directed true if the graph is directed
+     */
     public Graph(boolean directed) {
         this(new AdjacencyList<>(), directed);
     }
 
+    /**
+     * a default undirected graph (adjacency list implementation)
+     */
     public Graph() {
         this(false);
     }
@@ -50,7 +59,12 @@ public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements 
      */
     public Graph(Graph<E, V> other) {
         this.directed = other.directed;
-        this.impl = other.impl;
+        this.impl = other.impl.copy();
+    }
+
+    @Override
+    public Graphable<E, V> copy() {
+        return new Graph<>(this);
     }
 
     @Override
@@ -257,5 +271,10 @@ public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements 
     @Override
     public long outDegree(V vertex) {
         return impl.outDegree(vertex);
+    }
+
+    @Override
+    public void clear() {
+        impl.clear();
     }
 }

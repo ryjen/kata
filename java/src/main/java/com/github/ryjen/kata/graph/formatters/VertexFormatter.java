@@ -23,12 +23,12 @@ public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> e
 
         for (V a : graph.vertices()) {
 
-            buf.append(format(a));
+            buf.append(formatWidth(a));
 
             buf.append(" │ ");
 
             for (V b : graph.vertices()) {
-                buf.append(format(getEdgeLabel(graph.getEdge(a, b))));
+                buf.append(formatWidth(formatEdge(graph.getEdge(a, b))));
                 buf.append(' ');
             }
             buf.append('\n');
@@ -46,7 +46,7 @@ public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> e
         }
         buf.append(" │ ");
         for (V v : graph.vertices()) {
-            buf.append(format(v)).append(' ');
+            buf.append(formatWidth(v)).append(' ');
         }
         buf.append('\n');
         for (int i = 0; i < width; i++) {
@@ -67,11 +67,11 @@ public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> e
 
 
     @Override
-    protected Object getEdgeLabel(Edge<E, V> edge) {
+    protected String formatEdge(Edge<E, V> edge) {
         if (edge == null || edge.getLabel() == null) {
             return " ";
         }
 
-        return edge.getLabel();
+        return String.valueOf(edge.getLabel());
     }
 }

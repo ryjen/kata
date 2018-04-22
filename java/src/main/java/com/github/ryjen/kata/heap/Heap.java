@@ -113,14 +113,17 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
     /**
      * removes an element at a position
      *
-     * @param position the position to remove
-     * @param error    the handler for an empty heap
+     * @param position    the position to remove
+     * @param nullOnEmpty returns null if set to true and heap is empty
      * @return the element removed or the error handler return value
      * @throws NoSuchElementException if the error handler does
      */
-    private E remove(int position, NullHandler<E> error) {
+    private E remove(int position, boolean nullOnEmpty) {
         if (values.isEmpty()) {
-            return error.apply();
+            if (nullOnEmpty) {
+                return null;
+            }
+            throw new NoSuchElementException();
         }
         swap(position, values.size() - 1);
         E removeNode = values.remove(values.size() - 1);
@@ -139,7 +142,7 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
 
         int index = values.indexOf(o);
 
-        return index != -1 && remove(index, () -> null) != null;
+        return index != -1 && remove(index, true) != null;
     }
 
     /**
@@ -304,9 +307,7 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
      * @throws NoSuchElementException if the heap is empty
      */
     public E remove() {
-        return remove(0, () -> {
-            throw new NoSuchElementException();
-        });
+        return remove(0, false);
     }
 
     /**
@@ -315,7 +316,7 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
      * @return the top element or null
      */
     public E poll() {
-        return remove(0, () -> null);
+        return remove(0, true);
     }
 
     /**
@@ -350,14 +351,17 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
     /**
      * gets an element at a position
      *
-     * @param position the position of the element
-     * @param error    the error handler
+     * @param position    the position of the element
+     * @param nullOnEmpty return null of set to true and heap is empty
      * @return the element or the return value of the error handler
      * @throws NoSuchElementException if the error handler does
      */
-    private E get(int position, NullHandler<E> error) {
+    private E get(int position, boolean nullOnEmpty) {
         if (values.isEmpty()) {
-            return error.apply();
+            if (nullOnEmpty) {
+                return null;
+            }
+            throw new NoSuchElementException();
         }
         int parent = Util.parent(position);
         int child = Util.leftChild(parent);
@@ -371,9 +375,7 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
      * @throws NoSuchElementException if the heap is empty
      */
     public E element() {
-        return get(0, () -> {
-            throw new NoSuchElementException();
-        });
+        return get(0, false);
     }
 
     /**
@@ -382,7 +384,7 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
      * @return the top element or null
      */
     public E peek() {
-        return get(0, () -> null);
+        return get(0, true);
     }
 
     @Override
@@ -413,11 +415,27 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
     }
 
     /**
-     * utility for errors
-     *
-     * @param <E> the type of element
+     * utility methods
      */
-    private interface NullHandler<E> {
-        E apply();
+    private interface Util {
+
+        static int parent(int index) {
+            if (index < 0) {
+                return 0;
+            }
+            return (index - 1) / 2;
+        }
+
+        static int leftChild(int index) {
+            if (index < 0) {
+                return 0;
+            }
+            return (2 * index) + 1;
+        }
+
+        static int rightChild(int index) {
+            return leftChild(index) + 1;
+        }
+
     }
 }

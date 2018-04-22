@@ -43,13 +43,9 @@ public abstract class GraphTest {
 
     @Test
     public void testDefaultGraphWithVertices() {
-        Graph<?, Character> graph = new Graph();
+        Graph<?, Character> graph = new Graph<>();
 
-        graph.addVertex('A');
-
-        graph.addVertex('B');
-
-        graph.addVertex('C');
+        graph.addVertices(Arrays.asList('A', 'B', 'C'));
 
         StringBuffer buf = new StringBuffer();
         buf.append("  │ A B C \n");
@@ -59,6 +55,25 @@ public abstract class GraphTest {
         buf.append("C │       \n");
         String expected = buf.toString();
         String actual = graph.toString(new VertexFormatter<>(graph));
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDefaultGraphWithEdges() {
+        Graph<Integer, Character> graph = new Graph<>();
+
+        graph.addVertices(Arrays.asList('A', 'B', 'C'));
+
+        graph.addEdge('A', 'B', 2);
+        graph.addEdge('B', 'C', 3);
+
+        StringBuffer buf = new StringBuffer();
+        buf.append("  2   \n");
+        buf.append("2   3 \n");
+        buf.append("  3   \n");
+        String expected = buf.toString();
+        String actual = graph.toString();
 
         Assert.assertEquals(expected, actual);
     }
@@ -136,7 +151,7 @@ public abstract class GraphTest {
     }
 
     @Test
-    public void testMatrixToStringUndirected() {
+    public void testSimpleToStringUndirected() {
         Graph<Integer, Integer> graph = newIndexGraph(4, false);
 
         Assert.assertFalse(graph.isDirected());
@@ -157,7 +172,7 @@ public abstract class GraphTest {
     }
 
     @Test
-    public void testToStringVertices() {
+    public void testEmptyLabelToString() {
         Graph<Character, Character> graph = new Graph<Character, Character>(getImplementation(), false);
 
         graph.addVertices(Arrays.asList('A', 'B', 'C', 'D', 'Z'));
@@ -180,7 +195,7 @@ public abstract class GraphTest {
     }
 
     @Test
-    public void testMatrixToStringDirected() {
+    public void testSimpleToStringDirected() {
         Graph<Integer, Integer> graph = newIndexGraph(4, true);
 
         Assert.assertTrue(graph.isDirected());
@@ -423,6 +438,32 @@ public abstract class GraphTest {
         Assert.assertEquals(expected, actual);
     }
 
+
+    @Test
+    public void testBreadthFirstSearch() {
+        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), false);
+
+        List<Character> actual = new ArrayList<>();
+
+        g.addVertices(Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G'));
+
+        g.addEdge('A', 'B', 1);
+        g.addEdge('B', 'D', 2);
+        g.addEdge('B', 'F', 3);
+        g.addEdge('A', 'C', 4);
+        g.addEdge('C', 'G', 5);
+        g.addEdge('A', 'E', 6);
+        g.addEdge('E', 'F', 7);
+
+        g.bfs('A', actual::add);
+
+        List<Character> expected = Arrays.asList('A', 'B', 'C', 'E', 'D', 'F', 'G');
+
+
+        Assert.assertEquals(expected, actual);
+    }
+
+
     @Test
     public void testConnectedGraph() {
         Graph<Integer, Integer> graph = newIndexGraph(3, false);
@@ -472,6 +513,7 @@ public abstract class GraphTest {
         try {
             Iterable<Edge<Integer, Character>> actual = new MinimumSpanningTree.Prims<>(graph).find();
 
+            // sum of the minimum tree weights
             int expected = 11;
 
             Assert.assertEquals(expected, StreamSupport.stream(actual.spliterator(), false).mapToInt(Edge::getLabel).sum());
@@ -495,11 +537,12 @@ public abstract class GraphTest {
         graph.addEdge('e', 'c', 6);
         graph.addEdge('e', 'd', 7);
 
-        // see kruskal wiki the example
+        // see kruskal wiki for the expected tree
 
         try {
             Iterable<Edge<Integer, Character>> actual = new MinimumSpanningTree.Kruskals<>(graph).find();
 
+            // sum of the minimum tree weights
             int expected = 11;
 
             Assert.assertEquals(expected, StreamSupport.stream(actual.spliterator(), false).mapToInt(Edge::getLabel).sum());

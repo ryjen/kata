@@ -11,18 +11,26 @@ public class HeapIterator<E extends Comparable<E>> implements Iterator<E>, Itera
 
     private final Heap<E> heap;
 
+    /**
+     * default constructor makes a copy of the heap
+     *
+     * @param heap the heap to iterate
+     */
     public HeapIterator(Heap<E> heap) {
         this.heap = heap.copy();
     }
 
+    @Override
     public boolean hasNext() {
         return !heap.isEmpty();
     }
 
+    @Override
     public E next() {
         return heap.remove();
     }
 
+    @Override
     public void remove() {
         throw new UnsupportedOperationException();
     }

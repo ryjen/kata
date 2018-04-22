@@ -19,14 +19,27 @@ public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> i
     private final Matrix<Edge<E, V>> edges;
     private final List<V> vertices;
 
+    /**
+     * default constructor
+     */
     public AdjacencyMatrix() {
         this.vertices = new ArrayList<>();
         this.edges = new Matrix<>();
     }
 
+    /**
+     * copy constructor
+     *
+     * @param other the instance to copy from
+     */
     public AdjacencyMatrix(AdjacencyMatrix<E, V> other) {
         this.vertices = new ArrayList<>(other.vertices);
         this.edges = new Matrix<>(other.edges);
+    }
+
+    @Override
+    public Graphable<E, V> copy() {
+        return new AdjacencyMatrix<>(this);
     }
 
     @Override
@@ -46,6 +59,7 @@ public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> i
      * @param u    the upper vertex
      * @param edge the edge to set
      */
+    @Override
     public void addEdge(V v, V u, Edge<E, V> edge) {
         assert v != null;
         assert u != null;

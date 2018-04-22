@@ -14,7 +14,7 @@ class EdgeIterator<E extends Comparable<E>, V extends Comparable<V>> implements 
     private int row;
     private int col;
 
-    public EdgeIterator(AdjacencyMatrix<E, V> graph) {
+    EdgeIterator(AdjacencyMatrix<E, V> graph) {
         assert graph != null;
         this.graph = graph;
         this.row = 0;

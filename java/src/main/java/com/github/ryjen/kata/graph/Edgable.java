@@ -4,6 +4,9 @@ import com.github.ryjen.kata.graph.model.Edge;
 
 /**
  * Interface for an entity that supports edges
+ *
+ * @param <E> edge type
+ * @param <V> vertex type
  */
 public interface Edgable<E extends Comparable<E>, V extends Comparable<V>> {
 

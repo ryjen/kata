@@ -3,6 +3,12 @@ package com.github.ryjen.kata.graph.formatters;
 import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.model.Edge;
 
+/**
+ * a symbol formatter that displays a symbol for valid and invalid edges
+ *
+ * @param <E> the edge type
+ * @param <V> the vertex type
+ */
 public class SymbolFormatter<E extends Comparable<E>, V extends Comparable<V>> extends VertexFormatter<E, V> {
     private static final char VALID = '●';
     private static final char INVALID = '○';
@@ -21,7 +27,7 @@ public class SymbolFormatter<E extends Comparable<E>, V extends Comparable<V>> e
     }
 
     @Override
-    public String getEdgeLabel(Edge<E, V> edge) {
+    public String formatEdge(Edge<E, V> edge) {
         if (edge == null || edge.getLabel() == null) {
             return invalid;
         }

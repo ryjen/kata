@@ -1,5 +1,10 @@
 package com.github.ryjen.kata.graph;
 
+/**
+ * An interface to indicate an entity has degrees for a vertex
+ *
+ * @param <V> vertex type
+ */
 public interface Degreable<V extends Comparable<V>> {
 
     /**

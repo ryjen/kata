@@ -4,7 +4,7 @@ import com.github.ryjen.kata.graph.Graph;
 import com.github.ryjen.kata.graph.model.Edge;
 
 /**
- * a simple format that doesn't display vertices
+ * a simple format that doesn't display vertices and empty edges
  */
 public class SimpleFormatter<E extends Comparable<E>, V extends Comparable<V>> extends EdgeFormatter<E, V> {
 
@@ -22,7 +22,7 @@ public class SimpleFormatter<E extends Comparable<E>, V extends Comparable<V>> e
 
         for (V a : graph.vertices()) {
             for (V b : graph.vertices()) {
-                buf.append(format(getEdgeLabel(graph.getEdge(a, b))));
+                buf.append(formatWidth(formatEdge(graph.getEdge(a, b))));
                 buf.append(' ');
             }
             buf.append('\n');
@@ -30,11 +30,11 @@ public class SimpleFormatter<E extends Comparable<E>, V extends Comparable<V>> e
     }
 
     @Override
-    protected Object getEdgeLabel(Edge<E, V> edge) {
+    protected String formatEdge(Edge<E, V> edge) {
         if (edge == null || edge.getLabel() == null) {
             return " ";
         }
 
-        return edge.getLabel();
+        return String.valueOf(edge.getLabel());
     }
 }

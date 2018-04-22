@@ -3,7 +3,9 @@ package com.github.ryjen.kata.graph;
 import java.util.Collection;
 
 /**
- * Created by ryan on 2017-04-10.
+ * An interface to support vertices on an entity
+ *
+ * @param <Vertex> vertex type
  */
 public interface Vertexable<Vertex extends Comparable<Vertex>> {
 

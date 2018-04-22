@@ -46,6 +46,14 @@ abstract class AdjacentIterator<P extends Comparable<P>, E extends Comparable<E>
         return false;
     }
 
+    /**
+     * gets the property for a graph row and column
+     *
+     * @param graph the graph
+     * @param row   the row
+     * @param col   the column
+     * @return the property of the graph
+     */
     protected abstract P getPropertyForEntry(AdjacencyMatrix<E, V> graph, int row, int col);
 
     @Override

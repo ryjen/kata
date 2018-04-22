@@ -1,6 +1,11 @@
 package com.github.ryjen.kata.graph;
 
-
+/**
+ * an interface to indicate an entity is a graph that supports vertices and edges
+ *
+ * @param <E> edge type
+ * @param <V> vertex type
+ */
 public interface Graphable<E extends Comparable<E>, V extends Comparable<V>> extends Vertexable<V>, Edgable<E, V>, Degreable<V> {
 
     /**
@@ -14,5 +19,12 @@ public interface Graphable<E extends Comparable<E>, V extends Comparable<V>> ext
      * clear all vertices and edges from the instance
      */
     void clear();
+
+    /**
+     * clones this instance
+     *
+     * @return a new cloned instance
+     */
+    Graphable<E, V> copy();
 
 }

@@ -11,16 +11,18 @@ class Matrix<T> {
 
     private List<List<Optional<T>>> value;
 
-    public Matrix() {
+    /**
+     * default constructor
+     */
+    Matrix() {
     }
 
-    public Matrix(Matrix<T> other) {
+    Matrix(Matrix<T> other) {
 
         value = new ArrayList<>();
 
         for (List<Optional<T>> l : other.value) {
-            List<Optional<T>> n = new ArrayList<>();
-            n.addAll(l);
+            List<Optional<T>> n = new ArrayList<>(l);
             value.add(n);
         }
     }

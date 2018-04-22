@@ -1,7 +1,7 @@
 package com.github.ryjen.kata.heap.exceptions;
 
 /**
- * Created by ryan on 2017-03-19.
+ * Exception when heap reaches capacity
  */
 public class HeapCapacityException extends RuntimeException {
     private static final String MESSAGE = "Heap at capacity";

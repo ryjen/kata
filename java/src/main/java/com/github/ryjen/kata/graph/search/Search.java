@@ -2,7 +2,6 @@ package com.github.ryjen.kata.graph.search;
 
 import com.github.ryjen.kata.graph.Graph;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -64,10 +63,6 @@ public abstract class Search<E extends Comparable<E>, V extends Comparable<V>> {
 
     void callback(V v) {
         callback.onSearchVisit(v);
-    }
-
-    public Set<V> getVisited() {
-        return Collections.unmodifiableSet(visited);
     }
 
     public Graph<E, V> getGraph() {

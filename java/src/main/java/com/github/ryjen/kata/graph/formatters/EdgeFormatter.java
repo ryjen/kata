@@ -7,6 +7,12 @@ import com.github.ryjen.kata.graph.model.Edge;
 import java.util.OptionalInt;
 import java.util.stream.StreamSupport;
 
+/**
+ * formats a graph using edges
+ *
+ * @param <E> the edge type
+ * @param <V> the vertex type
+ */
 public abstract class EdgeFormatter<E extends Comparable<E>, V extends Comparable<V>> implements Formatter {
     protected final int width;
     protected final Graph<E, V> graph;
@@ -28,9 +34,15 @@ public abstract class EdgeFormatter<E extends Comparable<E>, V extends Comparabl
      * @param object the object to format
      * @return a string representation of the object that is at maximum width characters wide
      */
-    protected String format(Object object) {
+    protected String formatWidth(Object object) {
         return String.format("%-" + width + "s", object);
     }
 
-    protected abstract Object getEdgeLabel(Edge<E, V> edge);
+    /**
+     * formats an edge object
+     *
+     * @param edge
+     * @return
+     */
+    protected abstract String formatEdge(Edge<E, V> edge);
 }

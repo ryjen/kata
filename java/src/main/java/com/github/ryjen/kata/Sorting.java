@@ -5,10 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by ryan on 2017-03-12.
+ * Sorting algorithm implementations
  */
 public final class Sorting {
-
 
     /**
      * ALGORITHM merge(B[0..p-1], C[0..q-1], A[0..p+q-1])

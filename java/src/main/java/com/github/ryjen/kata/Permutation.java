@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created by ryan on 2017-02-04.
+ * Class to generate permuations
  */
 public final class Permutation<T> extends ArrayList<List<T>> {
 

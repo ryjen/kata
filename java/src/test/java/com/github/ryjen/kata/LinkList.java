@@ -88,7 +88,7 @@ public class LinkList {
             if (!values.contains(node.data)) {
                 values.add(node.data);
                 previous = node;
-            } else {
+            } else if (previous != null) {
                 previous.next = node.next;
                 // TODO: recycle node?
             }

@@ -5,7 +5,7 @@ import com.github.ryjen.kata.graph.Graph;
 import java.util.StringJoiner;
 
 /**
- * Format a matrix output in list format
+ * Format a vertices in list format
  */
 public class ListFormatter<E extends Comparable<E>, V extends Comparable<V>> implements Formatter {
 

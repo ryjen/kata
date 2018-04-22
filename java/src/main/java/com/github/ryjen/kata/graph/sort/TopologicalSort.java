@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Created by ryan on 2017-04-01.
+ * Topological sort for a graph
  */
 public class TopologicalSort<E extends Comparable<E>, V extends Comparable<V>> {
 

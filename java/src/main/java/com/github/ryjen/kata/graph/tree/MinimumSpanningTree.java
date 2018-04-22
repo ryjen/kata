@@ -8,13 +8,13 @@ import com.github.ryjen.kata.graph.model.Edge;
 import java.util.*;
 
 /**
- * Created by ryan on 2017-04-18.
+ * Implements minimum spanning tree algorithms
  */
 public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Comparable<V>> {
 
     final Graph<E, V> graph;
 
-    MinimumSpanningTree(Graph<E, V> graph) throws GraphDirectedException, GraphCyclicException {
+    private MinimumSpanningTree(Graph<E, V> graph) throws GraphDirectedException, GraphCyclicException {
         assert graph != null;
         this.graph = graph;
         if (graph.isDirected()) {
@@ -32,6 +32,12 @@ public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Com
      */
     public abstract Iterable<Edge<E, V>> find();
 
+    /**
+     * Prims implementation
+     *
+     * @param <E> edge type
+     * @param <V> vertex type
+     */
     public static class Prims<E extends Comparable<E>, V extends Comparable<V>> extends MinimumSpanningTree<E, V> {
 
         public Prims(Graph<E, V> graph) throws GraphDirectedException, GraphCyclicException {
@@ -90,6 +96,12 @@ public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Com
 
     }
 
+    /**
+     * Kruskals implementation
+     *
+     * @param <E> edge type
+     * @param <V> vertex type
+     */
     public static class Kruskals<E extends Comparable<E>, V extends Comparable<V>> extends MinimumSpanningTree<E, V> {
 
         final DisjointedSet<V> sets;

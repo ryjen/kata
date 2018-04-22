@@ -137,9 +137,9 @@ use maven or import maven project
 TODO
 ====
 
-- shortest path
-- dynamic programming
-- string matching
-- ropes (text editor strings)
-- binary trees
-- backtracking
+[x] shortest path
+[ ] dynamic programming
+[ ] string matching
+[ ] ropes (text editor strings)
+[ ] binary trees
+[ ] backtracking

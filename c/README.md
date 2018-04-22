@@ -7,7 +7,7 @@ coda_list
 =======
 
 
-See [README](src/coda/collections/README.md)
+See [README](src/coda/life/lists/README.md)
 
 
 TODO

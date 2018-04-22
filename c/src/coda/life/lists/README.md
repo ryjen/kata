@@ -82,6 +82,6 @@ coda_list_sort(list);
 
 ## TODO
 
-- unit tests (sigh, no TDD)
-- doubly linked list implementation
+[x] unit tests (sigh, no TDD)
+[ ] doubly linked list implementation
 

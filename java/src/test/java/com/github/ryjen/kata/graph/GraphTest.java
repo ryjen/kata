@@ -189,7 +189,7 @@ public abstract class GraphTest {
         buf.append("Z │ ○ ○ ○ ○ ○ \n");
 
         String expected = buf.toString();
-        String actual = graph.toString(new EmptyLabelFormatter<>(graph));
+        String actual = graph.toString(new LabelFormatter<>(graph));
 
         Assert.assertEquals(expected, actual);
     }

@@ -122,7 +122,7 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(Edge::getTo).collect(Collectors.toSet());
+        return vertexList.get(v).stream().map(Edge::getTo).collect(Collectors.toList());
     }
 
     @Override

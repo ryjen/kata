@@ -2,6 +2,7 @@ package com.github.ryjen.kata.graph.search;
 
 import com.github.ryjen.kata.graph.Graph;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -9,7 +10,6 @@ import java.util.Set;
  * an abstract class to implement a search on an graph
  */
 public abstract class Search<E extends Comparable<E>, V extends Comparable<V>> {
-    private final Set<V> visited;
     private final Graph<E, V> graph;
     private final OnVisit<V> callback;
 
@@ -24,8 +24,6 @@ public abstract class Search<E extends Comparable<E>, V extends Comparable<V>> {
 
         this.graph = graph;
         this.callback = callback;
-
-        visited = new LinkedHashSet<>(graph.size());
     }
 
     /**
@@ -46,20 +44,15 @@ public abstract class Search<E extends Comparable<E>, V extends Comparable<V>> {
      * @param v the vertex
      * @return true if the vertex has been visited
      */
-    boolean isVisited(V v) {
-        assert v != null;
-        return visited.contains(v);
-    }
+    public abstract boolean isVisited(V v);
 
     /**
      * flags a vertex as visited
      *
      * @param v the vertex
      */
-    void visit(V v) {
-        assert v != null;
-        visited.add(v);
-    }
+    public abstract void visit(V v);
+
 
     void callback(V v) {
         callback.onSearchVisit(v);

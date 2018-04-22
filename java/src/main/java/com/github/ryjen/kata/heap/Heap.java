@@ -119,15 +119,16 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
      * @throws NoSuchElementException if the error handler does
      */
     private E remove(int position, boolean nullOnEmpty) {
-        if (values.isEmpty()) {
+        if (values.isEmpty() || position >= values.size()) {
             if (nullOnEmpty) {
                 return null;
             }
             throw new NoSuchElementException();
         }
+
         swap(position, values.size() - 1);
         E removeNode = values.remove(values.size() - 1);
-        bubbleDown(position, values.size() - 1);
+        bubbleDown();
         return removeNode;
     }
 
@@ -241,12 +242,7 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
         assert value != null;
         // append value
         if (values.add(value)) {
-            // bubble it up
-            int start = Util.parent(values.size() - 1);
-            while (start >= 0) {
-                bubbleUp(start--, values.size() - 1);
-            }
-
+            bubbleUp();
             return true;
         }
         return false;
@@ -254,49 +250,42 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
 
     /**
      * bubble a value from the bottom of the heap to its correct location
-     *
-     * @param start the start position
-     * @param end   the end position
      */
-    private void bubbleUp(int start, int end) {
-        int child = end;
-        while (child >= start) {
-            int parent = Util.parent(child);
-            if (isMin(parent, child)) {
-                swap(parent, child);
-                child = parent;
-            } else {
-                return;
-            }
+    private void bubbleUp() {
+        int pos = values.size()-1;
+        int parent = Util.parent(pos);
+        while (pos >= 0 && parent >= 0 && isMin(parent, pos)) {
+            swap(pos,parent);
+            pos = parent;
+            parent = Util.parent(pos);
         }
     }
 
     /**
      * bubble down a value to its correct position
-     *
-     * @param start the start position
-     * @param end   the end position
      */
-    private void bubbleDown(int start, int end) {
-        int root = start;
+    private void bubbleDown() {
+        int pos = 0;
 
-        int child = Util.leftChild(root);
+        while(true) {
+            int left = Util.leftChild(pos);
+            int right = Util.rightChild(pos);
+            int length = values.size();
+            int largest = pos;
 
-        while (child <= end) {
-            int swap = root;
+            if (left < length && isMin(largest, left)) {
+                pos = left;
+            }
+            if (right < length && isMin(largest, right)) {
+                pos = right;
+            }
+            if (pos != largest) {
 
-            if (isMin(swap, child)) {
-                swap = child;
+                swap(largest, pos);
+                pos = largest;
+                continue;
             }
-            if (child + 1 <= end && isMin(swap, child + 1)) {
-                swap = child + 1;
-            }
-            if (swap == root) {
-                return;
-            }
-            swap(root, swap);
-            root = swap;
-            child = Util.leftChild(root);
+            break;
         }
     }
 
@@ -357,7 +346,7 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
      * @throws NoSuchElementException if the error handler does
      */
     private E get(int position, boolean nullOnEmpty) {
-        if (values.isEmpty()) {
+        if (values.isEmpty() || position < 0 || position >= values.size()) {
             if (nullOnEmpty) {
                 return null;
             }
@@ -414,27 +403,46 @@ public class Heap<E extends Comparable<E>> implements Queue<E> {
         return array;
     }
 
+    public void update(E item) {
+        int pos = values.indexOf(item);
+        if (pos == -1) {
+            return;
+        }
+
+        // check heap condition at parent
+        int par = Util.parent(pos);
+        if (par >= 0 && isMin(par, pos)) {
+            bubbleUp();
+            return;
+        }
+
+        int child = Util.leftChild(pos);
+        if (child < values.size()) {
+            // check heap condition at child
+            if (isMin(pos, child)) {
+                bubbleDown();
+            }
+        }
+    }
+
     /**
      * utility methods
      */
     private interface Util {
 
-        static int parent(int index) {
-            if (index < 0) {
-                return 0;
-            }
-            return (index - 1) / 2;
+        static int parent(int child) {
+            if (child > 0 && child % 2 == 0)
+                return (child /2 ) -1;
+            else
+                return child/2;
         }
 
         static int leftChild(int index) {
-            if (index < 0) {
-                return 0;
-            }
             return (2 * index) + 1;
         }
 
         static int rightChild(int index) {
-            return leftChild(index) + 1;
+            return (2 * index) + 2;
         }
 
     }

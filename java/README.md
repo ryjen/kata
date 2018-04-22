@@ -12,7 +12,7 @@ Various code kata in Java
 // could also be AdjacencyList<>() with the same result
 // as the output isn't implementation dependent
 
-Graph<String> graph = new AdjacencyMatrix<>();
+Graph<Intger,String> graph = Graph<>();
 
 // add some vertices
 
@@ -20,12 +20,14 @@ graph.addVertices("Hello", "World", "Robot", "Unnecessary", "Point");
 
 // add some edges between vertices
         
-graph.addEdge("World", "Robot");
+graph.addEdge("World", "Robot", 1);
 
-graph.addEdge("Hello", "Point");
+graph.addEdge("Hello", "Point", 2);
+```
 
-// print as a matrix
-System.out.println(graph.toString(new VertexFormatter<>(graph)));
+```Java
+// print as a symbol matrix
+System.out.println(graph.toString(new SymbolFormatter<>(graph)));
 
 /*
  * OUTPUT:
@@ -38,7 +40,24 @@ System.out.println(graph.toString(new VertexFormatter<>(graph)));
  * Point       │ ●           ○           ○           ○           ○           
  *
  */
-````
+```
+
+```Java
+// print as a edge label matrix
+System.out.println(graph.toString(new LabelFormatter<>(graph)));
+
+/*
+ * OUTPUT:
+ *             │ Hello       World       Robot       Unnecessary Point       
+ * ────────────┼─────────────────────────────────────────────────────────────
+ * Hello       │ ○           ○           ○           ○           2           
+ * World       │ ○           ○           1           ○           ○           
+ * Robot       │ ○           1           ○           ○           ○           
+ * Unnecessary │ ○           ○           ○           ○           ○           
+ * Point       │ 2           ○           ○           ○           ○           
+ *
+ */
+```
 
 [Heaps](src/main/java/com/github/ryjen/kata/heap)
 =====
@@ -118,8 +137,6 @@ use maven or import maven project
 TODO
 ====
 
-- move directedness into edges
-- minimum spanning trees
 - shortest path
 - dynamic programming
 - string matching

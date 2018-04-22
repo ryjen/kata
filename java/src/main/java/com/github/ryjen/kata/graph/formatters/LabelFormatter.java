@@ -9,16 +9,16 @@ import com.github.ryjen.kata.graph.model.Edge;
  * @param <E>
  * @param <V>
  */
-public class EmptyLabelFormatter<E extends Comparable<E>, V extends Comparable<V>> extends VertexFormatter<E, V> {
+public class LabelFormatter<E extends Comparable<E>, V extends Comparable<V>> extends VertexFormatter<E, V> {
     private static final char INVALID = '○';
     private final String empty;
 
-    public EmptyLabelFormatter(Graph<E, V> graph, String empty) {
+    public LabelFormatter(Graph<E, V> graph, String empty) {
         super(graph);
         this.empty = empty;
     }
 
-    public EmptyLabelFormatter(Graph<E, V> graph) {
+    public LabelFormatter(Graph<E, V> graph) {
         this(graph, String.valueOf(INVALID));
     }
 

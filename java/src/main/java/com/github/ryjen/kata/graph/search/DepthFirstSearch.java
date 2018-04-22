@@ -2,10 +2,7 @@ package com.github.ryjen.kata.graph.search;
 
 import com.github.ryjen.kata.graph.Graph;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * A Depth-First implementation of search
@@ -13,6 +10,7 @@ import java.util.Stack;
 public class DepthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> extends Search<E, V> {
 
     private final Ordering ordering;
+    private final Set<V> visited = new LinkedHashSet<>();
 
     public DepthFirstSearch(Graph<E, V> graph, OnVisit<V> callback) {
         this(graph, callback, Ordering.Pre);
@@ -37,6 +35,16 @@ public class DepthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> 
                 searchReversePostOrder(v);
                 break;
         }
+    }
+
+    @Override
+    public boolean isVisited(V v) {
+        return visited.contains(v);
+    }
+
+    @Override
+    public void visit(V v) {
+        visited.add(v);
     }
 
     /**

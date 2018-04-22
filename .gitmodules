@@ -1,3 +1,6 @@
 [submodule "c/cmake"]
 	path = c/cmake
 	url = http://github.com/ryjen/cmake.git
+[submodule "challenges"]
+	path = challenges
+	url = https://github.com/ryjen/challenges

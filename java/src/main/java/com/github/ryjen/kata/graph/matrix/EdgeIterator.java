@@ -8,13 +8,13 @@ import java.util.NoSuchElementException;
 /**
  * Iterates edges in a graph
  */
-class EdgeIterator<E extends Comparable<E>, V extends Comparable<V>> implements Iterator<Edge<E,V>>, Iterable<Edge<E,V>> {
+class EdgeIterator<E extends Comparable<E>, V extends Comparable<V>> implements Iterator<Edge<E, V>>, Iterable<Edge<E, V>> {
 
-    private final AdjacencyMatrix<E,V> graph;
+    private final AdjacencyMatrix<E, V> graph;
     private int row;
     private int col;
 
-    public EdgeIterator(AdjacencyMatrix<E,V> graph) {
+    public EdgeIterator(AdjacencyMatrix<E, V> graph) {
         assert graph != null;
         this.graph = graph;
         this.row = 0;
@@ -22,7 +22,7 @@ class EdgeIterator<E extends Comparable<E>, V extends Comparable<V>> implements 
     }
 
     @Override
-    public Iterator<Edge<E,V>> iterator() {
+    public Iterator<Edge<E, V>> iterator() {
         return this;
     }
 
@@ -42,7 +42,7 @@ class EdgeIterator<E extends Comparable<E>, V extends Comparable<V>> implements 
     }
 
     @Override
-    public Edge<E,V> next() {
+    public Edge<E, V> next() {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }

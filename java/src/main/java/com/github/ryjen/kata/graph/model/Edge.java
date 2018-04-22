@@ -1,36 +1,34 @@
 package com.github.ryjen.kata.graph.model;
 
-import com.github.ryjen.kata.graph.Vertexable;
-
-import java.util.*;
+import java.util.Objects;
 
 /**
  * represents and edge between two vertices.
- * @see Factory
  */
-public class Edge<T extends Comparable<T>, V extends Comparable<V>> implements Comparable<Edge<T, V>>, Vertexable<V> {
+public class Edge<T extends Comparable<T>, V extends Comparable<V>> implements Comparable<Edge<T, V>> {
 
     private V from;
-    private Set<V> endpoints;
+    private V to;
     private final T label;
 
     /**
      * create an edge with a label
+     *
      * @param label
      */
     public Edge(T label) {
         this.label = label;
-        this.endpoints = null;
+        this.to = null;
     }
 
     public Edge() {
         this.label = null;
-        this.endpoints = null;
+        this.to = null;
     }
 
-    public Edge(Edge<T,V> other) {
+    public Edge(Edge<T, V> other) {
         this.label = other.label;
-        this.endpoints = null;
+        this.to = null;
     }
 
     /**
@@ -42,11 +40,7 @@ public class Edge<T extends Comparable<T>, V extends Comparable<V>> implements C
         return label;
     }
 
-    public Set<V> getEndpoints() {
-        return Collections.unmodifiableSet(endpoints());
-    }
-
-    public Edge<T,V> setFrom(V vertex) {
+    public Edge<T, V> setFrom(V vertex) {
         this.from = vertex;
         return this;
     }
@@ -55,36 +49,13 @@ public class Edge<T extends Comparable<T>, V extends Comparable<V>> implements C
         return from;
     }
 
-    @Override
-    public Vertexable<V> addVertex(V vertex) {
-        endpoints().add(vertex);
+    public Edge<T, V> setTo(V vertex) {
+        this.to = vertex;
         return this;
     }
 
-    @Override
-    public Vertexable<V> addVertices(Collection<V> vertices) {
-        endpoints().addAll(vertices);
-        return this;
-    }
-
-    @Override
-    public boolean removeVertex(V vertex) {
-        return endpoints().remove(vertex);
-    }
-
-    @Override
-    public boolean containsVertex(V vertex) {
-        return endpoints().contains(vertex);
-    }
-
-    @Override
-    public Iterable<V> adjacent(V v) {
-        return Collections.emptySet();
-    }
-
-    @Override
-    public Iterable<V> vertices() {
-        return Collections.unmodifiableSet(endpoints());
+    public V getTo() {
+        return to;
     }
 
     @Override
@@ -96,26 +67,30 @@ public class Edge<T extends Comparable<T>, V extends Comparable<V>> implements C
     }
 
     @Override
-    public int compareTo(Edge<T,V> o) {
+    public int compareTo(Edge<T, V> o) {
         if (o == this) {
             return 0;
         }
 
-        if (from == null || label == null) {
+        if (label == null) {
             return 1;
         }
 
-        if (o.from == null || o.label == null) {
+        if (o.label == null) {
             return -1;
         }
 
-        int t = from.compareTo(o.from);
+        int t = label.compareTo(o.label);
 
-        if (t != 0) {
-            return t;
+        if (from != null && o.from != null) {
+            t += from.compareTo(o.from);
         }
 
-        return label.compareTo(o.label);
+        if (to != null && o.to != null) {
+            t += to.compareTo(o.to);
+        }
+
+        return t;
     }
 
     @Override
@@ -124,26 +99,27 @@ public class Edge<T extends Comparable<T>, V extends Comparable<V>> implements C
             return true;
         }
 
-        if (obj instanceof Edge<?,?>) {
-            Edge<?,?> o = (Edge<?,?>) obj;
+        if (obj instanceof Edge<?, ?>) {
+            Edge<?, ?> o = (Edge<?, ?>) obj;
 
-            return Objects.equals(o.from, from) && Objects.equals(o.label, label);
+            return Objects.equals(o.label, label) && Objects.equals(o.from, from) && Objects.equals(o.to, to);
         }
         return super.equals(obj);
     }
 
     @Override
     public int hashCode() {
-        if (label != null && from != null) {
-            return from.hashCode() + label.hashCode();
+        if (label != null) {
+            int code = label.hashCode();
+
+            if (from != null) {
+                code += from.hashCode();
+            }
+            if (to != null) {
+                code += to.hashCode();
+            }
+            return code;
         }
         return super.hashCode();
-    }
-
-    private Set<V> endpoints() {
-        if (endpoints == null) {
-            endpoints = new HashSet<>();
-        }
-        return endpoints;
     }
 }

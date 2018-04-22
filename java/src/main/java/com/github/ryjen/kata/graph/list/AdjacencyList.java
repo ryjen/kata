@@ -6,15 +6,12 @@ import com.github.ryjen.kata.graph.exceptions.NoSuchVertexException;
 import com.github.ryjen.kata.graph.model.Edge;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by ryan jennings on 2017-03-20.
  */
-public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> implements Graphable<E,V> {
+public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> implements Graphable<E, V> {
     private final Map<V, Set<Edge<E, V>>> vertexList;
 
     public AdjacencyList() {
@@ -51,14 +48,8 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
     public boolean removeVertex(V vertex) {
         if (vertexList.containsKey(vertex)) {
             vertexList.remove(vertex);
+            vertexList.values().removeIf(e -> e.removeIf(ed -> ed.getTo().compareTo(vertex) == 0));
 
-            for (Set<Edge<E, V>> list : vertexList.values()) {
-                for (Edge<E,V> edge : list) {
-                    if (edge.containsVertex(vertex)) {
-                        edge.removeVertex(vertex);
-                    }
-                }
-            }
             return true;
         }
         return false;
@@ -70,7 +61,7 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
     }
 
     @Override
-    public void addEdge(V a, V b, Edge<E,V> edge) {
+    public void addEdge(V a, V b, Edge<E, V> edge) {
         assert a != null;
         assert b != null;
 
@@ -78,15 +69,8 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
             throw new NoSuchVertexException();
         }
 
-        Set<Edge<E,V>> list = vertexList.get(a);
-
-        Optional<Edge<E,V>> existing = list.stream().filter(e -> Objects.equals(e.getLabel(), edge.getLabel())).findFirst();
-        if (!existing.isPresent()) {
-            edge.setFrom(a).addVertex(b);
-            list.add(edge);
-        } else {
-            existing.get().addVertex(b);
-        }
+        edge.setFrom(a).setTo(b);
+        vertexList.get(a).add(edge);
     }
 
     @Override
@@ -98,9 +82,9 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
             throw new NoSuchVertexException();
         }
 
-        Set<Edge<E,V>> list = vertexList.get(a);
+        Set<Edge<E, V>> list = vertexList.get(a);
 
-        return list.removeIf(e -> e.getEndpoints().contains(b));
+        return list.removeIf(e -> e.getTo().compareTo(b) == 0);
     }
 
     @Override
@@ -112,17 +96,17 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
 
         if (vertexList.containsKey(a)) {
             Set<Edge<E, V>> list = vertexList.get(a);
-            value = list.stream().anyMatch(e -> e.getEndpoints().contains(b));
+            value = list.stream().anyMatch(e -> e.getTo().compareTo(b) == 0);
         }
 
         return value;
     }
 
     @Override
-    public Edge<E,V> getEdge(V a, V b) {
+    public Edge<E, V> getEdge(V a, V b) {
         if (vertexList.containsKey(a)) {
             Set<Edge<E, V>> list = vertexList.get(a);
-            Optional<Edge<E, V>> edge = list.stream().filter(e -> e.getEndpoints().contains(b)).findFirst();
+            Optional<Edge<E, V>> edge = list.stream().filter(e -> e.getTo().compareTo(b) == 0).findFirst();
             return edge.orElse(null);
         }
         return null;
@@ -133,7 +117,7 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
-        return vertexList.get(v).stream().map(Edge::getEndpoints).flatMap(Collection::stream).collect(Collectors.toList());
+        return vertexList.get(v).stream().map(Edge::getTo).collect(Collectors.toList());
     }
 
     @Override
@@ -147,19 +131,19 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
     }
 
     @Override
-    public Iterable<Edge<E,V>> edges() {
+    public Iterable<Edge<E, V>> edges() {
         return endpoints();
     }
 
     @Override
-    public Iterable<Edge<E,V>> edges(V v) {
+    public Iterable<Edge<E, V>> edges(V v) {
         if (!vertexList.containsKey(v)) {
             return Collections.emptySet();
         }
         return vertexList.get(v);
     }
 
-    private Collection<Edge<E,V>> endpoints() {
+    private Collection<Edge<E, V>> endpoints() {
         return vertexList.values().stream()
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
@@ -171,14 +155,13 @@ public class AdjacencyList<E extends Comparable<E>, V extends Comparable<V>> imp
         if (!vertexList.containsKey(vertex)) {
             return 0;
         }
-        return vertexList.get(vertex).stream().map(Edge::getEndpoints).mapToInt(Collection::size).sum();
+        return vertexList.get(vertex).stream().map(Edge::getTo).count();
     }
 
     @Override
     public long inDegree(V vertex) {
         return vertexList.entrySet().stream().filter(e -> e.getKey() != vertex).map(Map.Entry::getValue)
-                .flatMap(Collection::stream).map(Edge::getEndpoints)
-                .flatMap(Collection::stream).filter(e -> e == vertex).count();
+                .flatMap(Collection::stream).map(Edge::getTo).filter(e -> e == vertex).count();
     }
 
     @Override

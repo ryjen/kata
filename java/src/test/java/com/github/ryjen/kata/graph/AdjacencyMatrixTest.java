@@ -1,10 +1,9 @@
 package com.github.ryjen.kata.graph;
 
 import com.github.ryjen.kata.graph.matrix.AdjacencyMatrix;
-import com.github.ryjen.kata.graph.model.Factory;
 
 /**
- * Created by ryan on 2017-04-10.
+ * Runs the test cases with an adjacency matrix implementation
  */
 public class AdjacencyMatrixTest extends GraphTest {
 

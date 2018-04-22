@@ -16,7 +16,7 @@ import java.util.function.BiFunction;
  */
 public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> implements Graphable<E, V> {
     private static final int NOT_FOUND = -1;
-    private final Matrix<Edge<E,V>> edges;
+    private final Matrix<Edge<E, V>> edges;
     private final List<V> vertices;
 
     public AdjacencyMatrix() {
@@ -30,12 +30,12 @@ public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> i
     }
 
     @Override
-    public Iterable<Edge<E,V>> edges() {
+    public Iterable<Edge<E, V>> edges() {
         return new EdgeIterator<>(this);
     }
 
     @Override
-    public Iterable<Edge<E,V>> edges(V v) {
+    public Iterable<Edge<E, V>> edges(V v) {
         return new AdjacentEdgeIterator<>(this, v);
     }
 
@@ -46,7 +46,7 @@ public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> i
      * @param u    the upper vertex
      * @param edge the edge to set
      */
-    public void addEdge(V v, V u, Edge<E,V> edge) {
+    public void addEdge(V v, V u, Edge<E, V> edge) {
         assert v != null;
         assert u != null;
 
@@ -62,13 +62,13 @@ public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> i
             throw new NoSuchVertexException();
         }
 
-        Edge<E,V> existing = edges.get(index1, index2);
+        Edge<E, V> existing = edges.get(index1, index2);
 
         if (existing == null) {
             edges.set(index1, index2, edge);
-            edge.setFrom(v).addVertex(u);
+            edge.setFrom(v).setTo(u);
         } else {
-            existing.addVertex(u);
+            existing.setTo(u);
         }
     }
 
@@ -197,14 +197,14 @@ public class AdjacencyMatrix<E extends Comparable<E>, V extends Comparable<V>> i
      * @return true if there is an edge between vertices
      */
     @Override
-    public Edge<E,V> getEdge(V v, V u) {
+    public Edge<E, V> getEdge(V v, V u) {
         assert v != null;
         assert u != null;
 
         return getEdgeByIndices(indexOf(v), indexOf(u));
     }
 
-    Edge<E,V> getEdgeByIndices(int v, int u) {
+    Edge<E, V> getEdgeByIndices(int v, int u) {
         return edges.get(v, u);
     }
 

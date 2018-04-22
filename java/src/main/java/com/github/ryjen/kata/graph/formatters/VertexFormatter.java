@@ -1,16 +1,12 @@
 package com.github.ryjen.kata.graph.formatters;
 
 import com.github.ryjen.kata.graph.Graph;
-
-import java.util.OptionalInt;
-import java.util.stream.StreamSupport;
+import com.github.ryjen.kata.graph.model.Edge;
 
 /**
  * a formatter that displays vertices
  */
-public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> implements Formatter {
-    private final int width;
-    private final Graph<E, V> graph;
+public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> extends EdgeFormatter<E, V> {
 
     /**
      * construct a new graph vertex formatter
@@ -18,25 +14,7 @@ public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> i
      * @param graph the graph to format
      */
     public VertexFormatter(Graph<E, V> graph) {
-        assert graph != null;
-        this.graph = graph;
-        OptionalInt vertexWidth = StreamSupport.stream(graph.vertices().spliterator(), false)
-                .mapToInt(value -> String.valueOf(value).length()).max();
-        OptionalInt edgeWidth = StreamSupport.stream(graph.edges().spliterator(), false)
-                .mapToInt(edge -> String.valueOf(edge).length()).max();
-        width = Math.max(vertexWidth.isPresent() ? vertexWidth.getAsInt() : 1,
-                edgeWidth.isPresent() ? edgeWidth.getAsInt() : 1);
-    }
-
-    /**
-     * formats an object to string with the calculated width
-     *
-     * @param object the object to format
-     * @param <T>    the type of object
-     * @return a string representation of the object that is at maximum width characters wide
-     */
-    private <T> String format(T object) {
-        return String.format("%-" + width + "s", object);
+        super(graph);
     }
 
     @Override
@@ -50,7 +28,7 @@ public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> i
             buf.append(" │ ");
 
             for (V b : graph.vertices()) {
-                buf.append(format(graph.getEdgeOrEmpty(a, b)));
+                buf.append(format(getEdgeLabel(graph.getEdge(a, b))));
                 buf.append(' ');
             }
             buf.append('\n');
@@ -85,5 +63,15 @@ public class VertexFormatter<E extends Comparable<E>, V extends Comparable<V>> i
         }
         buf.append('─');
         buf.append('\n');
+    }
+
+
+    @Override
+    protected Object getEdgeLabel(Edge<E, V> edge) {
+        if (edge == null || edge.getLabel() == null) {
+            return " ";
+        }
+
+        return edge.getLabel();
     }
 }

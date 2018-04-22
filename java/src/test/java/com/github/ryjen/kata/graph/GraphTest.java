@@ -2,10 +2,8 @@ package com.github.ryjen.kata.graph;
 
 import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
-import com.github.ryjen.kata.graph.formatters.ListFormatter;
-import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
-import com.github.ryjen.kata.graph.formatters.VertexFormatter;
-import com.github.ryjen.kata.graph.model.*;
+import com.github.ryjen.kata.graph.formatters.*;
+import com.github.ryjen.kata.graph.model.Edge;
 import com.github.ryjen.kata.graph.search.Ordering;
 import com.github.ryjen.kata.graph.sort.TopologicalSort;
 import com.github.ryjen.kata.graph.tree.MinimumSpanningTree;
@@ -21,22 +19,59 @@ import java.util.stream.StreamSupport;
  */
 public abstract class GraphTest {
 
+    protected abstract <E extends Comparable<E>, V extends Comparable<V>> Graphable<E, V> getImplementation();
 
-    protected abstract <E extends Comparable<E>, V extends Comparable<V>>  Graphable<E,V> getImplementation();
+    private Graph<Integer, Integer> newIndexGraph(int size, boolean directed) {
+        Graph<Integer, Integer> graph = new Graph<Integer, Integer>(getImplementation(), directed);
 
-    protected Graph<Character,Integer> newIndexGraph(int size, boolean directed) {
-        return new Graph<>(new IndexFactory(getImplementation(), size), directed);
+        for (int i = 0; i < size; i++) {
+            graph.addVertex(i);
+        }
+
+        return graph;
+    }
+
+    @Test
+    public void testDefaultGraph() {
+        Graph<?, ?> graph = new Graph();
+
+        String expected = "";
+        String actual = graph.toString();
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDefaultGraphWithVertices() {
+        Graph<?, Character> graph = new Graph();
+
+        graph.addVertex('A');
+
+        graph.addVertex('B');
+
+        graph.addVertex('C');
+
+        StringBuffer buf = new StringBuffer();
+        buf.append("  │ A B C \n");
+        buf.append("──┼───────\n");
+        buf.append("A │       \n");
+        buf.append("B │       \n");
+        buf.append("C │       \n");
+        String expected = buf.toString();
+        String actual = graph.toString(new VertexFormatter<>(graph));
+
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testUndirectedAdjacentVertices() {
 
-        Graph<Character,Integer> graph = newIndexGraph(4, false);
+        Graph<Integer, Integer> graph = newIndexGraph(4, false);
 
-        graph.addEdge(0, 1);
-        graph.addEdge(0, 2);
-        graph.addEdge(0, 3);
-        graph.addEdge(3, 2);
+        graph.addEdge(0, 1, 1);
+        graph.addEdge(0, 2, 2);
+        graph.addEdge(0, 3, 3);
+        graph.addEdge(3, 2, 4);
 
         Iterable<Integer> it = graph.adjacent(0);
 
@@ -58,12 +93,12 @@ public abstract class GraphTest {
     @Test
     public void testDirectedAdjacentVertices() {
 
-        Graph<Character,Integer> graph = newIndexGraph(4, true);
+        Graph<Integer, Integer> graph = newIndexGraph(4, true);
 
-        graph.addEdge(0, 1);
-        graph.addEdge(0, 2);
-        graph.addEdge(0, 3);
-        graph.addEdge(3, 2);
+        graph.addEdge(0, 1, 4);
+        graph.addEdge(0, 2, 5);
+        graph.addEdge(0, 3, 6);
+        graph.addEdge(3, 2, 7);
 
         Iterable<Integer> it = graph.adjacent(0);
 
@@ -84,36 +119,36 @@ public abstract class GraphTest {
 
     @Test
     public void testAddEdgeUndirected() {
-        Graph<Character,Integer> graph = newIndexGraph(4, false);
+        Graph<Integer, Integer> graph = newIndexGraph(4, false);
         Assert.assertFalse(graph.isDirected());
-        graph.addEdge(1, 2);
+        graph.addEdge(1, 2, 3);
         Assert.assertTrue(graph.isEdge(1, 2));
         Assert.assertTrue(graph.isEdge(2, 1));
     }
 
     @Test
     public void testAddEdgeDirected() {
-        Graph<Character,Integer> graph = newIndexGraph(4, true);
+        Graph<Integer, Integer> graph = newIndexGraph(4, true);
         Assert.assertTrue(graph.isDirected());
-        graph.addEdge(1, 2);
+        graph.addEdge(1, 2, 3);
         Assert.assertTrue(graph.isEdge(1, 2));
         Assert.assertFalse(graph.isEdge(2, 1));
     }
 
     @Test
     public void testMatrixToStringUndirected() {
-        Graph<Character,Integer> graph = newIndexGraph(4, false);
+        Graph<Integer, Integer> graph = newIndexGraph(4, false);
 
         Assert.assertFalse(graph.isDirected());
 
-        graph.addEdge(1, 2);
-        graph.addEdge(0, 3);
+        graph.addEdge(1, 2, 4);
+        graph.addEdge(0, 3, 5);
 
         StringBuilder buf = new StringBuilder();
-        buf.append("○ ○ ○ ● \n");
-        buf.append("○ ○ ● ○ \n");
-        buf.append("○ ● ○ ○ \n");
-        buf.append("● ○ ○ ○ \n");
+        buf.append("      5 \n");
+        buf.append("    4   \n");
+        buf.append("  4     \n");
+        buf.append("5       \n");
 
         String actual = graph.toString(new SimpleFormatter<>(graph));
         String expected = buf.toString();
@@ -123,41 +158,41 @@ public abstract class GraphTest {
 
     @Test
     public void testToStringVertices() {
-        Graph<Character,Character> graph = new Graph<>(new SymbolFactory<Character>(getImplementation()), false);
+        Graph<Character, Character> graph = new Graph<Character, Character>(getImplementation(), false);
 
         graph.addVertices(Arrays.asList('A', 'B', 'C', 'D', 'Z'));
 
-        graph.addEdge('B', 'D');
+        graph.addEdge('B', 'D', 'X');
 
         StringBuilder buf = new StringBuilder();
         buf.append("  │ A B C D Z \n");
         buf.append("──┼───────────\n");
         buf.append("A │ ○ ○ ○ ○ ○ \n");
-        buf.append("B │ ○ ○ ○ ● ○ \n");
+        buf.append("B │ ○ ○ ○ X ○ \n");
         buf.append("C │ ○ ○ ○ ○ ○ \n");
-        buf.append("D │ ○ ● ○ ○ ○ \n");
+        buf.append("D │ ○ X ○ ○ ○ \n");
         buf.append("Z │ ○ ○ ○ ○ ○ \n");
 
         String expected = buf.toString();
-        String actual = graph.toString(new VertexFormatter<>(graph));
+        String actual = graph.toString(new EmptyLabelFormatter<>(graph));
 
         Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testMatrixToStringDirected() {
-        Graph<Character,Integer> graph = newIndexGraph(4,true);
+        Graph<Integer, Integer> graph = newIndexGraph(4, true);
 
         Assert.assertTrue(graph.isDirected());
 
-        graph.addEdge(1, 2);
-        graph.addEdge(0, 3);
+        graph.addEdge(1, 2, 4);
+        graph.addEdge(0, 3, 5);
 
         StringBuilder buf = new StringBuilder();
-        buf.append("○ ○ ○ ● \n");
-        buf.append("○ ○ ● ○ \n");
-        buf.append("○ ○ ○ ○ \n");
-        buf.append("○ ○ ○ ○ \n");
+        buf.append("      5 \n");
+        buf.append("    4   \n");
+        buf.append("        \n");
+        buf.append("        \n");
 
         String actual = graph.toString(new SimpleFormatter<>(graph));
         String expected = buf.toString();
@@ -167,11 +202,11 @@ public abstract class GraphTest {
 
     @Test
     public void testListToStringDirected() {
-        Graph<Character,Integer> graph = newIndexGraph(5,true);
+        Graph<Integer, Integer> graph = newIndexGraph(5, true);
 
-        graph.addEdge(1, 2);
-        graph.addEdge(1, 4);
-        graph.addEdge(0, 3);
+        graph.addEdge(1, 2, 5);
+        graph.addEdge(1, 4, 6);
+        graph.addEdge(0, 3, 7);
 
         StringBuilder buf = new StringBuilder();
         buf.append("0 → 3\n");
@@ -188,36 +223,36 @@ public abstract class GraphTest {
 
     @Test
     public void testDegreeUndirected() {
-        Graph<Character,Integer> graph = newIndexGraph(4,false);
+        Graph<Integer, Integer> graph = newIndexGraph(4, false);
 
-        graph.addEdge(1, 2);
+        graph.addEdge(1, 2, 4);
 
         Assert.assertEquals(2, graph.degree(1));
 
-        graph.addEdge(3, 1);
+        graph.addEdge(3, 1, 5);
 
         Assert.assertEquals(4, graph.degree(1));
 
-        graph.addEdge(1, 0);
+        graph.addEdge(1, 0, 6);
 
         Assert.assertEquals(6, graph.degree(1));
 
         // no connection to vertex 1
-        graph.addEdge(2, 0);
+        graph.addEdge(2, 0, 7);
 
         Assert.assertEquals(6, graph.degree(1));
 
         // already added edge
-        graph.addEdge(2, 1);
+        graph.addEdge(2, 1, 4);
 
         Assert.assertEquals(6, graph.degree(1));
     }
 
     @Test
     public void testDegreeDirected() {
-        Graph<Character,Integer> graph = newIndexGraph(4,true);
+        Graph<Integer, Integer> graph = newIndexGraph(4, true);
 
-        graph.addEdge(1, 2);
+        graph.addEdge(1, 2, 3);
 
         Assert.assertEquals(0, graph.inDegree(1));
 
@@ -225,7 +260,7 @@ public abstract class GraphTest {
 
         Assert.assertEquals(1, graph.degree(1));
 
-        graph.addEdge(3, 1);
+        graph.addEdge(3, 1, 4);
 
         Assert.assertEquals(1, graph.inDegree(1));
 
@@ -233,7 +268,7 @@ public abstract class GraphTest {
 
         Assert.assertEquals(2, graph.degree(1));
 
-        graph.addEdge(1, 0);
+        graph.addEdge(1, 0, 5);
 
         Assert.assertEquals(1, graph.inDegree(1));
 
@@ -242,11 +277,11 @@ public abstract class GraphTest {
         Assert.assertEquals(3, graph.degree(1));
 
         // no connection to vertex 1
-        graph.addEdge(2, 0);
+        graph.addEdge(2, 0, 6);
 
         Assert.assertEquals(3, graph.degree(1));
 
-        graph.addEdge(2, 1);
+        graph.addEdge(2, 1, 7);
 
         Assert.assertEquals(2, graph.inDegree(1));
 
@@ -257,13 +292,13 @@ public abstract class GraphTest {
 
     @Test
     public void testVertexFormatting() {
-        Graph<Character, String> graph = new Graph<>(new SymbolFactory<String>(getImplementation()), false);
+        Graph<Integer, String> graph = new Graph<Integer, String>(getImplementation(), false);
 
         graph.addVertices(Arrays.asList("Hello", "World", "Robot", "Unnecessary", "Point"));
 
-        graph.addEdge("World", "Robot");
+        graph.addEdge("World", "Robot", 1);
 
-        graph.addEdge("Hello", "Point");
+        graph.addEdge("Hello", "Point", 2);
 
         StringBuilder buf = new StringBuilder();
         buf.append("            │ Hello       World       Robot       Unnecessary Point       \n");
@@ -276,7 +311,7 @@ public abstract class GraphTest {
 
         String expected = buf.toString();
 
-        String actual = graph.toString(new VertexFormatter<>(graph));
+        String actual = graph.toString(new SymbolFormatter<>(graph));
 
         Assert.assertEquals(expected, actual);
     }
@@ -284,17 +319,17 @@ public abstract class GraphTest {
     @Test
     public void testTopologicalSort() {
 
-        Graph<Character,Integer> graph = newIndexGraph(6,true);
+        Graph<Integer, Integer> graph = newIndexGraph(6, true);
 
-        graph.addEdge(5, 2);
-        graph.addEdge(5, 0);
-        graph.addEdge(4, 0);
-        graph.addEdge(4, 1);
-        graph.addEdge(2, 3);
-        graph.addEdge(3, 1);
+        graph.addEdge(5, 2, 6);
+        graph.addEdge(5, 0, 7);
+        graph.addEdge(4, 0, 8);
+        graph.addEdge(4, 1, 9);
+        graph.addEdge(2, 3, 10);
+        graph.addEdge(3, 1, 11);
 
         try {
-            TopologicalSort<Character,Integer> sorter = new TopologicalSort<>(graph);
+            TopologicalSort<Integer, Integer> sorter = new TopologicalSort<>(graph);
 
             Collection<Integer> sorted = sorter.sort();
 
@@ -309,12 +344,12 @@ public abstract class GraphTest {
 
     @Test
     public void testDirectAcyclicGraph() {
-        Graph<Character,Integer> graph = newIndexGraph(6,true);
+        Graph<Integer, Integer> graph = newIndexGraph(6, true);
 
-        graph.addEdge(4, 2);
-        graph.addEdge(2, 4);
-        graph.addEdge(1, 5);
-        graph.addEdge(3, 0);
+        graph.addEdge(4, 2, 6);
+        graph.addEdge(2, 4, 7);
+        graph.addEdge(1, 5, 8);
+        graph.addEdge(3, 0, 9);
 
         Assert.assertTrue(graph.isCyclic());
 
@@ -326,19 +361,19 @@ public abstract class GraphTest {
 
     @Test
     public void testDepthFirstSearchPreOrder() {
-        final Graph<Character, Character> g = new Graph<>(new SymbolFactory<Character>(getImplementation()), false);
+        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), false);
 
         List<Character> actual = new ArrayList<>();
 
         g.addVertices(Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G'));
 
-        g.addEdge('A', 'B');
-        g.addEdge('B', 'D');
-        g.addEdge('B', 'F');
-        g.addEdge('A', 'C');
-        g.addEdge('C', 'G');
-        g.addEdge('A', 'E');
-        g.addEdge('E', 'F');
+        g.addEdge('A', 'B', 1);
+        g.addEdge('B', 'D', 2);
+        g.addEdge('B', 'F', 3);
+        g.addEdge('A', 'C', 4);
+        g.addEdge('C', 'G', 5);
+        g.addEdge('A', 'E', 6);
+        g.addEdge('E', 'F', 7);
 
         g.dfs('A', actual::add, Ordering.Pre);
 
@@ -350,16 +385,16 @@ public abstract class GraphTest {
 
     @Test
     public void testDepthFirstSearchPostOrder() {
-        final Graph<Character, Character> g = new Graph<>(new SymbolFactory<Character>(getImplementation()), false);
+        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), false);
 
         List<Character> actual = new ArrayList<>();
 
         g.addVertices(Arrays.asList('A', 'B', 'C', 'D'));
 
-        g.addEdge('A', 'B');
-        g.addEdge('B', 'D');
-        g.addEdge('C', 'D');
-        g.addEdge('A', 'C');
+        g.addEdge('A', 'B', 1);
+        g.addEdge('B', 'D', 1);
+        g.addEdge('C', 'D', 2);
+        g.addEdge('A', 'C', 2);
 
         g.dfs('A', actual::add, Ordering.Post);
 
@@ -370,16 +405,16 @@ public abstract class GraphTest {
 
     @Test
     public void testDepthFirstSearchReversePostOrder() {
-        final Graph<Character, Character> g = new Graph<>(new SymbolFactory<Character>(getImplementation()), true);
+        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), true);
 
         List<Character> actual = new ArrayList<>();
 
         g.addVertices(Arrays.asList('A', 'B', 'C', 'D'));
 
-        g.addEdge('A', 'B');
-        g.addEdge('A', 'C');
-        g.addEdge('B', 'D');
-        g.addEdge('C', 'D');
+        g.addEdge('A', 'B', 1);
+        g.addEdge('A', 'C', 2);
+        g.addEdge('B', 'D', 3);
+        g.addEdge('C', 'D', 3);
 
         g.dfs('A', actual::add, Ordering.ReversePost);
 
@@ -390,12 +425,12 @@ public abstract class GraphTest {
 
     @Test
     public void testConnectedGraph() {
-        Graph<Character,Integer> graph = newIndexGraph(3,false);
+        Graph<Integer, Integer> graph = newIndexGraph(3, false);
 
         Assert.assertFalse(graph.isConnected());
 
-        graph.addEdge(0, 1);
-        graph.addEdge(1, 2);
+        graph.addEdge(0, 1, 3);
+        graph.addEdge(1, 2, 4);
 
         Assert.assertTrue(graph.isConnected());
 
@@ -403,16 +438,16 @@ public abstract class GraphTest {
 
     @Test
     public void testAdjacentEdges() {
-        Graph<Integer, Integer> graph = new Graph<>(new DefaultFactory<Integer, Integer>(getImplementation()), false);
+        Graph<Integer, Integer> graph = new Graph<Integer, Integer>(getImplementation(), false);
 
-        graph.addVertices(Arrays.asList(0,1,2,3,4));
+        graph.addVertices(Arrays.asList(0, 1, 2, 3, 4));
 
         graph.addEdge(0, 1, 3);
         graph.addEdge(1, 3, 4);
         graph.addEdge(2, 1, 1);
         graph.addEdge(3, 4, 3);
 
-        List<Integer> expected = Arrays.asList(1,3,4);
+        List<Integer> expected = Arrays.asList(1, 3, 4);
 
         List<Integer> actual = StreamSupport.stream(graph.edges(1).spliterator(), false).map(Edge::getLabel).sorted().collect(Collectors.toList());
 
@@ -421,7 +456,7 @@ public abstract class GraphTest {
 
     @Test
     public void testPrimsMinSpanningTree() {
-        Graph<Integer,Character> graph = new Graph<>(new DefaultFactory<Integer,Character>(getImplementation()), false);
+        Graph<Integer, Character> graph = new Graph<Integer, Character>(getImplementation(), false);
 
 
         graph.addVertices(Arrays.asList('a', 'b', 'c', 'd', 'e'));
@@ -435,7 +470,7 @@ public abstract class GraphTest {
         graph.addEdge('e', 'd', 7);
 
         try {
-            Iterable<Edge<Integer,Character>> actual = new MinimumSpanningTree.Prims<>(graph).find();
+            Iterable<Edge<Integer, Character>> actual = new MinimumSpanningTree.Prims<>(graph).find();
 
             int expected = 11;
 
@@ -448,7 +483,7 @@ public abstract class GraphTest {
 
     @Test
     public void testKruskalsMinSpanningTree() {
-        Graph<Integer, Character> graph = new Graph<>(new DefaultFactory<Integer, Character>(getImplementation()), false);
+        Graph<Integer, Character> graph = new Graph<Integer, Character>(getImplementation(), false);
 
         graph.addVertices(Arrays.asList('a', 'b', 'c', 'd', 'e'));
 

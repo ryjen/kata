@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public abstract class Search<E extends Comparable<E>, V extends Comparable<V>> {
     private final Set<V> visited;
-    private final Graph<E,V> graph;
+    private final Graph<E, V> graph;
     private final OnVisit<V> callback;
 
     /**
@@ -19,7 +19,7 @@ public abstract class Search<E extends Comparable<E>, V extends Comparable<V>> {
      *
      * @param graph the graph to search
      */
-    Search(Graph<E,V> graph, OnVisit<V> callback) {
+    Search(Graph<E, V> graph, OnVisit<V> callback) {
         assert graph != null;
         assert callback != null;
 

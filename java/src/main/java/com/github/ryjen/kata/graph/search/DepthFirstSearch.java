@@ -10,15 +10,15 @@ import java.util.Stack;
 /**
  * A Depth-First implementation of search
  */
-public class DepthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> extends Search<E,V> {
+public class DepthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> extends Search<E, V> {
 
     private final Ordering ordering;
 
-    public DepthFirstSearch(Graph<E,V> graph, OnVisit<V> callback) {
+    public DepthFirstSearch(Graph<E, V> graph, OnVisit<V> callback) {
         this(graph, callback, Ordering.Pre);
     }
 
-    public DepthFirstSearch(Graph<E,V> graph, OnVisit<V> callback, Ordering ordering) {
+    public DepthFirstSearch(Graph<E, V> graph, OnVisit<V> callback, Ordering ordering) {
         super(graph, callback);
         this.ordering = ordering;
     }

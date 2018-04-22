@@ -4,8 +4,8 @@ import com.github.ryjen.kata.graph.exceptions.GraphCyclicException;
 import com.github.ryjen.kata.graph.exceptions.GraphDirectedException;
 import com.github.ryjen.kata.graph.formatters.Formatter;
 import com.github.ryjen.kata.graph.formatters.SimpleFormatter;
+import com.github.ryjen.kata.graph.list.AdjacencyList;
 import com.github.ryjen.kata.graph.model.Edge;
-import com.github.ryjen.kata.graph.model.Factory;
 import com.github.ryjen.kata.graph.search.BreadthFirstSearch;
 import com.github.ryjen.kata.graph.search.DepthFirstSearch;
 import com.github.ryjen.kata.graph.search.Ordering;
@@ -22,32 +22,25 @@ import java.util.stream.StreamSupport;
  */
 public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements Edgable<E, V>, Vertexable<V>, Degreable<V>, Cloneable {
 
-    private Factory<E, V> factory;
-    private Graphable<E, V> impl;
-    private boolean directed;
+    private final Graphable<E, V> impl;
+    private final boolean directed;
 
     /**
-     * factory constructor
-     *
-     * @param directed true if the graph is directed
-     */
-    protected Graph(Factory<E, V> factory, boolean directed) {
-        assert factory != null;
-        this.factory = factory;
-        this.directed = directed;
-        this.impl = factory.getImplementation();
-        assert impl != null;
-    }
-
-    /**
-     *
      * @param impl
      * @param directed
      */
-    protected Graph(Graphable<E, V> impl, boolean directed) {
+    public Graph(Graphable<E, V> impl, boolean directed) {
         assert impl != null;
         this.directed = directed;
         this.impl = impl;
+    }
+
+    public Graph(boolean directed) {
+        this(new AdjacencyList<>(), directed);
+    }
+
+    public Graph() {
+        this(false);
     }
 
     /**
@@ -55,8 +48,7 @@ public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements 
      *
      * @param other the graph to copy from
      */
-    protected Graph(Graph<E, V> other) {
-        this.factory = other.factory;
+    public Graph(Graph<E, V> other) {
         this.directed = other.directed;
         this.impl = other.impl;
     }
@@ -99,20 +91,12 @@ public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements 
         return impl.vertices();
     }
 
-    public Edge<E,V> getEdgeOrEmpty(V v, V b) {
-        return isEdge(v, b) ? getEdge(v, b) : factory == null ? null : factory.getEmptyEdge();
-    }
-
-    public void addEdge(V a, V b) {
-        addEdge(a, b, factory == null ? new Edge<>() : factory.getDefaultEdge());
-    }
-
     /**
      * adds an edge with a weight between two vertices
      *
-     * @param a      the first vertex
-     * @param b      the second vertex
-     * @param label  the label of the edge
+     * @param a     the first vertex
+     * @param b     the second vertex
+     * @param label the label of the edge
      */
     public void addEdge(V a, V b, E label) {
         addEdge(a, b, new Edge<>(label));
@@ -132,7 +116,7 @@ public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements 
      * @see Search
      */
     public void dfs(V start, Search.OnVisit<V> callback, Ordering ordering) {
-        Search<E,V> dfs = new DepthFirstSearch<>(this, callback, ordering);
+        Search<E, V> dfs = new DepthFirstSearch<>(this, callback, ordering);
 
         dfs.search(start);
     }
@@ -143,7 +127,7 @@ public class Graph<E extends Comparable<E>, V extends Comparable<V>> implements 
      * @see Search
      */
     public void bfs(V start, Search.OnVisit<V> callback) {
-        Search<E,V> bfs = new BreadthFirstSearch<>(this, callback);
+        Search<E, V> bfs = new BreadthFirstSearch<>(this, callback);
 
         bfs.search(start);
     }

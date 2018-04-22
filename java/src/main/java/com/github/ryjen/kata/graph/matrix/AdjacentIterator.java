@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
  */
 abstract class AdjacentIterator<P extends Comparable<P>, E extends Comparable<E>, V extends Comparable<V>> implements Iterator<P>, Iterable<P> {
 
-    private final AdjacencyMatrix<E,V> graph;
+    private final AdjacencyMatrix<E, V> graph;
     private final int x;
     private int y;
     private V vertex;
@@ -19,7 +19,7 @@ abstract class AdjacentIterator<P extends Comparable<P>, E extends Comparable<E>
      * @param graph  the graph to search
      * @param vertex the vertex index to search from
      */
-    AdjacentIterator(AdjacencyMatrix<E,V> graph, V vertex) {
+    AdjacentIterator(AdjacencyMatrix<E, V> graph, V vertex) {
         assert graph != null;
         assert vertex != null;
         this.graph = graph;
@@ -46,7 +46,7 @@ abstract class AdjacentIterator<P extends Comparable<P>, E extends Comparable<E>
         return false;
     }
 
-    protected abstract P getPropertyForEntry(AdjacencyMatrix<E,V> graph, int row, int col);
+    protected abstract P getPropertyForEntry(AdjacencyMatrix<E, V> graph, int row, int col);
 
     @Override
     public P next() {

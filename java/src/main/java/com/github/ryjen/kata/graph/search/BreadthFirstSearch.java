@@ -8,9 +8,9 @@ import java.util.Queue;
 /**
  * A Breadth-First implementation of search
  */
-public class BreadthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> extends Search<E,V> {
+public class BreadthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> extends Search<E, V> {
 
-    public BreadthFirstSearch(Graph<E,V> graph, OnVisit<V> callback) {
+    public BreadthFirstSearch(Graph<E, V> graph, OnVisit<V> callback) {
         super(graph, callback);
     }
 

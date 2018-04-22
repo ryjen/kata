@@ -66,7 +66,7 @@ public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Com
                     break;
                 }
 
-                reached.addAll(min.getEndpoints());
+                reached.add(min.getTo());
                 result.add(min);
             }
 
@@ -80,7 +80,7 @@ public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Com
             for (V vertex : reached) {
                 for (Edge<E, V> adj : graph.edges(vertex)) {
 
-                    if (!reached.containsAll(adj.getEndpoints()) && (min == null || min.getLabel().compareTo(adj.getLabel()) > 0)) {
+                    if (!reached.contains(adj.getTo()) && (min == null || min.getLabel().compareTo(adj.getLabel()) > 0)) {
                         min = adj;
                     }
                 }
@@ -106,7 +106,7 @@ public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Com
         @Override
         public Iterable<Edge<E, V>> find() {
 
-            Set<Edge<E,V>> result = new TreeSet<>(Edge::compareTo);
+            Set<Edge<E, V>> result = new TreeSet<>(Comparator.comparing(Edge::getLabel));
 
             for (V v : graph.vertices()) {
                 sets.makeSet(v);
@@ -125,18 +125,16 @@ public abstract class MinimumSpanningTree<E extends Comparable<E>, V extends Com
                     continue;
                 }
 
-                for (V v : edge.getEndpoints()) {
+                Set<V> b = sets.find(edge.getTo());
 
-                    Set<V> b = sets.find(v);
 
-                    if (b == null) {
-                        continue;
-                    }
+                if (b == null) {
+                    continue;
+                }
 
-                    if (!a.containsAll(b)) {
-                        if (sets.union(a, b)) {
-                            result.add(edge);
-                        }
+                if (!a.containsAll(b)) {
+                    if (sets.union(a, b)) {
+                        result.add(edge);
                     }
                 }
             }

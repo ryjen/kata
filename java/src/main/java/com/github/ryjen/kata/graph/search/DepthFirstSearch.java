@@ -51,24 +51,16 @@ public class DepthFirstSearch<E extends Comparable<E>, V extends Comparable<V>> 
      * starts the search
      */
     private void searchPreOrder(V v) {
-        Stack<V> stack = new Stack<>();
-        stack.add(v);
 
-        while (!stack.isEmpty()) {
+        if (isVisited(v)) {
+            return;
+        }
 
-            v = stack.pop();
+        visit(v);
+        callback(v);
 
-            if (isVisited(v)) {
-                continue;
-            }
-
-            visit(v);
-
-            callback(v);
-
-            for (V w : adjacent(v)) {
-                stack.push(w);
-            }
+        for (V w : adjacent(v)) {
+            searchPreOrder(w);
         }
     }
 

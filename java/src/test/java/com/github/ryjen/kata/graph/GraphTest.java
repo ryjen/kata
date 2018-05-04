@@ -376,45 +376,50 @@ public abstract class GraphTest {
 
 
     @Test
-    public void testDepthFirstSearchPreOrder() {
-        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), false);
+    public void testDepthFirstsearchPreOrder() {
+        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), true);
 
         List<Character> actual = new ArrayList<>();
 
-        g.addVertices(Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G'));
+        g.addVertices(Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'));
 
-        g.addEdge('A', 'B', 1);
-        g.addEdge('B', 'D', 2);
-        g.addEdge('B', 'F', 3);
-        g.addEdge('A', 'C', 4);
-        g.addEdge('C', 'G', 5);
-        g.addEdge('A', 'E', 6);
-        g.addEdge('E', 'F', 7);
+        g.addEdge('F', 'B', 1);
+        g.addEdge('F', 'G', 1);
+        g.addEdge('B', 'A', 1);
+        g.addEdge('B', 'D', 1);
+        g.addEdge('G', 'I', 1);
+        g.addEdge('I', 'H', 1);
+        g.addEdge('D', 'C', 1);
+        g.addEdge('D', 'E', 1);
 
-        g.dfs('A', actual::add, Ordering.Pre);
+        List<Character> expected = Arrays.asList('F', 'B', 'A', 'D', 'C', 'E', 'G', 'I', 'H');
 
-        List<Character> expected = Arrays.asList('A', 'E', 'F', 'B', 'D', 'C', 'G');
+        g.dfs('F', actual::add, Ordering.Pre);
 
         Assert.assertEquals(expected, actual);
     }
 
-
     @Test
     public void testDepthFirstSearchPostOrder() {
-        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), false);
+        final Graph<Integer, Character> g = new Graph<Integer, Character>(getImplementation(), true);
 
         List<Character> actual = new ArrayList<>();
 
-        g.addVertices(Arrays.asList('A', 'B', 'C', 'D'));
+        g.addVertices(Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'));
 
-        g.addEdge('A', 'B', 1);
+        g.addEdge('F', 'B', 1);
+        g.addEdge('F', 'G', 1);
+        g.addEdge('B', 'A', 1);
         g.addEdge('B', 'D', 1);
-        g.addEdge('C', 'D', 2);
-        g.addEdge('A', 'C', 2);
+        g.addEdge('G', 'I', 1);
+        g.addEdge('I', 'H', 1);
+        g.addEdge('D', 'C', 1);
+        g.addEdge('D', 'E', 1);
 
-        g.dfs('A', actual::add, Ordering.Post);
 
-        List<Character> expected = Arrays.asList('C', 'D', 'B', 'A');
+        g.dfs('F', actual::add, Ordering.Post);
+
+        List<Character> expected = Arrays.asList('A', 'C', 'E', 'D', 'B', 'H', 'I', 'G', 'F');
 
         Assert.assertEquals(expected, actual);
     }

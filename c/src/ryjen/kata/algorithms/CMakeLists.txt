@@ -13,3 +13,6 @@ string(REPLACE "_" "/" INSTALL_DIRECTORY ${ALGORITHMS_LIB})
 
 install(FILES ${HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include/${INSTALL_DIRECTORY}")
 
+add_executable(dvr dvr.c)
+
+

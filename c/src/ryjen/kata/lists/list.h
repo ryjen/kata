@@ -1,7 +1,7 @@
 #ifndef RJ_KATA_LIST_H
 #define RJ_KATA_LIST_H
 
-#include <coda/life/lists/list-item.h>
+#include <ryjen/kata/lists/list-item.h>
 
 typedef struct __coda_list CodaList;
 

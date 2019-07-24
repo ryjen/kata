@@ -1,7 +1,7 @@
 #include <assert.h>
-#include <coda/life/graphs/adjacency-matrix.h>
-#include <coda/life/graphs/edge.h>
-#include <coda/life/graphs/vertex.h>
+#include <ryjen/kata/graphs/adjacency-matrix.h>
+#include <ryjen/kata/graphs/edge.h>
+#include <ryjen/kata/graphs/vertex.h>
 #include <stdlib.h>
 #include "internal.h"
 

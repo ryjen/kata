@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <coda/life/lists/list-item.h>
-#include <coda/life/lists/list-vtable.h>
+#include <ryjen/kata/lists/list-item.h>
+#include <ryjen/kata/lists/list-vtable.h>
 #include "internal.h"
 
 typedef struct __coda_slist CodaSList;

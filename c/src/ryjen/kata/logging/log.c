@@ -3,8 +3,8 @@
 #include <execinfo.h>
 #endif
 
-#include <coda/life/logging/error.h>
-#include <coda/life/logging/log.h>
+#include <ryjen/kata/logging/error.h>
+#include <ryjen/kata/logging/log.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -8,7 +8,7 @@
 
 #include <cmocka.h>
 
-#include <coda/life/algorithms/math.h>
+#include <ryjen/kata/algorithms/math.h>
 
 static void test_coda_gcd_valid(void **state)
 {

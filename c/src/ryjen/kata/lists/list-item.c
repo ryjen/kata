@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "internal.h"
-#include <coda/life/lists/list-item.h>
+#include <ryjen/kata/lists/list-item.h>
 
 CodaListItem *coda_list_item_new(void *data, size_t size, CodaListCompareCallback comparer) {
     return coda_list_item_new_transient(data, size, comparer, malloc, free, memmove);

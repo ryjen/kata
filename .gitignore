@@ -39,3 +39,6 @@ debug
 target
 *.log
 *.iml
+
+*/__pycache__
+*.pyc
